@@ -1,0 +1,22 @@
+{
+  "name": "devcom-africa",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Plateforme d'échange panafricaine : pour les devs, par les devs — Systalink Challenge 2026 | Binary Minds (Bénin)",
+  "scripts": {
+    "dev": "python -m http.server 3000",
+    "serve": "python -m http.server 3000",
+    "build": "echo 'Build OK for Vercel Edge deployment'"
+  },
+  "keywords": [
+    "systalink-challenge",
+    "coupe-afrique-developpeurs",
+    "binary-minds",
+    "devcom",
+    "mobile-money",
+    "benin",
+    "africa-tech"
+  ],
+  "author": "Modeste YABLA <arcaneai2007@gmail.com> (Binary Minds)",
+  "license": "MIT"
+}
