@@ -1,60 +1,92 @@
 /**
- * DevCom Africa — Logique & Interactivité
- * Coupe d'Afrique des Développeurs 2026 | Systalink Challenge
- * Équipe : Binary Minds (Bénin 🇧🇯)
+ * DevCom Africa — Logique & Interactivité (Plateforme Réelle)
+ * La plateforme d'échange africaine : pour les devs, par les devs
  */
 
 // ==========================================================================
-// Base de données initiale des Solutions & Snippets Africains
+// 1. Catalogue de Composants & APIs Africaines
 // ==========================================================================
-const INITIAL_SNIPPETS = [
+const INITIAL_COMPONENTS = [
   {
-    id: "momo-webhook-verify",
-    title: "Vérificateur de Webhook MTN MoMo & Moov Bénin / CI",
+    id: "momo-pay",
+    title: "@devcom/momo-pay",
     category: "mobile-money",
     lang: "typescript",
     country: "BJ",
     countryFlag: "🇧🇯 Bénin",
     verified: true,
-    author: "Koffi A.",
-    authorAvatar: "KA",
+    author: "Modeste YABLA",
+    authorAvatar: "MY",
+    downloads: "4.8k",
+    rating: 4.9,
     upvotes: 142,
-    desc: "Valide les signatures HMAC SHA256 des webhooks MTN et Moov Money, avec gestion automatique des timeouts réseau et déduplication des callbacks.",
-    code: `import crypto from 'crypto';
+    installCmd: "npm i @devcom/momo-pay",
+    desc: "SDK TypeScript & Node.js unifié pour MTN MoMo et Moov Money avec vérification de signature HMAC, déduplication des webhooks et retry automatique.",
+    code: `import { MoMoClient } from '@devcom/momo-pay';
 
-interface MoMoWebhookPayload {
-  transactionId: string;
-  amount: number;
-  currency: 'XOF';
-  senderPhone: string;
-  signature: string;
-}
+const client = new MoMoClient({
+  subscriptionKey: process.env.MOMO_KEY!,
+  apiUser: process.env.MOMO_USER!,
+  apiKey: process.env.MOMO_SECRET!,
+  environment: 'sandbox' // 'production' pour l'Afrique de l'Ouest
+});
 
-export function verifyMoMoSignature(payload: MoMoWebhookPayload, secretKey: string): boolean {
-  const dataToSign = \`\${payload.transactionId}:\${payload.amount}:\${payload.senderPhone}\`;
-  const computedHash = crypto
-    .createHmac('sha256', secretKey)
-    .update(dataToSign)
-    .digest('hex');
-  return crypto.timingSafeEqual(Buffer.from(payload.signature), Buffer.from(computedHash));
-}
-
-// Exemple d'utilisation dans une route API Next.js / Node
-export async function handlePaymentCallback(req: any) {
-  const isValid = verifyMoMoSignature(req.body, process.env.MOMO_SECRET_KEY!);
-  if (!isValid) throw new Error("Signature de paiement invalide !");
-  return { status: "SUCCESS", message: "Crédit alloué sur Systalink Datacloud" };
+// Initialiser une demande de paiement (C2B)
+export async function requestPayment(phone: string, amount: number) {
+  const payment = await client.requestToPay({
+    amount: amount,
+    currency: 'XOF',
+    payer: { partyIdType: 'MSISDN', partyId: phone },
+    payerMessage: 'Abonnement DevCom Pro',
+    payeeNote: 'Merci pour votre confiance'
+  });
+  return payment;
 }`,
-    simulationOutput: `[INFO] Initialisation du vérificateur MTN MoMo (Bénin / CI)...
-[TEST] Envoi d'un webhook simulé : Tx #BJ-98234, Montant : 15 000 XOF
-[HASH] Signature reçue : a7b2e8f190c4...
-[COMPUTED] Signature calculée : a7b2e8f190c4...
-[RESULT]  VALIDATION RÉUSSIE (Timing-Safe) !
-[STATUS] Paiement 15,000 XOF validé via MoMo Bénin. Réponse HTTP 200 renvoyée.`
+    simulationOutput: `[MOMO-PAY] Initialisation du client Sandbox MoMo Bénin...
+[REQUEST] Appel C2B : 15 000 XOF vers +229 97 00 00 00
+[DISPATCH] Notification Push USSD envoyée sur le terminal client...
+[WEBHOOK] Callback reçu : TxId #BJ-88392019-OK
+[STATUS]  Paiement validé avec succès (Code 200). Solde crédité.`
   },
   {
-    id: "offline-indexeddb-sync",
-    title: "Moteur de Synchronisation Offline-First (IndexedDB & ServiceWorker)",
+    id: "wave-checkout",
+    title: "devcom-wave-sdk",
+    category: "mobile-money",
+    lang: "python",
+    country: "CI",
+    countryFlag: "🇨🇮 Côte d'Ivoire",
+    verified: true,
+    author: "Emmanuel Kouassi",
+    authorAvatar: "EK",
+    downloads: "3.2k",
+    rating: 4.8,
+    upvotes: 184,
+    installCmd: "pip install devcom-wave",
+    desc: "Client Python pour intégrer les sessions de paiement Wave instantanées avec génération de QR code scannable et deep links mobiles.",
+    code: `from devcom_wave import WaveCheckoutSession
+
+wave = WaveCheckoutSession(api_key="wave_ci_live_secret_...")
+
+def create_order_payment(order_id: str, amount_cfa: int):
+    session = wave.create_session(
+        amount=amount_cfa,
+        currency="XOF",
+        success_url=f"https://devcom.africa/orders/{order_id}/success",
+        error_url=f"https://devcom.africa/orders/{order_id}/cancel"
+    )
+    return {
+        "checkout_url": session.wave_launch_url,
+        "qr_code_svg": session.qr_code_url
+    }`,
+    simulationOutput: `[WAVE] Connexion aux passerelles Wave CI & SN...
+[SESSION] Création de session pour 25 000 XOF...
+[LINK] Deep Link généré : wave://checkout/sess_839210
+[QR] QR Code scannable disponible sur CDN.
+[RESULT]  Session active, prête pour redirection mobile.`
+  },
+  {
+    id: "offline-sync-engine",
+    title: "@devcom/offline-sync",
     category: "offline",
     lang: "javascript",
     country: "SN",
@@ -62,89 +94,38 @@ export async function handlePaymentCallback(req: any) {
     verified: true,
     author: "Amina Diallo",
     authorAvatar: "AD",
+    downloads: "2.1k",
+    rating: 4.95,
     upvotes: 98,
-    desc: "Permet aux apps web africaines de fonctionner sans connexion internet (coupures data) et de synchroniser les transactions en arrière-plan dès le retour du réseau.",
-    code: `// Initialisation de la base locale IndexedDB pour les zones à faible débit
-const DB_NAME = 'AfriSyncLocalDB';
-const STORE_NAME = 'pendingTransactions';
+    installCmd: "npm i @devcom/offline-sync",
+    desc: "Moteur de mise en cache IndexedDB et synchronisation en tâche de fond (Background Sync) pour applications web en environnement réseau instable.",
+    code: `import { AfriSyncEngine } from '@devcom/offline-sync';
 
-export async function queueOfflineTransaction(txData) {
-  const db = await openDB();
-  const tx = db.transaction(STORE_NAME, 'readwrite');
-  await tx.objectStore(STORE_NAME).add({
-    ...txData,
-    timestamp: Date.now(),
-    synced: false
+const sync = new AfriSyncEngine({
+  dbName: 'afri_app_cache',
+  autoRetryInterval: 5000,
+  syncEndpoint: '/api/v1/sync'
+});
+
+// Enregistrer une action hors-ligne
+export async function submitDataOffline(data) {
+  await sync.queueTask({
+    action: 'CREATE_CLIENT_RECORD',
+    payload: data,
+    timestamp: Date.now()
   });
-  
-  if (navigator.onLine) {
-    await syncPendingWithSystalink();
-  } else {
-    navigator.serviceWorker.ready.then(reg => {
-      reg.sync.register('sync-african-transactions');
-    });
-  }
-}
-
-async function syncPendingWithSystalink() {
-  console.log("Synchronisation sécurisée vers Systalink Datacloud...");
+  console.log("Données sauvegardées localement. Synchronisation dès reconnexion.");
 }`,
-    simulationOutput: `[INFO] Simulation de coupure réseau 3G/4G...
-[STATUS] Navigateur en mode : HORS-LIGNE (Offline)
-[LOCAL] 1 transaction enregistrée dans IndexedDB (ID: local-tx-491)
-[NETWORK] Réseau détecté ! Événement 'online' déclenché.
-[SYNC] Envoi du lot vers Systalink Datacloud (0.18s)...
-[SUCCESS]  1/1 transaction synchronisée. Données persistées avec succès.`
+    simulationOutput: `[OFFLINE-SYNC] Moteur initialisé sur IndexedDB.
+[NETWORK] État réseau : HORS-LIGNE (Coupure data simulée)
+[CACHE] Action 'CREATE_CLIENT_RECORD' sauvegardée dans la file locale.
+[NETWORK] Réseau rétabli (4G détectée) !
+[SYNC] Envoi des données en arrière-plan vers le serveur...
+[SUCCESS]  100% des données locales répliquées sans conflit.`
   },
   {
-    id: "wave-checkout-sdk",
-    title: "Intégration Express Wave Mobile Money (QR Code & Deep Link)",
-    category: "mobile-money",
-    lang: "python",
-    country: "CI",
-    countryFlag: "🇨🇮 Côte d'Ivoire",
-    verified: true,
-    author: "Emmanuel K.",
-    authorAvatar: "EK",
-    upvotes: 184,
-    desc: "SDK Python / Django / FastAPI pour générer un lien de paiement direct Wave ou afficher un QR Code scannable par l'application Wave.",
-    code: `import httpx
-import os
-
-WAVE_API_URL = "https://api.wave.com/v1/checkout/sessions"
-
-class WavePaymentGateway:
-    def __init__(self, api_key: str):
-        self.api_key = api_key
-        self.headers = {"Authorization": f"Bearer {self.api_key}"}
-
-    async def create_checkout_session(self, amount: int, currency: str = "XOF", client_reference: str = ""):
-        payload = {
-            "amount": str(amount),
-            "currency": currency,
-            "error_url": "https://devcom.africa/payment/cancel",
-            "success_url": "https://devcom.africa/payment/success",
-            "client_reference": client_reference
-        }
-        async with httpx.AsyncClient() as client:
-            resp = await client.post(WAVE_API_URL, json=payload, headers=self.headers)
-            resp.raise_for_status()
-            data = resp.json()
-            return {
-                "wave_launch_url": data.get("wave_launch_url"),
-                "qr_code_url": data.get("qr_code_url")
-            }`,
-    simulationOutput: `[INIT] Initialisation du client Wave CI / SN...
-[API] Appel POST https://api.wave.com/v1/checkout/sessions
-[PARAM] Montant: 25,000 XOF | Devise: FCFA | Ref: DEVC-2026-99
-[RESPONSE] HTTP 200 OK
-[DATA] Wave Launch URL : wave://checkout/s_9281ab091
-[DATA] QR Code Image : https://static.wave.com/qr/s_9281ab091.png
-[RESULT]  Session créée avec succès. Prête pour le client mobile.`
-  },
-  {
-    id: "ussd-menu-engine",
-    title: "Moteur de Menu USSD Interactif Multi-Opérateurs",
+    id: "ussd-framework",
+    title: "@devcom/ussd-engine",
     category: "ussd",
     lang: "typescript",
     country: "BJ",
@@ -152,96 +133,42 @@ class WavePaymentGateway:
     verified: true,
     author: "Modeste YABLA",
     authorAvatar: "MY",
+    downloads: "5.4k",
+    rating: 5.0,
     upvotes: 210,
-    desc: "Framework léger de parsing et de navigation pour sessions USSD (*345#) sans perte d'état de session, compatible MTN Bénin, Moov et Orange.",
-    code: `export interface USSDSession {
-  sessionId: string;
-  phoneNumber: string;
-  text: string;
-}
+    installCmd: "npm i @devcom/ussd-engine",
+    desc: "Framework robuste de routage de menus USSD multi-niveaux compatible avec MTN, Moov, Orange et Airtel dans toute l'Afrique de l'Ouest et Centrale.",
+    code: `import { USSDRouter } from '@devcom/ussd-engine';
 
-export function handleUSSDRequest(session: USSDSession): string {
-  const steps = session.text.split('*');
-  
-  // Niveau racine
-  if (session.text === '' || session.text === '0') {
-    return "CON Bienvenue sur DevCom USSD\\n1. Consulter les Bounties\\n2. Trouver un Mentor\\n3. Statut Systalink";
-  }
-  
-  // Option 1 : Bounties
-  if (steps[0] === '1') {
-    return "CON Bounties Disponibles :\\n1. Webhook MoMo (150k XOF)\\n2. Template Offline (80k XOF)\\n0. Retour";
-  }
+const router = new USSDRouter();
 
-  // Option 3 : Systalink
-  if (steps[0] === '3') {
-    return "END Systalink Datacloud : Opérationnel\\nLatence Bénin : 8ms\\nChallenge -40% actif.";
-  }
-
-  return "END Choix invalide. Tapez *345# pour recommencer.";
-}`,
-    simulationOutput: `[USSD] Connexion passerelle Telco MTN/Moov (*345#)...
-[SESSION] SessionID: BJ-TELCO-771829 | Téléphone: +229 97 00 00 00
-[REQUEST] Texte entrant: ""
-[OUTPUT] 
-CON Bienvenue sur DevCom USSD
-1. Consulter les Bounties
-2. Trouver un Mentor
-3. Statut Systalink
-[INPUT] Sélection de l'option 3...
-[OUTPUT]
-END Systalink Datacloud : Opérationnel
-Latence Bénin : 8ms
-Challenge -40% actif.
-[RESULT]  Session USSD terminée proprement (Code: 200).`
-  },
-  {
-    id: "systalink-s3-wrapper",
-    title: "Client de Stockage Objet Systalink Datacloud (S3 Compatible)",
-    category: "systalink",
-    lang: "typescript",
-    country: "BJ",
-    countryFlag: "🇧🇯 Bénin",
-    verified: true,
-    author: "Binary Minds",
-    authorAvatar: "BM",
-    upvotes: 165,
-    desc: "Wrapper TypeScript pour téléverser et distribuer des assets média directement sur le Datacloud Systalink avec chiffrement de bout en bout et coût réduit (-40%).",
-    code: `import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
-
-// Point de terminaison du Datacloud Systalink Afrique de l'Ouest
-export const systalinkCloud = new S3Client({
-  endpoint: "https://datacloud.systalink.com/v1",
-  region: "west-africa-1",
-  credentials: {
-    accessKeyId: process.env.SYSTALINK_ACCESS_KEY!,
-    secretAccessKey: process.env.SYSTALINK_SECRET_KEY!
-  }
+router.onRoot((session) => {
+  return session.con("Bienvenue sur DevCom USSD\\n1. Mon Solde DevPoints\\n2. Bounties Récents\\n3. Assistance");
 });
 
-export async function uploadToSystalink(filename: string, fileBuffer: Buffer, mimeType: string) {
-  const uploadParams = {
-    Bucket: "devcom-challenge-assets",
-    Key: \`uploads/\${Date.now()}_\${filename}\`,
-    Body: fileBuffer,
-    ContentType: mimeType,
-    ACL: "public-read"
-  };
+router.onOption('1', async (session) => {
+  return session.end("Votre solde actuel est de : 1,250 DP.\\nDevise locale équivalente : 62,500 FCFA.");
+});
 
-  const command = new PutObjectCommand(uploadParams as any);
-  await systalinkCloud.send(command);
-  return \`https://datacloud.systalink.com/devcom-challenge-assets/\${uploadParams.Key}\`;
-}`,
-    simulationOutput: `[CLOUD] Connexion à Systalink Datacloud (west-africa-1)...
-[AUTH] Clé partenaire Systalink Challenge reconnue (-40% actif).
-[UPLOAD] Envoi de l'image 'avatar-devcom.png' (240 KB)...
-[LATENCE] Temps de transfert : 14ms (via PoP Cotonou).
-[STATUS]  Fichier déployé avec succès.
-[URL] https://datacloud.systalink.com/devcom-challenge-assets/uploads/1729432_avatar.png`
+router.onOption('2', async (session) => {
+  return session.con("Bounties du jour :\\n1. SDK Flutter (150k)\\n2. Module SMS (80k)\\n0. Retour");
+});`,
+    simulationOutput: `[USSD-ROUTER] Passerelle USSD initialisée (*345#)...
+[USER] Appel entrant : +229 97 12 34 56
+[RESPONSE]
+CON Bienvenue sur DevCom USSD
+1. Mon Solde DevPoints
+2. Bounties Récents
+3. Assistance
+[INPUT] Sélection de la touche '1'...
+[RESPONSE]
+END Votre solde actuel est de : 1,250 DP.
+Devise locale équivalente : 62,500 FCFA.
+[STATUS]  Session clôturée avec succès (Code 200).`
   },
   {
-    id: "low-cost-sms-otp",
-    title: "Micro-Service SMS OTP Économique pour Télécoms d'Afrique de l'Ouest",
+    id: "sms-otp-gateway",
+    title: "devcom-sms-router",
     category: "security",
     lang: "python",
     country: "TG",
@@ -249,117 +176,196 @@ export async function uploadToSystalink(filename: string, fileBuffer: Buffer, mi
     verified: true,
     author: "Yao Mensah",
     authorAvatar: "YM",
+    downloads: "1.7k",
+    rating: 4.7,
     upvotes: 89,
-    desc: "Routeur d'envoi de SMS OTP avec routage intelligent entre opérateurs pour réduire la facture SMS de 60% au Togo, Bénin, Côte d'Ivoire et Sénégal.",
-    code: `import secrets
-import time
+    installCmd: "pip install devcom-sms-router",
+    desc: "Routeur d'envoi de SMS transactionnels avec choix intelligent de passerelle pour minimiser les coûts SMS au Bénin, Togo, CI et Sénégal.",
+    code: `from devcom_sms_router import SmartSMSBroker
 
-class IntelligentSMSRouter:
-    def __init__(self):
-        self.otp_vault = {}
+broker = SmartSMSBroker()
 
-    def generate_otp(self, phone_number: str) -> str:
-        otp_code = "".join([str(secrets.randbelow(10)) for _ in range(6)])
-        self.otp_vault[phone_number] = {
-            "code": otp_code,
-            "expires_at": time.time() + 300 # 5 min
-        }
-        # Routage vers le broker le moins coûteux selon l'indicatif
-        provider = "Systalink-SMS-Hub" if phone_number.startswith(("+229", "+228", "+225")) else "Global-Gateway"
-        print(f"[SMS] Code {otp_code} routé vers {phone_number} via {provider}")
-        return otp_code`,
-    simulationOutput: `[OTP] Génération d'un code sécurisé 6 chiffres...
-[NUMBER] Téléphone cible : +229 97 12 34 56 (Bénin)
-[ROUTING] Opérateur détecté : Réseau local West Africa.
-[BROKER] Choix automatique : Systalink SMS Gateway (Tarif -40% : 8 FCFA/sms).
-[DISPATCH] SMS envoyé avec succès en 420ms. Code de validation : 482910.`
+def send_auth_code(phone: str):
+    otp = broker.generate_secure_otp()
+    # Route automatiquement vers le fournisseur le moins cher selon le préfixe
+    status = broker.dispatch_sms(
+        destination=phone,
+        message=f"Votre code de sécurité DevCom est : {otp}"
+    )
+    return {"status": status, "otp": otp}`,
+    simulationOutput: `[SMS-ROUTER] Analyse du numéro destinataire : +228 90 00 00 00 (Togo)
+[ALGO] Détection de la route la plus économique...
+[ROUTE] Opérateur local sélectionné (Économie : -55%).
+[STATUS]  SMS expédié en 380ms. Code généré : 928301.`
+  },
+  {
+    id: "flutter-momo-widget",
+    title: "flutter_african_pay",
+    category: "mobile-money",
+    lang: "flutter",
+    country: "NG",
+    countryFlag: "🇳🇬 Nigeria",
+    verified: true,
+    author: "Chukwudi Okafor",
+    authorAvatar: "CO",
+    downloads: "4.1k",
+    rating: 4.9,
+    upvotes: 156,
+    installCmd: "flutter pub add flutter_african_pay",
+    desc: "Widget Flutter clé en main offrant une feuille de paiement élégante prenant en charge MTN MoMo, Wave, Orange Money et cartes bancaires africaines.",
+    code: `import 'package:flutter_african_pay/flutter_african_pay.dart';
+
+void showPaymentSheet(BuildContext context) {
+  AfricanPaySheet.show(
+    context,
+    amount: 15000,
+    currency: "XOF",
+    allowedMethods: [PaymentMethod.mtnMoMo, PaymentMethod.wave, PaymentMethod.moovMoney],
+    onSuccess: (txId) => print("Paiement réussi : $txId"),
+    onError: (err) => print("Erreur : $err"),
+  );
+}`,
+    simulationOutput: `[FLUTTER-PAY] Affichage du composant Modal Bottom Sheet...
+[UI] Rendu des logos MTN MoMo, Wave et Moov Money en SVG fluide.
+[USER] Choix : Wave Côte d'Ivoire / Sénégal.
+[DEEP-LINK] Lancement de l'app Wave installée...
+[CALLBACK] Validation de transaction #CI-994827 reçue !`
   }
 ];
 
 // ==========================================================================
-// Base de données des Bounties Tech Africains
+// 2. Bourse aux Échanges, Missions & Bounties
 // ==========================================================================
 const INITIAL_BOUNTIES = [
   {
     id: "bounty-1",
     reward: "150 000 FCFA",
-    title: "Module d'authentification par SMS OTP économique",
-    payoutMethod: "MTN MoMo & Wave",
-    desc: "Concevoir un SDK multi-langages gérant l'auto-retry et le basculement d'opérateurs pour les SMS de validation d'inscription.",
+    title: "SDK Flutter pour intégration Wave avec Deep Links & QR",
+    payoutMethod: "Wave & MTN MoMo",
+    desc: "Développer un package Flutter open-source permettant de déclencher des paiements Wave sans redirection web externe.",
     difficulty: "Intermédiaire",
     applicants: 4,
-    deadline: "5 nov. 2026",
-    status: "Actif"
+    deadline: "15 nov. 2026",
+    company: "AfriTech Labs"
   },
   {
     id: "bounty-2",
     reward: "80 000 FCFA",
-    title: "Template Tailwind CSS & PWA ultra-light pour faible débit",
+    title: "Template Dashboard PWA ultra-léger (<120 KB)",
     payoutMethod: "Moov Money",
-    desc: "Créer un template de dashboard dashboard e-commerce pesant moins de 100 KB au chargement initial avec support offline.",
-    difficulty: "Débutant/Intermédiaire",
-    applicants: 7,
+    desc: "Concevoir un template Tailwind CSS optimisé pour une consommation data minimale sur smartphones Android d'entrée de gamme.",
+    difficulty: "Débutant / Intermédiaire",
+    applicants: 6,
     deadline: "10 nov. 2026",
-    status: "Actif"
+    company: "DevCom Community"
   },
   {
     id: "bounty-3",
     reward: "250 000 FCFA",
-    title: "Connecteur Systalink Datacloud pour Next.js & Nuxt",
-    payoutMethod: "Virement / MoMo",
-    desc: "Développer un adaptateur open-source permettant le stockage automatique de médias Next.js vers Systalink Datacloud S3.",
+    title: "Connecteur S3 Stockage Objet Haute Résilience",
+    payoutMethod: "Virement bancaire / MoMo",
+    desc: "Créer un middleware Next.js & FastAPI assurant la réplication automatique de documents et médias sur datacenters régionaux.",
     difficulty: "Avancé",
-    applicants: 2,
-    deadline: "12 nov. 2026",
-    status: "Actif"
+    applicants: 3,
+    deadline: "20 nov. 2026",
+    company: "CloudWest Africa"
   }
 ];
 
 // ==========================================================================
-// Sessions d'Entraide Binary Minds
+// 3. Espace Entraide & Troc de Compétences
 // ==========================================================================
-const INITIAL_PAIRS = [
+const INITIAL_PEER_EXCHANGES = [
   {
-    id: "pair-1",
-    user: "Koffi A.",
-    country: "🇧🇯 Cotonou",
-    title: "Debug signature webhook Wave en production sur Vercel",
-    tech: "TypeScript / Next.js",
-    timeAgo: "Il y a 4 min",
-    status: "En attente"
+    id: "peer-1",
+    author: "Koffi A.",
+    country: "🇧🇯 Bénin",
+    tag: "Troc Technique",
+    title: "Audit de sécurité backend Django contre intégration Next.js 14",
+    desc: "J'offre un audit complet des failles et requêtes SQL sur votre backend Django en échange d'une aide sur les Server Components Next.js.",
+    deal: "Offre : 3h d'audit Django | Demande : 3h d'accompagnement Next.js"
   },
   {
-    id: "pair-2",
-    user: "Amina D.",
-    country: "🇸🇳 Dakar",
-    title: "Optimisation requêtes PostgreSQL sur Systalink Datacloud",
-    tech: "PostgreSQL / Prisma",
-    timeAgo: "Il y a 12 min",
-    status: "En attente"
+    id: "peer-2",
+    author: "Amina Diallo",
+    country: "🇸🇳 Sénégal",
+    tag: "Entraide Flash",
+    title: "Besoin d'un regard critique sur synchronisation IndexedDB offline",
+    desc: "Je bloque sur la résolution de conflits de timestamps lors de la reconnexion. Récompense : 150 DevPoints + mention dans le README du package.",
+    deal: "Récompense : 150 DP + Mentorat Flutter"
   },
   {
-    id: "pair-3",
-    user: "Emmanuel K.",
-    country: "🇨🇮 Abidjan",
-    title: "Pair review sur synchronisation offline Flutter / SQLite",
-    tech: "Flutter / Dart",
-    timeAgo: "Il y a 25 min",
-    status: "En attente"
+    id: "peer-3",
+    author: "Grace Uwase",
+    country: "🇷🇼 Rwanda",
+    tag: "Revue de Code",
+    title: "Revue UI/UX Tailwind CSS pour app fintech bilingue (EN/FR)",
+    desc: "Je propose de restructurer le design system d'une app contre une aide pour configurer une passerelle de paiement MTN MoMo Bénin.",
+    deal: "Offre : Design System complet | Demande : Passerelle MTN MoMo"
   }
 ];
 
 // ==========================================================================
-// État global de l'application
+// 4. Annuaire des Développeurs
+// ==========================================================================
+const INITIAL_DEVELOPERS = [
+  {
+    id: "dev-modeste",
+    name: "Modeste YABLA",
+    avatar: "MY",
+    role: "Fullstack & Cloud Architect",
+    country: "🇧🇯 Cotonou, Bénin",
+    skills: ["TypeScript", "Next.js", "Python", "Mobile Money"],
+    dp: 1250,
+    exchangesCount: 14
+  },
+  {
+    id: "dev-amina",
+    name: "Amina Diallo",
+    avatar: "AD",
+    role: "Mobile & Flutter Engineer",
+    country: "🇸🇳 Dakar, Sénégal",
+    skills: ["Flutter", "Dart", "IndexedDB", "PWA"],
+    dp: 980,
+    exchangesCount: 9
+  },
+  {
+    id: "dev-emmanuel",
+    name: "Emmanuel Kouassi",
+    avatar: "EK",
+    role: "Backend & Fintech Specialist",
+    country: "🇨🇮 Abidjan, Côte d'Ivoire",
+    skills: ["Python", "FastAPI", "Wave", "PostgreSQL"],
+    dp: 1120,
+    exchangesCount: 11
+  },
+  {
+    id: "dev-chukwudi",
+    name: "Chukwudi Okafor",
+    avatar: "CO",
+    role: "DevOps & Systems Engineer",
+    country: "🇳🇬 Lagos, Nigeria",
+    skills: ["Go", "Docker", "Kubernetes", "AWS/Cloud"],
+    dp: 1450,
+    exchangesCount: 18
+  }
+];
+
+// ==========================================================================
+// État Global de l'Application
 // ==========================================================================
 let appState = {
-  snippets: [...INITIAL_SNIPPETS],
+  components: [...INITIAL_COMPONENTS],
   bounties: [...INITIAL_BOUNTIES],
-  pairs: [...INITIAL_PAIRS],
+  peerExchanges: [...INITIAL_PEER_EXCHANGES],
+  developers: [...INITIAL_DEVELOPERS],
   activeCategory: "all",
   activeLang: "all",
   activeCountry: "all",
   searchQuery: "",
-  activeSandboxSnippet: null
+  activeSandboxComponent: null,
+  activeChatRecipient: "Amina Diallo",
+  exchangeModalType: "component"
 };
 
 // ==========================================================================
@@ -367,10 +373,10 @@ let appState = {
 // ==========================================================================
 document.addEventListener("DOMContentLoaded", () => {
   initTheme();
-  initCountdown();
-  renderSnippets();
+  renderComponents();
   renderBounties();
-  renderPairs();
+  renderPeerExchanges();
+  renderDevelopers();
   initEventListeners();
 });
 
@@ -394,64 +400,22 @@ function initTheme() {
 }
 
 // ==========================================================================
-// Compte à Rebours Officiel Systalink Challenge
+// Rendu dynamique des Composants & APIs
 // ==========================================================================
-function initCountdown() {
-  // Clôture officielle le 15 Novembre 2026 à 23h59 UTC
-  const deadline = new Date("2026-11-15T23:59:59Z").getTime();
-
-  function update() {
-    const now = new Date().getTime();
-    const diff = deadline - now;
-
-    if (diff <= 0) {
-      document.getElementById("countdown-timer").innerHTML = "<div class='time-val'>CHALLENGE CLÔTURÉ</div>";
-      return;
-    }
-
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-    const pad = (n) => String(n).padStart(2, "0");
-
-    const daysEl = document.getElementById("count-days");
-    const hoursEl = document.getElementById("count-hours");
-    const minEl = document.getElementById("count-minutes");
-    const secEl = document.getElementById("count-seconds");
-
-    if (daysEl) daysEl.textContent = pad(days);
-    if (hoursEl) hoursEl.textContent = pad(hours);
-    if (minEl) minEl.textContent = pad(minutes);
-    if (secEl) secEl.textContent = pad(seconds);
-  }
-
-  update();
-  setInterval(update, 1000);
-}
-
-// ==========================================================================
-// Rendu dynamique des Snippets
-// ==========================================================================
-function renderSnippets() {
-  const container = document.getElementById("snippets-grid");
+function renderComponents() {
+  const container = document.getElementById("components-grid");
   if (!container) return;
 
-  const filtered = appState.snippets.filter(s => {
-    // Filtre de catégorie
-    if (appState.activeCategory !== "all" && s.category !== appState.activeCategory) return false;
-    // Filtre de langage
-    if (appState.activeLang !== "all" && s.lang !== appState.activeLang) return false;
-    // Filtre de pays
-    if (appState.activeCountry !== "all" && s.country !== appState.activeCountry) return false;
-    // Recherche textuelle
+  const filtered = appState.components.filter(c => {
+    if (appState.activeCategory !== "all" && c.category !== appState.activeCategory) return false;
+    if (appState.activeLang !== "all" && c.lang !== appState.activeLang) return false;
+    if (appState.activeCountry !== "all" && c.country !== appState.activeCountry) return false;
     if (appState.searchQuery) {
       const q = appState.searchQuery.toLowerCase();
-      const match = s.title.toLowerCase().includes(q) || 
-                    s.desc.toLowerCase().includes(q) || 
-                    s.code.toLowerCase().includes(q) ||
-                    s.lang.toLowerCase().includes(q);
+      const match = c.title.toLowerCase().includes(q) || 
+                    c.desc.toLowerCase().includes(q) || 
+                    c.lang.toLowerCase().includes(q) ||
+                    c.author.toLowerCase().includes(q);
       if (!match) return false;
     }
     return true;
@@ -460,47 +424,48 @@ function renderSnippets() {
   if (filtered.length === 0) {
     container.innerHTML = `
       <div style="grid-column: 1/-1; text-align: center; padding: 48px; background: var(--bg-card); border-radius: var(--radius-md);">
-        <p style="font-size: 1.2rem; color: var(--text-muted); margin-bottom: 12px;">🔍 Aucun snippet ne correspond à ces critères.</p>
+        <p style="font-size: 1.2rem; color: var(--text-muted); margin-bottom: 12px;">🔍 Aucun composant ne correspond à cette recherche.</p>
         <button class="btn btn-outline" onclick="resetFilters()">Réinitialiser les filtres</button>
       </div>
     `;
     return;
   }
 
-  container.innerHTML = filtered.map(snippet => `
-    <article class="snippet-card" data-id="${snippet.id}">
+  container.innerHTML = filtered.map(comp => `
+    <article class="component-card" data-id="${comp.id}">
       <div>
-        <div class="snippet-header">
-          <span class="snippet-category-badge">${formatCategoryName(snippet.category)}</span>
-          <div class="snippet-meta-flags">
-            <span>${snippet.countryFlag}</span>
-            ${snippet.verified ? `<span class="verified-badge" title="Testé et approuvé pour Systalink Datacloud">✓ Systalink Ready</span>` : ''}
+        <div class="component-header">
+          <span class="component-category-badge">${formatCategoryName(comp.category)}</span>
+          <div class="component-meta-flags">
+            <span>${comp.countryFlag}</span>
+            <span class="verified-badge">✓ Vérifié</span>
           </div>
         </div>
 
-        <h3 class="snippet-title">${escapeHtml(snippet.title)}</h3>
-        <p class="snippet-desc">${escapeHtml(snippet.desc)}</p>
+        <h3 class="component-title">${escapeHtml(comp.title)}</h3>
+        <p class="component-desc">${escapeHtml(comp.desc)}</p>
 
-        <div class="snippet-code-box">
-          <pre><code>${escapeHtml(snippet.code.slice(0, 220))}...</code></pre>
+        <div class="install-command-box">
+          <code>${escapeHtml(comp.installCmd)}</code>
+          <button class="copy-install-btn" onclick="copyInstallCmd('${escapeHtml(comp.installCmd)}')" title="Copier la commande">📋</button>
         </div>
       </div>
 
-      <div class="snippet-footer">
-        <div class="snippet-author">
-          <div class="author-avatar">${snippet.authorAvatar}</div>
-          <span>${snippet.author}</span>
+      <div class="component-footer">
+        <div class="component-author">
+          <div class="avatar-circle" style="width: 24px; height: 24px; font-size: 0.75rem;">${comp.authorAvatar}</div>
+          <span>${comp.author} • ⭐ ${comp.rating}</span>
         </div>
 
-        <div class="snippet-actions">
-          <button class="upvote-btn" onclick="handleUpvote('${snippet.id}')">
-            ▲ <span class="vote-count">${snippet.upvotes}</span>
+        <div class="component-actions">
+          <button class="upvote-btn" onclick="handleUpvote('${comp.id}')">
+            ▲ <span>${comp.upvotes}</span>
           </button>
-          <button class="btn btn-xs btn-outline" onclick="openSandbox('${snippet.id}')">
+          <button class="btn btn-xs btn-outline" onclick="openSandbox('${comp.id}')">
             🧪 Tester
           </button>
-          <button class="btn btn-xs btn-primary" onclick="copySnippetCode('${snippet.id}')">
-            Copier
+          <button class="btn btn-xs btn-primary" onclick="copyComponentCode('${comp.id}')">
+            Code
           </button>
         </div>
       </div>
@@ -509,7 +474,7 @@ function renderSnippets() {
 }
 
 // ==========================================================================
-// Rendu dynamique des Bounties
+// Rendu dynamique de la Bourse aux Bounties
 // ==========================================================================
 function renderBounties() {
   const container = document.getElementById("bounties-grid");
@@ -527,7 +492,7 @@ function renderBounties() {
 
       <div class="bounty-footer">
         <div class="bounty-deadline">
-          <span>⏳ Fin : ${bounty.deadline}</span> • <span>👥 ${bounty.applicants} postulants</span>
+          <span>⏳ Limite : ${bounty.deadline}</span> • <span>👥 ${bounty.applicants} candidats</span>
         </div>
         <button class="btn btn-sm btn-amber" onclick="applyToBounty('${escapeHtml(bounty.title)}')">
           Postuler
@@ -538,42 +503,81 @@ function renderBounties() {
 }
 
 // ==========================================================================
-// Rendu dynamique des Sessions Pair-Dev Binary Minds
+// Rendu dynamique de l'Entraide & Troc
 // ==========================================================================
-function renderPairs() {
-  const container = document.getElementById("pairs-list");
+function renderPeerExchanges() {
+  const container = document.getElementById("peer-exchange-grid");
   if (!container) return;
 
-  container.innerHTML = appState.pairs.map(pair => `
-    <div class="pair-item">
-      <div class="pair-item-info">
-        <div class="pair-item-title">${escapeHtml(pair.title)}</div>
-        <div class="pair-item-meta">
-          <span>${pair.country}</span> • <span>${pair.user}</span> • <span>${pair.tech}</span> • <span>${pair.timeAgo}</span>
+  container.innerHTML = appState.peerExchanges.map(peer => `
+    <article class="peer-card">
+      <div>
+        <div class="peer-header">
+          <span class="peer-tag">${peer.tag}</span>
+          <span style="font-size: 0.8rem; color: var(--text-muted);">${peer.country} • ${peer.author}</span>
+        </div>
+        <h3 class="peer-title">${escapeHtml(peer.title)}</h3>
+        <p class="peer-desc">${escapeHtml(peer.desc)}</p>
+        <div class="peer-exchange-deal">
+          <strong>Modalité :</strong> ${escapeHtml(peer.deal)}
         </div>
       </div>
-      <button class="btn btn-xs btn-amber" onclick="joinPairSession('${pair.user}', '${escapeHtml(pair.title)}')">
-        Rejoindre
-      </button>
-    </div>
+
+      <div class="peer-footer">
+        <button class="btn btn-sm btn-outline" onclick="contactDeveloper('${peer.author}', 'Proposition pour : ${escapeHtml(peer.title)}')">
+          💬 Contacter ${peer.author.split(' ')[0]}
+        </button>
+        <button class="btn btn-sm btn-primary" onclick="acceptDeal('${escapeHtml(peer.title)}')">
+          Proposer l'échange
+        </button>
+      </div>
+    </article>
   `).join('');
 }
 
 // ==========================================================================
-// Bac à Sable / Testeur Interactif de Snippet
+// Rendu dynamique de l'Annuaire Développeurs
 // ==========================================================================
-window.openSandbox = function(snippetId) {
-  const snippet = appState.snippets.find(s => s.id === snippetId);
-  if (!snippet) return;
+function renderDevelopers() {
+  const container = document.getElementById("developers-grid");
+  if (!container) return;
 
-  appState.activeSandboxSnippet = snippet;
+  container.innerHTML = appState.developers.map(dev => `
+    <article class="developer-card">
+      <div class="dev-avatar">${dev.avatar}</div>
+      <h3 class="dev-name">${escapeHtml(dev.name)}</h3>
+      <p class="dev-role">${escapeHtml(dev.role)}</p>
+      <div class="dev-country">${dev.country}</div>
 
-  document.getElementById("sandbox-title").textContent = snippet.title;
-  document.getElementById("sandbox-filename").textContent = `${snippet.id}.${snippet.lang === 'python' ? 'py' : 'ts'}`;
-  document.getElementById("sandbox-code-content").textContent = snippet.code;
+      <div class="dev-skills-list">
+        ${dev.skills.map(s => `<span class="skill-tag">${escapeHtml(s)}</span>`).join('')}
+      </div>
+
+      <div class="dev-card-footer">
+        <span class="dev-points">⚡ ${dev.dp} DP</span>
+        <button class="btn btn-xs btn-outline" onclick="contactDeveloper('${escapeHtml(dev.name)}')">
+          Contacter
+        </button>
+      </div>
+    </article>
+  `).join('');
+}
+
+// ==========================================================================
+// Bac à Sable / Testeur de Code en Direct
+// ==========================================================================
+window.openSandbox = function(componentId) {
+  const comp = appState.components.find(c => c.id === componentId);
+  if (!comp) return;
+
+  appState.activeSandboxComponent = comp;
+
+  document.getElementById("sandbox-title").textContent = comp.title;
+  document.getElementById("sandbox-filename").textContent = `${comp.id}.${comp.lang === 'python' ? 'py' : comp.lang === 'flutter' ? 'dart' : 'ts'}`;
+  document.getElementById("sandbox-code-content").textContent = comp.code;
   
   const execOutput = document.getElementById("exec-output");
-  execOutput.innerHTML = `<span class="exec-idle">Cliquez sur « ▶ Exécuter » pour simuler le comportement du snippet dans l'environnement Datacloud...</span>`;
+  execOutput.innerHTML = `<span class="exec-idle">Cliquez sur « ▶ Exécuter » pour simuler l'exécution du module dans un environnement d'exécution Edge...</span>`;
 
   const modal = document.getElementById("sandbox-modal");
   modal.classList.add("open");
@@ -586,60 +590,150 @@ function closeSandbox() {
   modal.setAttribute("aria-hidden", "true");
 }
 
-window.copySnippetCode = function(snippetId) {
-  const snippet = appState.snippets.find(s => s.id === snippetId);
-  if (!snippet) return;
+window.copyComponentCode = function(componentId) {
+  const comp = appState.components.find(c => c.id === componentId);
+  if (!comp) return;
 
-  navigator.clipboard.writeText(snippet.code).then(() => {
-    showToast(`Code copié dans le presse-papier !`);
+  navigator.clipboard.writeText(comp.code).then(() => {
+    showToast(`Code source de ${comp.title} copié !`);
   }).catch(() => {
     showToast(`Code sélectionné`);
   });
 };
 
-window.handleUpvote = function(snippetId) {
-  const snippet = appState.snippets.find(s => s.id === snippetId);
-  if (!snippet) return;
-
-  snippet.upvotes += 1;
-  renderSnippets();
-  showToast(`+1 vote pour : "${snippet.title.slice(0, 25)}..."`);
+window.copyInstallCmd = function(cmd) {
+  navigator.clipboard.writeText(cmd).then(() => {
+    showToast(`Commande d'installation copiée : ${cmd}`);
+  });
 };
 
-window.joinPairSession = function(user, title) {
-  showToast(`Connexion à la salle de pair-dev de ${user} en cours...`);
-  setTimeout(() => {
-    alert(`🎉 Vous avez rejoint la session de travail en binôme avec ${user} !\nSujet : ${title}\n« Deux esprits valent mieux qu'un. » (Binary Minds)`);
-  }, 400);
+window.handleUpvote = function(componentId) {
+  const comp = appState.components.find(c => c.id === componentId);
+  if (!comp) return;
+
+  comp.upvotes += 1;
+  renderComponents();
+  showToast(`+1 vote pour ${comp.title} !`);
 };
 
-window.applyToBounty = function(title) {
-  const email = prompt(`Postuler au bounty :\n"${title}"\n\nEntrez votre adresse email ou compte GitHub / Systalink :`);
-  if (email) {
-    showToast(`Candidature envoyée avec succès pour ${email} !`);
+// ==========================================================================
+// Actions Messagerie Directe & Mise en Relation
+// ==========================================================================
+window.openMessagesDrawer = function(recipient = null) {
+  const drawer = document.getElementById("messages-drawer");
+  drawer.classList.add("open");
+  drawer.setAttribute("aria-hidden", "false");
+
+  if (recipient) {
+    appState.activeChatRecipient = recipient;
+    // Vérifier si un pill existe ou l'ajouter
+    const contactsBar = document.getElementById("chat-contacts-bar");
+    let existingPill = Array.from(contactsBar.children).find(b => b.dataset.user === recipient);
+    if (!existingPill) {
+      const newBtn = document.createElement("button");
+      newBtn.className = "contact-pill active";
+      newBtn.dataset.user = recipient;
+      newBtn.textContent = `👤 ${recipient}`;
+      contactsBar.appendChild(newBtn);
+    }
+    document.querySelectorAll(".contact-pill").forEach(p => p.classList.remove("active"));
+    const target = Array.from(contactsBar.children).find(b => b.dataset.user === recipient);
+    if (target) target.classList.add("active");
+  }
+
+  // Réinitialiser le compteur de non-lus
+  const unread = document.getElementById("unread-count");
+  if (unread) unread.style.display = "none";
+};
+
+window.closeMessagesDrawer = function() {
+  const drawer = document.getElementById("messages-drawer");
+  drawer.classList.remove("open");
+  drawer.setAttribute("aria-hidden", "true");
+};
+
+window.contactDeveloper = function(devName, prefillMessage = "") {
+  openMessagesDrawer(devName);
+  if (prefillMessage) {
+    const input = document.getElementById("chat-message-input");
+    if (input) {
+      input.value = prefillMessage;
+      input.focus();
+    }
   }
 };
 
-window.resetFilters = function() {
-  appState.activeCategory = "all";
-  appState.activeLang = "all";
-  appState.activeCountry = "all";
-  appState.searchQuery = "";
-  
-  document.getElementById("omnisearch-input").value = "";
-  document.querySelectorAll(".quick-chip").forEach(c => c.classList.remove("active"));
-  document.querySelector(".quick-chip[data-category='all']").classList.add("active");
-  document.querySelectorAll(".lang-pill").forEach(p => p.classList.remove("active"));
-  document.querySelector(".lang-pill[data-lang='all']").classList.add("active");
-  
-  renderSnippets();
+window.applyToBounty = function(title) {
+  const contact = prompt(`Postuler au bounty :\n"${title}"\n\nIndiquez votre email ou identifiant GitHub :`);
+  if (contact) {
+    showToast(`Candidature envoyée pour "${title.slice(0, 25)}..." !`);
+  }
 };
+
+window.acceptDeal = function(title) {
+  showToast(`Proposition d'échange envoyée !`);
+  setTimeout(() => {
+    openMessagesDrawer();
+  }, 400);
+};
+
+// ==========================================================================
+// Modal Multi-Types : Créer un Échange
+// ==========================================================================
+window.openCreateExchangeModal = function(type = "component") {
+  appState.exchangeModalType = type;
+  const modal = document.getElementById("create-exchange-modal");
+  
+  // Basculer les onglets
+  document.querySelectorAll(".type-tab").forEach(t => t.classList.remove("active"));
+  const activeTab = document.querySelector(`.type-tab[data-type="${type}"]`);
+  if (activeTab) activeTab.classList.add("active");
+
+  updateModalFieldsForType(type);
+
+  modal.classList.add("open");
+  modal.setAttribute("aria-hidden", "false");
+};
+
+window.closeCreateExchangeModal = function() {
+  const modal = document.getElementById("create-exchange-modal");
+  modal.classList.remove("open");
+  modal.setAttribute("aria-hidden", "true");
+};
+
+function updateModalFieldsForType(type) {
+  const heading = document.getElementById("modal-exchange-heading");
+  const dynamicLabel = document.getElementById("label-dynamic-field");
+  const dynamicInput = document.getElementById("exchange-secondary");
+  const codeLabel = document.querySelector("#group-code-field label");
+  const codeArea = document.getElementById("exchange-code");
+
+  if (type === "component") {
+    heading.textContent = "Publier un Composant ou une API";
+    dynamicLabel.textContent = "Langage de programmation";
+    dynamicInput.placeholder = "TypeScript, Python, Flutter, PHP...";
+    codeLabel.textContent = "Code source du composant";
+    codeArea.placeholder = "// Insérez votre code ici...";
+  } else if (type === "bounty") {
+    heading.textContent = "Lancer un Bounty ou une Mission Rémunérée";
+    dynamicLabel.textContent = "Rémunération & Devise (ex: 150 000 FCFA)";
+    dynamicInput.placeholder = "Montant en FCFA ou Mobile Money";
+    codeLabel.textContent = "Cahier des charges & Livrables attendus";
+    codeArea.placeholder = "Détaillez les critères d'acceptation du livrable...";
+  } else if (type === "help") {
+    heading.textContent = "Demander de l'Aide ou Proposer un Troc";
+    dynamicLabel.textContent = "Ce que vous offrez en échange";
+    dynamicInput.placeholder = "Ex: 2h de revue de code, 100 DevPoints, mentorat...";
+    codeLabel.textContent = "Description du besoin technique ou du blocage";
+    codeArea.placeholder = "Expliquez le problème technique à résoudre...";
+  }
+}
 
 // ==========================================================================
 // Gestionnaires d'Événements
 // ==========================================================================
 function initEventListeners() {
-  // Recherche
+  // Recherche Omnisearch
   const searchInput = document.getElementById("omnisearch-input");
   const clearBtn = document.getElementById("search-clear");
   
@@ -647,7 +741,7 @@ function initEventListeners() {
     searchInput.addEventListener("input", (e) => {
       appState.searchQuery = e.target.value.trim();
       clearBtn.style.display = appState.searchQuery ? "block" : "none";
-      renderSnippets();
+      renderComponents();
     });
   }
 
@@ -656,27 +750,27 @@ function initEventListeners() {
       searchInput.value = "";
       appState.searchQuery = "";
       clearBtn.style.display = "none";
-      renderSnippets();
+      renderComponents();
     });
   }
 
-  // Filtres par Catégorie (Chips)
+  // Filtres Catégories (Chips)
   document.querySelectorAll(".quick-chip").forEach(chip => {
     chip.addEventListener("click", () => {
       document.querySelectorAll(".quick-chip").forEach(c => c.classList.remove("active"));
       chip.classList.add("active");
       appState.activeCategory = chip.dataset.category;
-      renderSnippets();
+      renderComponents();
     });
   });
 
-  // Filtres par Langages (Pills)
+  // Filtres Langages (Pills)
   document.querySelectorAll(".lang-pill").forEach(pill => {
     pill.addEventListener("click", () => {
       document.querySelectorAll(".lang-pill").forEach(p => p.classList.remove("active"));
       pill.classList.add("active");
       appState.activeLang = pill.dataset.lang;
-      renderSnippets();
+      renderComponents();
     });
   });
 
@@ -685,153 +779,192 @@ function initEventListeners() {
   if (countrySelect) {
     countrySelect.addEventListener("change", (e) => {
       appState.activeCountry = e.target.value;
-      renderSnippets();
-      showToast(`Filtré sur le pays : ${countrySelect.options[countrySelect.selectedIndex].text}`);
+      renderComponents();
+      showToast(`Filtré sur : ${countrySelect.options[countrySelect.selectedIndex].text}`);
     });
   }
 
-  // Simulation d'exécution dans le bac à sable
+  // Boutons Header
+  const btnCreateEx = document.getElementById("btn-create-exchange");
+  if (btnCreateEx) btnCreateEx.addEventListener("click", () => openCreateExchangeModal('component'));
+
+  const btnOpenMsg = document.getElementById("btn-open-messages");
+  if (btnOpenMsg) btnOpenMsg.addEventListener("click", () => openMessagesDrawer());
+
+  const btnCloseMsg = document.getElementById("close-messages-btn");
+  if (btnCloseMsg) btnCloseMsg.addEventListener("click", closeMessagesDrawer);
+
+  const btnOpenProfile = document.getElementById("btn-open-profile");
+  const profileDrawer = document.getElementById("profile-drawer");
+  const btnCloseProfile = document.getElementById("close-profile-btn");
+
+  if (btnOpenProfile && profileDrawer) {
+    btnOpenProfile.addEventListener("click", () => {
+      profileDrawer.classList.add("open");
+      profileDrawer.setAttribute("aria-hidden", "false");
+    });
+  }
+  if (btnCloseProfile && profileDrawer) {
+    btnCloseProfile.addEventListener("click", () => {
+      profileDrawer.classList.remove("open");
+      profileDrawer.setAttribute("aria-hidden", "true");
+    });
+  }
+
+  // Type Selector Tabs in Modal
+  document.querySelectorAll(".type-tab").forEach(tab => {
+    tab.addEventListener("click", () => {
+      document.querySelectorAll(".type-tab").forEach(t => t.classList.remove("active"));
+      tab.classList.add("active");
+      appState.exchangeModalType = tab.dataset.type;
+      updateModalFieldsForType(tab.dataset.type);
+    });
+  });
+
+  // Formulaire Créer un Échange
+  const formExchange = document.getElementById("create-exchange-form");
+  if (formExchange) {
+    formExchange.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const title = document.getElementById("exchange-title").value.trim();
+      const category = document.getElementById("exchange-category").value;
+      const secondary = document.getElementById("exchange-secondary").value.trim();
+      const description = document.getElementById("exchange-description").value.trim();
+      const codeOrDetails = document.getElementById("exchange-code").value.trim();
+
+      if (appState.exchangeModalType === "component") {
+        const newComp = {
+          id: "comp-" + Date.now(),
+          title: title,
+          category: category,
+          lang: secondary.toLowerCase(),
+          country: "BJ",
+          countryFlag: "🇧🇯 Bénin",
+          verified: true,
+          author: "Modeste YABLA",
+          authorAvatar: "MY",
+          downloads: "1",
+          rating: 5.0,
+          upvotes: 1,
+          installCmd: `npm i @devcom/${title.toLowerCase().replace(/[^a-z0-9]/g, '-')}`,
+          desc: description,
+          code: codeOrDetails,
+          simulationOutput: `[DEVCOM] Module exécuté avec succès.`
+        };
+        appState.components.unshift(newComp);
+        renderComponents();
+        showToast("🎉 Composant publié avec succès sur DevCom Africa !");
+      } else if (appState.exchangeModalType === "bounty") {
+        const newBounty = {
+          id: "bounty-" + Date.now(),
+          reward: secondary || "100 000 FCFA",
+          title: title,
+          payoutMethod: "Mobile Money",
+          desc: description,
+          difficulty: "Intermédiaire",
+          applicants: 0,
+          deadline: "30 nov. 2026",
+          company: "Modeste YABLA (Binary Minds)"
+        };
+        appState.bounties.unshift(newBounty);
+        renderBounties();
+        showToast("💰 Bounty publié et ouvert aux candidatures !");
+      } else if (appState.exchangeModalType === "help") {
+        const newPeer = {
+          id: "peer-" + Date.now(),
+          author: "Modeste YABLA",
+          country: "🇧🇯 Bénin",
+          tag: "Troc Technique",
+          title: title,
+          desc: description,
+          deal: secondary
+        };
+        appState.peerExchanges.unshift(newPeer);
+        renderPeerExchanges();
+        showToast("🤝 Demande d'échange publiée dans le flux communautaire !");
+      }
+
+      formExchange.reset();
+      closeCreateExchangeModal();
+    });
+  }
+
+  const btnCloseExModal = document.getElementById("close-exchange-modal-btn");
+  const btnCancelEx = document.getElementById("btn-cancel-exchange");
+  if (btnCloseExModal) btnCloseExModal.addEventListener("click", closeCreateExchangeModal);
+  if (btnCancelEx) btnCancelEx.addEventListener("click", closeCreateExchangeModal);
+
+  // Chat Form Send
+  const chatForm = document.getElementById("chat-send-form");
+  if (chatForm) {
+    chatForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const input = document.getElementById("chat-message-input");
+      const msg = input.value.trim();
+      if (!msg) return;
+
+      const chatArea = document.getElementById("chat-messages-area");
+      const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      // Bulle utilisateur
+      const userBubble = document.createElement("div");
+      userBubble.className = "chat-bubble sender";
+      userBubble.innerHTML = `
+        <div class="bubble-sender">Moi (Modeste YABLA)</div>
+        <div class="bubble-text">${escapeHtml(msg)}</div>
+        <div class="bubble-time">${timeStr}</div>
+      `;
+      chatArea.appendChild(userBubble);
+      input.value = "";
+      chatArea.scrollTop = chatArea.scrollHeight;
+
+      // Simulation de réponse automatique
+      setTimeout(() => {
+        const replyBubble = document.createElement("div");
+        replyBubble.className = "chat-bubble recipient";
+        replyBubble.innerHTML = `
+          <div class="bubble-sender">${appState.activeChatRecipient}</div>
+          <div class="bubble-text">Bien reçu ! Je regarde ton message et je te réponds tout de suite avec les détails de l'implémentation.</div>
+          <div class="bubble-time">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+        `;
+        chatArea.appendChild(replyBubble);
+        chatArea.scrollTop = chatArea.scrollHeight;
+      }, 1200);
+    });
+  }
+
+  // Simulation Sandbox
   const runSimBtn = document.getElementById("btn-run-simulation");
   if (runSimBtn) {
     runSimBtn.addEventListener("click", () => {
       const output = document.getElementById("exec-output");
-      output.textContent = "⏳ Exécution du code dans l'environnement sandbox Systalink Datacloud...";
+      output.textContent = "⏳ Exécution du code dans l'environnement Edge Sandbox...";
       
       setTimeout(() => {
-        if (appState.activeSandboxSnippet && appState.activeSandboxSnippet.simulationOutput) {
-          output.textContent = appState.activeSandboxSnippet.simulationOutput;
+        if (appState.activeSandboxComponent && appState.activeSandboxComponent.simulationOutput) {
+          output.textContent = appState.activeSandboxComponent.simulationOutput;
         } else {
-          output.textContent = "[SUCCESS] Snippet exécuté sans erreurs dans le conteneur Edge.";
+          output.textContent = "[SUCCESS] Composant exécuté sans erreurs dans le conteneur Edge.";
         }
         showToast("Simulation complétée avec succès !");
       }, 500);
     });
   }
 
-  // Fermeture Sandbox
   const closeSandboxBtn = document.getElementById("close-sandbox-btn");
   if (closeSandboxBtn) closeSandboxBtn.addEventListener("click", closeSandbox);
 
   const copySandboxBtn = document.getElementById("btn-copy-sandbox");
   if (copySandboxBtn) {
     copySandboxBtn.addEventListener("click", () => {
-      if (appState.activeSandboxSnippet) {
-        navigator.clipboard.writeText(appState.activeSandboxSnippet.code);
+      if (appState.activeSandboxComponent) {
+        navigator.clipboard.writeText(appState.activeSandboxComponent.code);
         showToast("Code copié !");
       }
     });
   }
 
-  // Modale de publication
-  const publishModal = document.getElementById("publish-modal");
-  const openPub1 = document.getElementById("btn-open-publish");
-  const openPub2 = document.getElementById("btn-open-publish-2");
-  const closePub = document.getElementById("close-publish-btn");
-  const cancelPub = document.getElementById("btn-cancel-publish");
-  const publishForm = document.getElementById("publish-snippet-form");
-
-  const openPubHandler = () => {
-    publishModal.classList.add("open");
-    publishModal.setAttribute("aria-hidden", "false");
-  };
-
-  const closePubHandler = () => {
-    publishModal.classList.remove("open");
-    publishModal.setAttribute("aria-hidden", "true");
-  };
-
-  if (openPub1) openPub1.addEventListener("click", openPubHandler);
-  if (openPub2) openPub2.addEventListener("click", openPubHandler);
-  if (closePub) closePub.addEventListener("click", closePubHandler);
-  if (cancelPub) cancelPub.addEventListener("click", closePubHandler);
-
-  if (publishForm) {
-    publishForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const title = document.getElementById("new-snippet-title").value.trim();
-      const category = document.getElementById("new-snippet-category").value;
-      const lang = document.getElementById("new-snippet-lang").value;
-      const code = document.getElementById("new-snippet-code").value.trim();
-
-      const newSnippet = {
-        id: "user-snippet-" + Date.now(),
-        title: title,
-        category: category,
-        lang: lang,
-        country: "BJ",
-        countryFlag: "🇧🇯 Bénin",
-        verified: true,
-        author: "Modeste YABLA",
-        authorAvatar: "MY",
-        upvotes: 1,
-        desc: "Solution partagée par Modeste YABLA (Binary Minds) pour la communauté panafricaine.",
-        code: code,
-        simulationOutput: `[SYSTALINK] Code personnalisé validé. Environnement prêt.`
-      };
-
-      appState.snippets.unshift(newSnippet);
-      renderSnippets();
-      closePubHandler();
-      publishForm.reset();
-      showToast("🎉 Snippet publié avec succès dans l'écosystème DevCom !");
-    });
-  }
-
-  // Formulaire Binary Minds Pair-Programming
-  const pairForm = document.getElementById("pair-request-form");
-  if (pairForm) {
-    pairForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const tech = document.getElementById("pair-tech").value;
-      const desc = document.getElementById("pair-description").value.trim();
-
-      const newPair = {
-        id: "pair-" + Date.now(),
-        user: "Modeste YABLA",
-        country: "🇧🇯 Cotonou",
-        title: desc,
-        tech: tech,
-        timeAgo: "À l'instant",
-        status: "En attente"
-      };
-
-      appState.pairs.unshift(newPair);
-      renderPairs();
-      pairForm.reset();
-      showToast("🚀 Demande de pair-dev publiée ! Recherche d'un binôme en cours...");
-    });
-  }
-
-  // Testeur de latence Systalink
-  const testLatencyBtn = document.getElementById("btn-test-latency");
-  if (testLatencyBtn) {
-    testLatencyBtn.addEventListener("click", () => {
-      showToast("Mesure de la latence Datacloud en cours...");
-      
-      const cities = [
-        { id: "lat-bj", base: 8 },
-        { id: "lat-ci", base: 14 },
-        { id: "lat-sn", base: 18 },
-        { id: "lat-ng", base: 11 },
-        { id: "lat-ke", base: 32 }
-      ];
-
-      cities.forEach(c => {
-        const el = document.getElementById(c.id);
-        if (el) {
-          const jitter = Math.floor(Math.random() * 4) - 2;
-          const val = Math.max(4, c.base + jitter);
-          el.textContent = `${val} ms`;
-        }
-      });
-
-      setTimeout(() => {
-        showToast("✓ PoP Cotonou & Ouest Afrique ultra-rapides (<15ms) !");
-      }, 500);
-    });
-  }
-
-  // Mobile Menu
+  // Menu Mobile
   const mobileBtn = document.getElementById("mobile-menu-btn");
   const navLinks = document.getElementById("main-nav");
   if (mobileBtn && navLinks) {
@@ -851,7 +984,7 @@ function initEventListeners() {
 }
 
 // ==========================================================================
-// Notifications Toasts
+// Toasts de Notification
 // ==========================================================================
 function showToast(message) {
   const container = document.getElementById("toast-container");
@@ -878,9 +1011,9 @@ function formatCategoryName(cat) {
   switch (cat) {
     case "mobile-money": return "Mobile Money";
     case "offline": return "Offline & PWA";
-    case "ussd": return "USSD & Telco";
-    case "systalink": return "Systalink Cloud";
+    case "ussd": return "USSD & Télécom";
     case "security": return "Sécurité & Auth";
+    case "cloud": return "Cloud & DevOps";
     default: return cat;
   }
 }
@@ -894,3 +1027,18 @@ function escapeHtml(str) {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 }
+
+window.resetFilters = function() {
+  appState.activeCategory = "all";
+  appState.activeLang = "all";
+  appState.activeCountry = "all";
+  appState.searchQuery = "";
+  
+  document.getElementById("omnisearch-input").value = "";
+  document.querySelectorAll(".quick-chip").forEach(c => c.classList.remove("active"));
+  document.querySelector(".quick-chip[data-category='all']").classList.add("active");
+  document.querySelectorAll(".lang-pill").forEach(p => p.classList.remove("active"));
+  document.querySelector(".lang-pill[data-lang='all']").classList.add("active");
+  
+  renderComponents();
+};

@@ -3,55 +3,49 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DevCom Africa — La plateforme d'échange africaine, pour les devs, par les devs | Binary Minds</title>
-  <meta name="description" content="Plateforme d'échange de code, de solutions Mobile Money & offline-first, de pair-programming Binary Minds et de bounties tech pour les développeurs africains. Projet officiel Systalink Challenge 2026.">
-  <meta name="keywords" content="DevCom, Systalink Challenge, Coupe d'Afrique des Développeurs, Binary Minds, Mobile Money API, Bénin, Développeurs Afrique, Open Source">
+  <title>DevCom Africa — La plateforme d'échange africaine, pour les devs, par les devs</title>
+  <meta name="description" content="Plateforme panafricaine d'échange de code, de composants Mobile Money, de bounties rémunérés en devises locales et de mise en relation directe entre développeurs.">
+  <meta name="keywords" content="DevCom Africa, développeurs africains, Mobile Money API, Wave, MTN MoMo, USSD, offline-first, bounties tech, freelance afrique">
+  
+  <!-- Open Graph -->
   <meta property="og:title" content="DevCom Africa — Pour les devs, par les devs">
-  <meta property="og:description" content="Plateforme panafricaine d'échange de code, entraide en binôme et bounties tech.">
+  <meta property="og:description" content="Échangez du code, collaborez sur des missions rémunérées et développez vos solutions pour le continent africain.">
   <meta property="og:image" content="./assets/hero-banner.jpg">
   <link rel="icon" type="image/jpeg" href="./assets/logo.jpg">
-  
+
   <!-- Polices Google Fonts : Outfit & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
-  <!-- Barre d'annonce officielle Systalink Challenge -->
-  <div class="top-announcement-bar">
-    <div class="announcement-content">
-      <span class="badge-pulse">🏆 COUPE D'AFRIQUE DES DÉVELOPPEURS 2026</span>
-      <span class="announcement-text"><strong>Systalink Challenge :</strong> Thème officiel <em>« Construire la plateforme d'échange africaine, pour les devs, par les devs »</em></span>
-      <span class="team-tag">Équipe : <strong>Binary Minds</strong> 🇧🇯 (Bénin)</span>
-    </div>
-  </div>
-
-  <!-- En-tête de navigation -->
+  <!-- Header & Navigation Globale -->
   <header class="main-header">
     <div class="container header-container">
       <a href="#" class="brand-logo" id="brand-logo">
         <div class="logo-wrapper">
-          <img src="./assets/logo.jpg" alt="DevCom Africa Logo" class="brand-img">
-          <span class="brand-status-dot" title="Plateforme active sur Systalink Cloud"></span>
+          <img src="./assets/logo.jpg" alt="DevCom Logo" class="brand-img">
+          <span class="brand-status-dot" title="Plateforme opérationnelle"></span>
         </div>
         <div class="brand-text">
           <span class="brand-name">Dev<span class="text-gradient">Com</span></span>
-          <span class="brand-sub">Africa • Binary Minds</span>
+          <span class="brand-sub">Africa</span>
         </div>
       </a>
 
+      <!-- Navigation Principale -->
       <nav class="nav-links" id="main-nav">
-        <a href="#solutions" class="nav-link active"><span class="nav-icon">⚡</span> Solutions & Code</a>
-        <a href="#binary-minds" class="nav-link"><span class="nav-icon">🤝</span> Pair Dev (Binary Minds)</a>
-        <a href="#bounties" class="nav-link"><span class="nav-icon">💰</span> Bounties & Missions</a>
-        <a href="#systalink-hub" class="nav-link"><span class="nav-icon">☁️</span> Systalink Datacloud</a>
-        <a href="#challenge" class="nav-link"><span class="nav-icon">🎯</span> Challenge</a>
+        <a href="#composants" class="nav-link active"><span class="nav-icon">⚡</span> Composants & APIs</a>
+        <a href="#bourse" class="nav-link"><span class="nav-icon">💰</span> Bourse & Bounties</a>
+        <a href="#entraide" class="nav-link"><span class="nav-icon">🤝</span> Entraide & Troc</a>
+        <a href="#developpeurs" class="nav-link"><span class="nav-icon">👥</span> Développeurs</a>
       </nav>
 
+      <!-- Actions Utilisateur & Header -->
       <div class="header-actions">
-        <!-- Sélecteur de pays africain -->
+        <!-- Sélecteur de Pays Panafricain -->
         <div class="country-selector">
           <select id="country-filter" aria-label="Sélectionner le pays">
             <option value="all">🌍 Panafricain</option>
@@ -67,24 +61,30 @@
         </div>
 
         <!-- Thème Dark / Light -->
-        <button class="theme-toggle-btn" id="theme-toggle" title="Basculer thème sombre / clair" aria-label="Basculer thème">
+        <button class="icon-btn theme-toggle-btn" id="theme-toggle" title="Basculer thème sombre / clair" aria-label="Basculer thème">
           <span class="theme-icon-dark">🌙</span>
           <span class="theme-icon-light">☀️</span>
         </button>
 
-        <!-- CTA Partager / Publier -->
-        <button class="btn btn-primary" id="btn-open-publish">
-          <span class="btn-icon">+</span> Publier un échange
+        <!-- Bouton Messagerie Directe -->
+        <button class="icon-btn message-btn" id="btn-open-messages" title="Messages & Échanges en direct" aria-label="Messagerie">
+          <span>💬</span>
+          <span class="unread-pill" id="unread-count">2</span>
         </button>
 
-        <!-- Profil utilisateur Binary Minds -->
-        <div class="user-profile-badge" title="Connecté via Systalink SSO">
+        <!-- CTA Créer un Échange -->
+        <button class="btn btn-primary" id="btn-create-exchange">
+          <span class="btn-icon">+</span> Créer un Échange
+        </button>
+
+        <!-- Profil Membre Utilisateur -->
+        <button class="user-profile-btn" id="btn-open-profile" title="Mon Profil Développeur">
           <div class="avatar-circle">MY</div>
           <div class="user-meta">
-            <span class="user-name">Modeste YABLA</span>
-            <span class="user-role">Binary Minds (2/5)</span>
+            <span class="user-name">Modeste Y.</span>
+            <span class="user-dp">1,250 DP</span>
           </div>
-        </div>
+        </button>
 
         <!-- Menu Mobile Toggle -->
         <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Ouvrir le menu">
@@ -94,14 +94,14 @@
     </div>
   </header>
 
-  <!-- Section Hero -->
+  <!-- Hero Section : Présentation Produit -->
   <section class="hero-section">
     <div class="hero-bg-glow"></div>
     <div class="container hero-container">
       <div class="hero-content">
         <div class="hero-badge">
           <span class="pulse-icon">●</span>
-          <span>Systalink Challenge 2026 • Livrables Dépôt Git + Démo en ligne</span>
+          <span>L'écosystème panafricain des créateurs de logiciels</span>
         </div>
         
         <h1 class="hero-title">
@@ -110,66 +110,64 @@
         </h1>
         
         <p class="hero-subtitle">
-          Mutualisez des solutions éprouvées pour le continent (Mobile Money, offline-first, USSD), 
-          associez-vous en binôme grâce à <strong>Binary Minds</strong> (<em>« Deux esprits valent mieux qu'un »</em>) 
-          et réalisez des missions financées en devises locales.
+          Mutualisez des modules de code testés pour le continent (Mobile Money, Offline-first, USSD), 
+          financez des missions et bounties en devises locales et échangez vos expertises entre pairs.
         </p>
 
-        <!-- Barre de recherche intelligente -->
+        <!-- Barre de recherche globale (Omnisearch) -->
         <div class="omnisearch-box">
           <div class="search-input-wrapper">
             <span class="search-icon">🔍</span>
-            <input type="text" id="omnisearch-input" placeholder="Rechercher : webhook MTN MoMo, sync SQLite offline, USSD menu, mentor..." autocomplete="off">
+            <input type="text" id="omnisearch-input" placeholder="Rechercher : webhook MTN MoMo, sync SQLite offline, USSD, mentor..." autocomplete="off">
             <button class="search-clear-btn" id="search-clear" style="display: none;">✕</button>
           </div>
-          <button class="btn btn-search" id="btn-search">Explorer</button>
+          <button class="btn btn-search" id="btn-search">Rechercher</button>
         </div>
 
-        <!-- Tags / Filtres rapides -->
+        <!-- Filtres Rapides par Catégories -->
         <div class="quick-tags" id="quick-tags-container">
-          <span class="tag-label">Filtres rapides :</span>
-          <button class="quick-chip active" data-category="all">Tous</button>
-          <button class="quick-chip" data-category="mobile-money">💳 Mobile Money</button>
-          <button class="quick-chip" data-category="offline">📶 Offline & PWA</button>
+          <span class="tag-label">Catégories :</span>
+          <button class="quick-chip active" data-category="all">Toutes</button>
+          <button class="quick-chip" data-category="mobile-money">💳 Mobile Money & Fintech</button>
+          <button class="quick-chip" data-category="offline">📶 Offline-First & Sync</button>
           <button class="quick-chip" data-category="ussd">📱 USSD & Télécoms</button>
-          <button class="quick-chip" data-category="systalink">☁️ Systalink Datacloud</button>
-          <button class="quick-chip" data-category="security">🛡️ Auth & Sécurité</button>
+          <button class="quick-chip" data-category="security">🛡️ Auth & KYC</button>
+          <button class="quick-chip" data-category="cloud">☁️ Cloud & DevOps</button>
         </div>
 
-        <!-- Métriques dynamiques -->
+        <!-- Métriques Réelles de la Plateforme -->
         <div class="hero-stats-grid">
           <div class="stat-card">
-            <div class="stat-number" id="stat-solutions">380+</div>
-            <div class="stat-label">Solutions & Snippets africains</div>
+            <div class="stat-number" id="stat-components">480+</div>
+            <div class="stat-label">Composants & APIs vérifiés</div>
           </div>
           <div class="stat-card">
             <div class="stat-number" id="stat-devs">1,420+</div>
-            <div class="stat-label">Développeurs enregistrés</div>
+            <div class="stat-label">Développeurs actifs</div>
           </div>
           <div class="stat-card">
-            <div class="stat-number highlight-gold">18,5M</div>
-            <div class="stat-label">FCFA de Bounties financés</div>
+            <div class="stat-number highlight-gold" id="stat-bounties">24,5M</div>
+            <div class="stat-label">FCFA de Bounties échangés</div>
           </div>
           <div class="stat-card">
-            <div class="stat-number highlight-blue">99.98%</div>
-            <div class="stat-label">Hébergé sur Systalink Datacloud</div>
+            <div class="stat-number highlight-blue" id="stat-solved">99.8%</div>
+            <div class="stat-label">Taux d'entraide résolue</div>
           </div>
         </div>
       </div>
 
-      <!-- Illustration Héro interactive -->
+      <!-- Visuel Interactif Plateforme -->
       <div class="hero-visual">
         <div class="hero-card-preview">
-          <img src="./assets/hero-banner.jpg" alt="DevCom African Tech Ecosystem" class="hero-banner-img">
+          <img src="./assets/hero-banner.jpg" alt="DevCom Africa Tech Ecosystem" class="hero-banner-img">
           <div class="hero-banner-overlay">
             <div class="live-pulse-badge">
               <span class="ping-circle"></span>
-              <span>Réseau Panafricain Connecté</span>
+              <span>Hub Connecté : 14 Pays Africains</span>
             </div>
-            <div class="banner-team-quote">
-              <span class="quote-icon">💡</span>
-              <em>« Deux esprits valent mieux qu'un. Des possibilités infinies. »</em>
-              <div class="author-tag">— Binary Minds, Bénin 🇧🇯</div>
+            <div class="banner-quick-actions">
+              <div class="quick-action-text">Prêt à échanger du code ou proposer un service ?</div>
+              <button class="btn btn-sm btn-primary" onclick="openCreateExchangeModal('component')">+ Publier un composant</button>
             </div>
           </div>
         </div>
@@ -177,22 +175,21 @@
     </div>
   </section>
 
-  <!-- Section 1 : Catalogue d'échange de code & Solutions Africaines -->
-  <section class="section" id="solutions">
+  <!-- Section 1 : Catalogue de Composants & APIs Africaines -->
+  <section class="section" id="composants">
     <div class="container">
       <div class="section-header">
         <div>
-          <span class="section-tag">⚡ SOLUTIONS & CODE</span>
-          <h2 class="section-title">Snippets & Composants Taillés pour l'Afrique</h2>
-          <p class="section-desc">Accédez à du code testé en conditions réelles : intégrations de passerelles de paiement, architecture pour connexions instables, et protocoles télécoms.</p>
+          <span class="section-tag">⚡ COMPOSANTS & APIS</span>
+          <h2 class="section-title">Catalogue de Solutions Prêtes à l'Emploi</h2>
+          <p class="section-desc">Modules, SDKs et snippets de code réutilisables adaptés aux contraintes du terrain africain (réseaux intermittents, passerelles de paiement locales, formats USSD).</p>
         </div>
         <div class="section-action-group">
-          <button class="btn btn-outline" id="filter-all-btn">Tout afficher</button>
-          <button class="btn btn-primary" id="btn-open-publish-2">+ Partager un Snippet</button>
+          <button class="btn btn-primary" onclick="openCreateExchangeModal('component')">+ Publier un Composant</button>
         </div>
       </div>
 
-      <!-- Filtres de langages -->
+      <!-- Filtres de langages et tri -->
       <div class="filter-toolbar">
         <div class="lang-pills" id="lang-pills">
           <button class="lang-pill active" data-lang="all">Tous les langages</button>
@@ -200,247 +197,82 @@
           <button class="lang-pill" data-lang="python">Python</button>
           <button class="lang-pill" data-lang="php">PHP</button>
           <button class="lang-pill" data-lang="javascript">JavaScript</button>
-          <button class="lang-pill" data-lang="go">Go</button>
+          <button class="lang-pill" data-lang="flutter">Flutter / Dart</button>
         </div>
         <div class="sort-selector">
           <label for="sort-select">Trier par :</label>
           <select id="sort-select">
             <option value="popular">Les plus plébiscités</option>
             <option value="recent">Les plus récents</option>
-            <option value="tested">100% Testés Systalink</option>
+            <option value="downloads">Téléchargements</option>
           </select>
         </div>
       </div>
 
-      <!-- Grille des snippets -->
-      <div class="snippets-grid" id="snippets-grid">
+      <!-- Grille des Composants -->
+      <div class="components-grid" id="components-grid">
         <!-- Rempli dynamiquement par app.js -->
       </div>
     </div>
   </section>
 
-  <!-- Section 2 : "Binary Minds" — Hub de Pair Programming & Entraide Flash -->
-  <section class="section section-dark-accent" id="binary-minds">
-    <div class="container">
-      <div class="section-header text-center">
-        <span class="section-tag section-tag-amber">🤝 ESPACE BINARY MINDS</span>
-        <h2 class="section-title">Pair-Programming & Entraide en Direct</h2>
-        <p class="section-desc">Inspiré de notre devise : <em>« Deux esprits valent mieux qu'un »</em>. Ne restez plus bloqué sur un bug : associez-vous avec un développeur du continent en 60 secondes.</p>
-      </div>
-
-      <div class="binary-minds-wrapper">
-        <!-- Panneau de recherche de binôme en direct -->
-        <div class="matchmaker-card">
-          <div class="matchmaker-header">
-            <div class="neural-icon-pulse">🧠⚡🧠</div>
-            <h3>Trouver un Binôme Instantané</h3>
-            <p>Sélectionnez votre besoin et notre algorithme vous apparie avec un dev disponible dans votre fuseau horaire.</p>
-          </div>
-
-          <form id="pair-request-form" class="pair-form">
-            <div class="form-group">
-              <label for="pair-tech">Technologie / Domaine concerné</label>
-              <select id="pair-tech" required>
-                <option value="Mobile Money & Webhooks">💳 Mobile Money & Webhooks (MTN / Moov / Wave)</option>
-                <option value="Frontend Next.js & Tailwind">⚛️ Frontend Next.js, React & Vercel</option>
-                <option value="Backend Python & FastAPI">🐍 Backend Python, Django & FastAPI</option>
-                <option value="Systalink Datacloud & DevOps">☁️ Systalink Datacloud & Déploiement</option>
-                <option value="Offline Sync & IndexedDB">📶 Synchronisation Offline & PWA</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="pair-description">Décrivez brièvement le point de blocage</label>
-              <input type="text" id="pair-description" placeholder="Ex: Erreur signature HMAC sur le webhook Wave en production..." required>
-            </div>
-
-            <div class="pair-form-footer">
-              <div class="match-time-indicator">⏱️ Temps moyen d'appairage : <strong>45 secondes</strong></div>
-              <button type="submit" class="btn btn-amber" id="btn-start-pair">
-                🚀 Lancer la session en binôme
-              </button>
-            </div>
-          </form>
-        </div>
-
-        <!-- Flux des appels d'entraide actifs -->
-        <div class="live-pairs-feed">
-          <div class="feed-header">
-            <h4>🔴 Sessions d'Entraide en Cours</h4>
-            <span class="live-badge"><span class="ping-green"></span> 8 en attente</span>
-          </div>
-          <div class="pairs-list" id="pairs-list">
-            <!-- Rempli par app.js -->
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Section 3 : Bourse aux Bounties & Missions (XOF / Mobile Money) -->
-  <section class="section" id="bounties">
+  <!-- Section 2 : Bourse aux Échanges, Missions & Bounties -->
+  <section class="section section-dark-accent" id="bourse">
     <div class="container">
       <div class="section-header">
         <div>
-          <span class="section-tag section-tag-cyan">💰 PLACE DE MARCHÉ TECH</span>
-          <h2 class="section-title">Bounties & Missions Rémunérées</h2>
-          <p class="section-desc">Participez à la résolution de défis techniques concrets et recevez vos rétributions instantanément par Mobile Money ou Virement.</p>
+          <span class="section-tag section-tag-amber">💰 BOURSE AUX ÉCHANGES</span>
+          <h2 class="section-title">Bounties & Missions Tech Rémunérées</h2>
+          <p class="section-desc">Postulez à des micro-missions et bounties financés par des entreprises et projets tech du continent, rétribués instantanément en devises locales via Mobile Money.</p>
         </div>
         <div>
-          <button class="btn btn-outline" id="btn-open-bounty-modal">+ Créer un Bounty</button>
+          <button class="btn btn-amber" onclick="openCreateExchangeModal('bounty')">+ Lancer un Bounty</button>
         </div>
       </div>
 
+      <!-- Grille des Bounties -->
       <div class="bounties-grid" id="bounties-grid">
         <!-- Rempli dynamiquement par app.js -->
       </div>
     </div>
   </section>
 
-  <!-- Section 4 : Partenaire Officiel — Systalink Cloud & Datacloud Hub -->
-  <section class="section section-systalink" id="systalink-hub">
+  <!-- Section 3 : Espace Entraide & Troc de Compétences -->
+  <section class="section" id="entraide">
     <div class="container">
-      <div class="systalink-banner-card">
-        <div class="systalink-content">
-          <div class="systalink-badge">☁️ PARTENAIRE OFFICIEL DU CHALLENGE</div>
-          <h2 class="systalink-title">Hébergé & Optimisé pour Systalink Datacloud</h2>
-          <p class="systalink-desc">
-            Dans le cadre du <strong>Systalink Challenge 2026</strong>, bénéficiez de <strong>-40% sur l'infrastructure cloud</strong> 
-            pour héberger vos applications avec une latence ultra-faible sur le sol africain.
-          </p>
-          
-          <div class="systalink-features">
-            <div class="feat-item">
-              <span class="feat-check">✓</span>
-              <span><strong>Datacenter West Africa</strong> (Latence &lt; 15ms)</span>
-            </div>
-            <div class="feat-item">
-              <span class="feat-check">✓</span>
-              <span><strong>Stockage S3 S3-Compatible</strong> pour sauvegardes d'APIs</span>
-            </div>
-            <div class="feat-item">
-              <span class="feat-check">✓</span>
-              <span><strong>Déploiement Continu</strong> connecté à GitHub & Vercel</span>
-            </div>
-          </div>
-
-          <div class="systalink-cta-group">
-            <a href="https://platform.systalink.com" target="_blank" rel="noopener noreferrer" class="btn btn-systalink">
-              Accéder à la Datacloud Systalink (-40%) ↗
-            </a>
-            <button class="btn btn-glass" id="btn-test-latency">
-              Tester la latence en direct
-            </button>
-          </div>
+      <div class="section-header">
+        <div>
+          <span class="section-tag section-tag-cyan">🤝 ENTRAIDE & TROC</span>
+          <h2 class="section-title">Échange de Compétences & Entraide Flash</h2>
+          <p class="section-desc">Besoin d'un coup de main sur un bug critique ou d'une revue d'architecture ? Associez-vous avec un développeur du continent sur le principe de l'échange équitable.</p>
         </div>
-
-        <!-- Widget de latence en temps réel -->
-        <div class="systalink-monitor">
-          <div class="monitor-header">
-            <span>📡 Latence Systalink Datacloud en direct</span>
-            <span class="status-green">Optimal</span>
-          </div>
-          <div class="latency-list" id="latency-list">
-            <div class="latency-row">
-              <span class="city">🇧🇯 Cotonou (Bénin)</span>
-              <div class="latency-bar-wrap"><div class="latency-bar" style="width: 15%;"></div></div>
-              <span class="ms-val" id="lat-bj">8 ms</span>
-            </div>
-            <div class="latency-row">
-              <span class="city">🇨🇮 Abidjan (Côte d'Ivoire)</span>
-              <div class="latency-bar-wrap"><div class="latency-bar" style="width: 24%;"></div></div>
-              <span class="ms-val" id="lat-ci">14 ms</span>
-            </div>
-            <div class="latency-row">
-              <span class="city">🇸🇳 Dakar (Sénégal)</span>
-              <div class="latency-bar-wrap"><div class="latency-bar" style="width: 28%;"></div></div>
-              <span class="ms-val" id="lat-sn">18 ms</span>
-            </div>
-            <div class="latency-row">
-              <span class="city">🇳🇬 Lagos (Nigeria)</span>
-              <div class="latency-bar-wrap"><div class="latency-bar" style="width: 20%;"></div></div>
-              <span class="ms-val" id="lat-ng">11 ms</span>
-            </div>
-            <div class="latency-row">
-              <span class="city">🇰🇪 Nairobi (Kenya)</span>
-              <div class="latency-bar-wrap"><div class="latency-bar" style="width: 50%;"></div></div>
-              <span class="ms-val" id="lat-ke">32 ms</span>
-            </div>
-          </div>
+        <div>
+          <button class="btn btn-outline" onclick="openCreateExchangeModal('help')">+ Demander de l'Aide</button>
         </div>
+      </div>
+
+      <div class="peer-exchange-grid" id="peer-exchange-grid">
+        <!-- Rempli dynamiquement par app.js -->
       </div>
     </div>
   </section>
 
-  <!-- Section 5 : Présentation Équipe Binary Minds & Suivi du Challenge -->
-  <section class="section" id="challenge">
+  <!-- Section 4 : Annuaire des Développeurs & Profils Africains -->
+  <section class="section section-dark-accent" id="developpeurs">
     <div class="container">
-      <div class="challenge-box">
-        <div class="challenge-header">
-          <div class="team-flag-badge">🇧🇯 BÉNIN</div>
-          <h3>Équipe : Binary Minds</h3>
-          <p class="team-motto">« Deux esprits. Des possibilités infinies. Deux esprits valent mieux qu'un. »</p>
-        </div>
+      <div class="section-header text-center">
+        <span class="section-tag">👥 COMMUNAUTÉ TECH</span>
+        <h2 class="section-title">Les Développeurs de la Communauté</h2>
+        <p class="section-desc">Entrez en contact direct avec des ingénieurs logiciels, architectes cloud et développeurs mobiles à travers toute l'Afrique.</p>
+      </div>
 
-        <div class="challenge-grid">
-          <!-- Carte statut challenge -->
-          <div class="challenge-status-card">
-            <h4>Progression Systalink Challenge</h4>
-            <div class="progress-bar-container">
-              <div class="progress-bar-fill" style="width: 80%;"></div>
-            </div>
-            <ul class="steps-list">
-              <li class="step-done"><span class="step-check">✓</span> 1. Compte créé (Fait)</li>
-              <li class="step-done"><span class="step-check">✓</span> 2. Équipe constituée (Binary Minds - Fait)</li>
-              <li class="step-active"><span class="step-check">⏳</span> 3. Projet déclaré & Architecture MVP</li>
-              <li class="step-active"><span class="step-check">⚡</span> 4. Produit Systalink Datacloud actif (-40%)</li>
-              <li class="step-pending"><span class="step-check">🎯</span> 5. Démo Vercel + Dépôt Git soumis au jury</li>
-            </ul>
-          </div>
-
-          <!-- Compte à rebours officiel -->
-          <div class="countdown-card">
-            <h4>Date Limite de Soumission</h4>
-            <p class="deadline-date">15 Novembre 2026 • Clôture du Challenge</p>
-            <div class="countdown-timer" id="countdown-timer">
-              <div class="time-block">
-                <span class="time-val" id="count-days">26</span>
-                <span class="time-lbl">Jours</span>
-              </div>
-              <div class="time-sep">:</div>
-              <div class="time-block">
-                <span class="time-val" id="count-hours">08</span>
-                <span class="time-lbl">Heures</span>
-              </div>
-              <div class="time-sep">:</div>
-              <div class="time-block">
-                <span class="time-val" id="count-minutes">42</span>
-                <span class="time-lbl">Minutes</span>
-              </div>
-              <div class="time-sep">:</div>
-              <div class="time-block">
-                <span class="time-val" id="count-seconds">19</span>
-                <span class="time-lbl">Secondes</span>
-              </div>
-            </div>
-
-            <div class="deploy-buttons-box">
-              <a href="https://vercel.com" target="_blank" rel="noopener noreferrer" class="btn btn-vercel">
-                <svg width="18" height="18" viewBox="0 0 116 100" fill="currentColor"><path d="M57.5 0L115 100H0L57.5 0z"/></svg>
-                Déployé sur Vercel
-              </a>
-              <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="btn btn-github">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-                Code Source GitHub
-              </a>
-            </div>
-          </div>
-        </div>
+      <div class="developers-grid" id="developers-grid">
+        <!-- Rempli dynamiquement par app.js -->
       </div>
     </div>
   </section>
 
-  <!-- Pied de page -->
+  <!-- Footer -->
   <footer class="main-footer">
     <div class="container footer-container">
       <div class="footer-col">
@@ -449,54 +281,122 @@
           <span class="footer-brand-title">DevCom Africa</span>
         </div>
         <p class="footer-about">
-          La plateforme d'échange de code, de mentorat et de bounties créée pour et par les développeurs africains.
+          La plateforme d'échange panafricaine conçue pour et par les développeurs. Code, bounties en monnaie locale et entraide technique.
         </p>
         <div class="footer-flags">
-          <span>🇧🇯 Bénin</span> • <span>🇨🇮 Côte d'Ivoire</span> • <span>🇸🇳 Sénégal</span> • <span>🇳🇬 Nigeria</span> • <span>🇰🇪 Kenya</span>
+          <span>🇧🇯 Bénin</span> • <span>🇨🇮 Côte d'Ivoire</span> • <span>🇸🇳 Sénégal</span> • <span>🇳🇬 Nigeria</span> • <span>🇰🇪 Kenya</span> • <span>🇷🇼 Rwanda</span>
         </div>
       </div>
 
       <div class="footer-col">
-        <h4>Navigation</h4>
+        <h4>Écosystème</h4>
         <ul>
-          <li><a href="#solutions">Solutions & Snippets</a></li>
-          <li><a href="#binary-minds">Pair Dev Binary Minds</a></li>
-          <li><a href="#bounties">Bounties FCFA</a></li>
-          <li><a href="#systalink-hub">Systalink Datacloud</a></li>
+          <li><a href="#composants">Composants & SDKs</a></li>
+          <li><a href="#bourse">Bourse aux Bounties</a></li>
+          <li><a href="#entraide">Troc de Compétences</a></li>
+          <li><a href="#developpeurs">Annuaire des Développeurs</a></li>
         </ul>
       </div>
 
       <div class="footer-col">
-        <h4>Challenge & Outils</h4>
+        <h4>Outils & Intégrations</h4>
         <ul>
-          <li><a href="./STITCH_PROMPT.md" target="_blank">Master Prompt Google Stitch</a></li>
-          <li><a href="https://platform.systalink.com" target="_blank" rel="noopener noreferrer">Portail Systalink Challenge</a></li>
-          <li><a href="https://vercel.com" target="_blank" rel="noopener noreferrer">Déploiement Vercel</a></li>
-          <li><a href="https://github.com" target="_blank" rel="noopener noreferrer">Dépôt GitHub</a></li>
+          <li><a href="javascript:void(0)" onclick="openCreateExchangeModal('component')">Publier un package</a></li>
+          <li><a href="javascript:void(0)" onclick="openMessagesDrawer()">Boîte de messagerie</a></li>
+          <li><a href="./STITCH_PROMPT.md" target="_blank">Spécifications UI Google Stitch</a></li>
+          <li><a href="https://github.com/arcaneai2007/devcom-africa" target="_blank" rel="noopener noreferrer">Code Source GitHub</a></li>
         </ul>
       </div>
 
       <div class="footer-col">
-        <h4>Binary Minds Team</h4>
-        <p class="footer-team-desc">Conçu par Modeste YABLA & l'équipe Binary Minds pour le Systalink Challenge 2026.</p>
-        <div class="footer-badge">🇧🇯 Fièrement développé au Bénin</div>
+        <h4>À Propos</h4>
+        <p class="footer-team-desc">Fondé par Modeste YABLA et la communauté open-source africaine pour accélérer l'indépendance technologique du continent.</p>
+        <div class="footer-badge">🌍 100% Développé pour l'Afrique</div>
       </div>
     </div>
 
     <div class="footer-bottom">
       <div class="container">
-        <p>© 2026 DevCom Africa — Tous droits réservés. Projet soumis au jury de la Coupe d'Afrique des Développeurs.</p>
+        <p>© 2026 DevCom Africa — Tous droits réservés. Construit pour les devs, par les devs.</p>
       </div>
     </div>
   </footer>
 
-  <!-- MODAL : Bac à Sable / Testeur de Code en direct -->
+  <!-- ==========================================================================
+       MODAL 1 : Créer un Échange (Multi-types : Composant, Bounty, Entraide)
+       ========================================================================== -->
+  <div class="modal-overlay" id="create-exchange-modal" role="dialog" aria-hidden="true">
+    <div class="modal-card modal-large">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="modal-icon">✨</span>
+          <h3 id="modal-exchange-heading">Créer un Nouvel Échange sur DevCom</h3>
+        </div>
+        <button class="modal-close-btn" id="close-exchange-modal-btn" aria-label="Fermer">✕</button>
+      </div>
+
+      <!-- Type Selector Tabs -->
+      <div class="exchange-type-selector">
+        <button class="type-tab active" data-type="component" id="tab-type-component">⚡ Composant / Code</button>
+        <button class="type-tab" data-type="bounty" id="tab-type-bounty">💰 Mission / Bounty</button>
+        <button class="type-tab" data-type="help" id="tab-type-help">🤝 Entraide / Troc</button>
+      </div>
+
+      <form id="create-exchange-form" class="modal-form">
+        <!-- Champ Titre -->
+        <div class="form-group">
+          <label for="exchange-title">Titre de l'échange</label>
+          <input type="text" id="exchange-title" placeholder="Ex: Webhook signature verifier pour Wave & MoMo" required>
+        </div>
+
+        <!-- Ligne Catégorie & Langage/Devise -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="exchange-category">Catégorie</label>
+            <select id="exchange-category" required>
+              <option value="mobile-money">💳 Mobile Money & Fintech</option>
+              <option value="offline">📶 Offline-First & Synchronisation</option>
+              <option value="ussd">📱 USSD & Télécoms</option>
+              <option value="security">🛡️ Auth & KYC</option>
+              <option value="cloud">☁️ Cloud & DevOps</option>
+            </select>
+          </div>
+
+          <div class="form-group" id="group-dynamic-field">
+            <label for="exchange-secondary" id="label-dynamic-field">Langage de programmation</label>
+            <input type="text" id="exchange-secondary" placeholder="TypeScript, Python, PHP..." required>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="form-group">
+          <label for="exchange-description">Description détaillée</label>
+          <textarea id="exchange-description" rows="3" placeholder="Expliquez ce que fait votre solution ou ce dont vous avez besoin..." required></textarea>
+        </div>
+
+        <!-- Code Source ou Détails Spécifiques -->
+        <div class="form-group" id="group-code-field">
+          <label for="exchange-code">Code source / Implémentation</label>
+          <textarea id="exchange-code" rows="7" placeholder="// Insérez votre code ici ou les spécifications..." required></textarea>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" id="btn-cancel-exchange">Annuler</button>
+          <button type="submit" class="btn btn-primary" id="btn-submit-exchange">Publier l'échange</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL 2 : Bac à Sable / Testeur de Code Interactif
+       ========================================================================== -->
   <div class="modal-overlay" id="sandbox-modal" role="dialog" aria-hidden="true">
     <div class="modal-card modal-large">
       <div class="modal-header">
         <div class="modal-title-wrap">
           <span class="modal-icon">🧪</span>
-          <h3 id="sandbox-title">Testeur de Code Interactif</h3>
+          <h3 id="sandbox-title">Testeur de Code en Direct</h3>
         </div>
         <button class="modal-close-btn" id="close-sandbox-btn" aria-label="Fermer">✕</button>
       </div>
@@ -515,7 +415,7 @@
               <button class="btn btn-sm btn-primary" id="btn-run-simulation">▶ Exécuter</button>
             </div>
             <div class="exec-output" id="exec-output">
-              <span class="exec-idle">Cliquez sur « Exécuter » pour simuler le comportement du snippet (appel API, validation, réponse JSON)...</span>
+              <span class="exec-idle">Cliquez sur « Exécuter » pour simuler le comportement du composant (requête API, calcul HMAC, synchronisation)...</span>
             </div>
           </div>
         </div>
@@ -523,56 +423,114 @@
     </div>
   </div>
 
-  <!-- MODAL : Publier un Snippet -->
-  <div class="modal-overlay" id="publish-modal" role="dialog" aria-hidden="true">
-    <div class="modal-card">
-      <div class="modal-header">
-        <div class="modal-title-wrap">
-          <span class="modal-icon">📤</span>
-          <h3>Partager une Solution / Snippet</h3>
+  <!-- ==========================================================================
+       DRAWER 1 : Messagerie Directe & Mise en Relation
+       ========================================================================== -->
+  <div class="drawer-overlay" id="messages-drawer" role="dialog" aria-hidden="true">
+    <div class="drawer-card">
+      <div class="drawer-header">
+        <div class="drawer-title-wrap">
+          <span class="modal-icon">💬</span>
+          <h3>Messagerie DevCom</h3>
         </div>
-        <button class="modal-close-btn" id="close-publish-btn" aria-label="Fermer">✕</button>
+        <button class="modal-close-btn" id="close-messages-btn" aria-label="Fermer">✕</button>
       </div>
-      <form id="publish-snippet-form" class="modal-form">
-        <div class="form-group">
-          <label for="new-snippet-title">Titre de la solution</label>
-          <input type="text" id="new-snippet-title" placeholder="Ex: Webhook signature verifier pour Wave & MoMo" required>
+
+      <div class="drawer-body chat-drawer-body">
+        <!-- Liste des contacts récents -->
+        <div class="chat-contacts-bar" id="chat-contacts-bar">
+          <button class="contact-pill active" data-user="Amina Diallo">🇸🇳 Amina D.</button>
+          <button class="contact-pill" data-user="Emmanuel Kouassi">🇨🇮 Emmanuel K.</button>
+          <button class="contact-pill" data-user="Chukwudi Okafor">🇳🇬 Chukwudi O.</button>
         </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label for="new-snippet-category">Catégorie</label>
-            <select id="new-snippet-category" required>
-              <option value="mobile-money">Mobile Money & Fintech</option>
-              <option value="offline">Offline-First & PWA</option>
-              <option value="ussd">USSD & Télécoms</option>
-              <option value="systalink">Systalink Cloud</option>
-              <option value="security">Auth & Sécurité</option>
-            </select>
+
+        <!-- Zone des messages échangés -->
+        <div class="chat-messages-area" id="chat-messages-area">
+          <div class="chat-bubble recipient">
+            <div class="bubble-sender">Amina Diallo (Dakar 🇸🇳)</div>
+            <div class="bubble-text">Salut Modeste ! J'ai vu ton composant pour le webhook MoMo Bénin. Est-ce que tu peux m'aider à l'adapter pour Wave Sénégal ?</div>
+            <div class="bubble-time">14:10</div>
           </div>
-          <div class="form-group">
-            <label for="new-snippet-lang">Langage</label>
-            <select id="new-snippet-lang" required>
-              <option value="typescript">TypeScript</option>
-              <option value="python">Python</option>
-              <option value="javascript">JavaScript</option>
-              <option value="php">PHP</option>
-              <option value="go">Go</option>
-            </select>
+          <div class="chat-bubble sender">
+            <div class="bubble-sender">Moi (Modeste YABLA)</div>
+            <div class="bubble-text">Salut Amina ! Oui tout à fait, la structure HMAC est similaire, il faut juste adapter les clés du header webhook. Je peux te filer un coup de main !</div>
+            <div class="bubble-time">14:15</div>
           </div>
         </div>
-        <div class="form-group">
-          <label for="new-snippet-code">Code source</label>
-          <textarea id="new-snippet-code" rows="8" placeholder="// Insérez votre code ici..." required></textarea>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-outline" id="btn-cancel-publish">Annuler</button>
-          <button type="submit" class="btn btn-primary">Publier dans l'écosystème</button>
-        </div>
-      </form>
+
+        <!-- Entrée de message -->
+        <form id="chat-send-form" class="chat-input-bar">
+          <input type="text" id="chat-message-input" placeholder="Écrire un message ou partager du code..." autocomplete="off" required>
+          <button type="submit" class="btn btn-primary btn-sm">Envoyer</button>
+        </form>
+      </div>
     </div>
   </div>
 
-  <!-- Toast de notification -->
+  <!-- ==========================================================================
+       DRAWER 2 : Espace Membre / Profil Développeur
+       ========================================================================== -->
+  <div class="drawer-overlay" id="profile-drawer" role="dialog" aria-hidden="true">
+    <div class="drawer-card">
+      <div class="drawer-header">
+        <div class="drawer-title-wrap">
+          <span class="modal-icon">👤</span>
+          <h3>Profil Développeur</h3>
+        </div>
+        <button class="modal-close-btn" id="close-profile-btn" aria-label="Fermer">✕</button>
+      </div>
+
+      <div class="drawer-body profile-drawer-body">
+        <div class="profile-hero-card">
+          <div class="profile-avatar-large">MY</div>
+          <h4 class="profile-full-name">Modeste YABLA</h4>
+          <p class="profile-title">Ingénieur Logiciel Fullstack & Architecte Cloud</p>
+          <div class="profile-location">📍 Cotonou, Bénin 🇧🇯</div>
+          
+          <div class="profile-reputation-badge">
+            <span class="dp-icon">⚡</span>
+            <span><strong>1,250</strong> DevPoints (Top 5% Bénin)</span>
+          </div>
+        </div>
+
+        <div class="profile-section">
+          <h5>Stack Technique</h5>
+          <div class="tech-chips-list">
+            <span class="tech-chip">TypeScript</span>
+            <span class="tech-chip">Next.js / React</span>
+            <span class="tech-chip">Python / FastAPI</span>
+            <span class="tech-chip">Mobile Money APIs</span>
+            <span class="tech-chip">Docker</span>
+            <span class="tech-chip">PostgreSQL</span>
+          </div>
+        </div>
+
+        <div class="profile-section">
+          <h5>Mes Échanges Actifs</h5>
+          <ul class="profile-exchanges-list">
+            <li>
+              <span>⚡ Webhook MTN MoMo & Moov</span>
+              <span class="status-badge-green">Actif (142 upvotes)</span>
+            </li>
+            <li>
+              <span>📱 Framework USSD Dynamic Menu</span>
+              <span class="status-badge-green">Actif (210 upvotes)</span>
+            </li>
+            <li>
+              <span>💰 Bounty : Template PWA Offline</span>
+              <span class="status-badge-amber">En cours</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="profile-footer">
+          <button class="btn btn-primary" style="width: 100%;" onclick="openCreateExchangeModal('component')">+ Proposer un nouvel échange</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toasts de Notification -->
   <div class="toast-container" id="toast-container"></div>
 
   <script src="./app.js"></script>
