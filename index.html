@@ -3,535 +3,440 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DevCom Africa — La plateforme d'échange africaine, pour les devs, par les devs</title>
-  <meta name="description" content="Plateforme panafricaine d'échange de code, de composants Mobile Money, de bounties rémunérés en devises locales et de mise en relation directe entre développeurs.">
-  <meta name="keywords" content="DevCom Africa, développeurs africains, Mobile Money API, Wave, MTN MoMo, USSD, offline-first, bounties tech, freelance afrique">
-  
-  <!-- Open Graph -->
-  <meta property="og:title" content="DevCom Africa — Pour les devs, par les devs">
-  <meta property="og:description" content="Échangez du code, collaborez sur des missions rémunérées et développez vos solutions pour le continent africain.">
-  <meta property="og:image" content="./assets/hero-banner.jpg">
+  <title>DevCom Africa — Hub d'Échange des Développeurs Africains</title>
+  <meta name="description" content="Plateforme d'échange de composants logiciels, APIs Mobile Money, bounties rémunérés et entraide technique entre développeurs africains.">
   <link rel="icon" type="image/jpeg" href="./assets/logo.jpg">
 
-  <!-- Polices Google Fonts : Outfit & JetBrains Mono -->
+  <!-- Polices Google : Inter & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
-  <!-- Header & Navigation Globale -->
-  <header class="main-header">
-    <div class="container header-container">
-      <a href="#" class="brand-logo" id="brand-logo">
-        <div class="logo-wrapper">
-          <img src="./assets/logo.jpg" alt="DevCom Logo" class="brand-img">
-          <span class="brand-status-dot" title="Plateforme opérationnelle"></span>
-        </div>
-        <div class="brand-text">
-          <span class="brand-name">Dev<span class="text-gradient">Com</span></span>
-          <span class="brand-sub">Africa</span>
-        </div>
-      </a>
+  <div class="app-layout">
+    <!-- ====================================================================
+         1. SIDEBAR LATÉRALE (Style Linear / GitHub / Supabase)
+         ==================================================================== -->
+    <aside class="app-sidebar" id="app-sidebar">
+      <!-- Logo & Marque -->
+      <div class="sidebar-brand">
+        <a href="#" class="brand-link">
+          <img src="./assets/logo.jpg" alt="DevCom" class="brand-avatar">
+          <div class="brand-titles">
+            <span class="brand-title">DevCom</span>
+            <span class="brand-tag">Africa</span>
+          </div>
+        </a>
+      </div>
 
-      <!-- Navigation Principale -->
-      <nav class="nav-links" id="main-nav">
-        <a href="#composants" class="nav-link active"><span class="nav-icon">⚡</span> Composants & APIs</a>
-        <a href="#bourse" class="nav-link"><span class="nav-icon">💰</span> Bourse & Bounties</a>
-        <a href="#entraide" class="nav-link"><span class="nav-icon">🤝</span> Entraide & Troc</a>
-        <a href="#developpeurs" class="nav-link"><span class="nav-icon">👥</span> Développeurs</a>
+      <!-- Navigation Principale par Vues Dédiées -->
+      <nav class="sidebar-nav">
+        <div class="nav-group-label">Plateforme</div>
+        <button class="nav-item active" data-view="components-view" id="nav-btn-components">
+          <span class="nav-icon">⚡</span>
+          <span class="nav-label">Composants & APIs</span>
+          <span class="nav-count" id="count-components-badge">6</span>
+        </button>
+
+        <button class="nav-item" data-view="bounties-view" id="nav-btn-bounties">
+          <span class="nav-icon">💰</span>
+          <span class="nav-label">Bourse & Bounties</span>
+          <span class="nav-count" id="count-bounties-badge">3</span>
+        </button>
+
+        <button class="nav-item" data-view="peer-view" id="nav-btn-peer">
+          <span class="nav-icon">🤝</span>
+          <span class="nav-label">Entraide & Troc</span>
+          <span class="nav-count" id="count-peer-badge">3</span>
+        </button>
+
+        <button class="nav-item" data-view="developers-view" id="nav-btn-developers">
+          <span class="nav-icon">👥</span>
+          <span class="nav-label">Développeurs</span>
+          <span class="nav-count">4</span>
+        </button>
+
+        <div class="nav-group-label" style="margin-top: 24px;">Mes Activités</div>
+        <button class="nav-item" id="nav-btn-messages">
+          <span class="nav-icon">💬</span>
+          <span class="nav-label">Messagerie</span>
+          <span class="nav-badge-pill" id="sidebar-unread-pill">2</span>
+        </button>
+
+        <button class="nav-item" id="nav-btn-my-profile">
+          <span class="nav-icon">👤</span>
+          <span class="nav-label">Mon Profil & Solde</span>
+        </button>
       </nav>
 
-      <!-- Actions Utilisateur & Header -->
-      <div class="header-actions">
-        <!-- Sélecteur de Pays Panafricain -->
-        <div class="country-selector">
-          <select id="country-filter" aria-label="Sélectionner le pays">
-            <option value="all">🌍 Panafricain</option>
-            <option value="BJ" selected>🇧🇯 Bénin</option>
-            <option value="CI">🇨🇮 Côte d'Ivoire</option>
-            <option value="SN">🇸🇳 Sénégal</option>
-            <option value="NG">🇳🇬 Nigeria</option>
-            <option value="TG">🇹🇬 Togo</option>
-            <option value="CM">🇨🇲 Cameroun</option>
-            <option value="KE">🇰🇪 Kenya</option>
-            <option value="RW">🇷🇼 Rwanda</option>
-          </select>
+      <!-- Pied de Sidebar : Profil Utilisateur & Switch Thème -->
+      <div class="sidebar-footer">
+        <div class="user-snippet-card" id="user-snippet-btn">
+          <div class="user-avatar-sq">MY</div>
+          <div class="user-snippet-info">
+            <span class="user-snippet-name">Modeste YABLA</span>
+            <span class="user-snippet-location">🇧🇯 Bénin • 1,250 DP</span>
+          </div>
         </div>
 
-        <!-- Thème Dark / Light -->
-        <button class="icon-btn theme-toggle-btn" id="theme-toggle" title="Basculer thème sombre / clair" aria-label="Basculer thème">
+        <button class="theme-btn" id="theme-toggle" title="Basculer thème sombre / clair" aria-label="Thème">
           <span class="theme-icon-dark">🌙</span>
           <span class="theme-icon-light">☀️</span>
         </button>
-
-        <!-- Bouton Messagerie Directe -->
-        <button class="icon-btn message-btn" id="btn-open-messages" title="Messages & Échanges en direct" aria-label="Messagerie">
-          <span>💬</span>
-          <span class="unread-pill" id="unread-count">2</span>
-        </button>
-
-        <!-- CTA Créer un Échange -->
-        <button class="btn btn-primary" id="btn-create-exchange">
-          <span class="btn-icon">+</span> Créer un Échange
-        </button>
-
-        <!-- Profil Membre Utilisateur -->
-        <button class="user-profile-btn" id="btn-open-profile" title="Mon Profil Développeur">
-          <div class="avatar-circle">MY</div>
-          <div class="user-meta">
-            <span class="user-name">Modeste Y.</span>
-            <span class="user-dp">1,250 DP</span>
-          </div>
-        </button>
-
-        <!-- Menu Mobile Toggle -->
-        <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Ouvrir le menu">
-          <span></span><span></span><span></span>
-        </button>
       </div>
-    </div>
-  </header>
+    </aside>
 
-  <!-- Hero Section : Présentation Produit -->
-  <section class="hero-section">
-    <div class="hero-bg-glow"></div>
-    <div class="container hero-container">
-      <div class="hero-content">
-        <div class="hero-badge">
-          <span class="pulse-icon">●</span>
-          <span>L'écosystème panafricain des créateurs de logiciels</span>
-        </div>
-        
-        <h1 class="hero-title">
-          La plateforme d'échange africaine, <br>
-          <span class="text-gradient">pour les devs, par les devs.</span>
-        </h1>
-        
-        <p class="hero-subtitle">
-          Mutualisez des modules de code testés pour le continent (Mobile Money, Offline-first, USSD), 
-          financez des missions et bounties en devises locales et échangez vos expertises entre pairs.
-        </p>
-
-        <!-- Barre de recherche globale (Omnisearch) -->
-        <div class="omnisearch-box">
-          <div class="search-input-wrapper">
-            <span class="search-icon">🔍</span>
-            <input type="text" id="omnisearch-input" placeholder="Rechercher : webhook MTN MoMo, sync SQLite offline, USSD, mentor..." autocomplete="off">
-            <button class="search-clear-btn" id="search-clear" style="display: none;">✕</button>
-          </div>
-          <button class="btn btn-search" id="btn-search">Rechercher</button>
-        </div>
-
-        <!-- Filtres Rapides par Catégories -->
-        <div class="quick-tags" id="quick-tags-container">
-          <span class="tag-label">Catégories :</span>
-          <button class="quick-chip active" data-category="all">Toutes</button>
-          <button class="quick-chip" data-category="mobile-money">💳 Mobile Money & Fintech</button>
-          <button class="quick-chip" data-category="offline">📶 Offline-First & Sync</button>
-          <button class="quick-chip" data-category="ussd">📱 USSD & Télécoms</button>
-          <button class="quick-chip" data-category="security">🛡️ Auth & KYC</button>
-          <button class="quick-chip" data-category="cloud">☁️ Cloud & DevOps</button>
-        </div>
-
-        <!-- Métriques Réelles de la Plateforme -->
-        <div class="hero-stats-grid">
-          <div class="stat-card">
-            <div class="stat-number" id="stat-components">480+</div>
-            <div class="stat-label">Composants & APIs vérifiés</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-number" id="stat-devs">1,420+</div>
-            <div class="stat-label">Développeurs actifs</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-number highlight-gold" id="stat-bounties">24,5M</div>
-            <div class="stat-label">FCFA de Bounties échangés</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-number highlight-blue" id="stat-solved">99.8%</div>
-            <div class="stat-label">Taux d'entraide résolue</div>
+    <!-- ====================================================================
+         2. ZONE PRINCIPALE (TopBar + Vues Dédiées)
+         ==================================================================== -->
+    <main class="app-main">
+      <!-- TopBar Épurée -->
+      <header class="app-topbar">
+        <div class="topbar-left">
+          <button class="sidebar-toggle-btn" id="sidebar-toggle-btn" aria-label="Menu">☰</button>
+          <div class="view-breadcrumb">
+            <span class="breadcrumb-root">DevCom</span>
+            <span class="breadcrumb-sep">/</span>
+            <span class="breadcrumb-current" id="breadcrumb-current-title">Composants & APIs</span>
           </div>
         </div>
-      </div>
 
-      <!-- Visuel Interactif Plateforme -->
-      <div class="hero-visual">
-        <div class="hero-card-preview">
-          <img src="./assets/hero-banner.jpg" alt="DevCom Africa Tech Ecosystem" class="hero-banner-img">
-          <div class="hero-banner-overlay">
-            <div class="live-pulse-badge">
-              <span class="ping-circle"></span>
-              <span>Hub Connecté : 14 Pays Africains</span>
-            </div>
-            <div class="banner-quick-actions">
-              <div class="quick-action-text">Prêt à échanger du code ou proposer un service ?</div>
-              <button class="btn btn-sm btn-primary" onclick="openCreateExchangeModal('component')">+ Publier un composant</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Section 1 : Catalogue de Composants & APIs Africaines -->
-  <section class="section" id="composants">
-    <div class="container">
-      <div class="section-header">
-        <div>
-          <span class="section-tag">⚡ COMPOSANTS & APIS</span>
-          <h2 class="section-title">Catalogue de Solutions Prêtes à l'Emploi</h2>
-          <p class="section-desc">Modules, SDKs et snippets de code réutilisables adaptés aux contraintes du terrain africain (réseaux intermittents, passerelles de paiement locales, formats USSD).</p>
-        </div>
-        <div class="section-action-group">
-          <button class="btn btn-primary" onclick="openCreateExchangeModal('component')">+ Publier un Composant</button>
-        </div>
-      </div>
-
-      <!-- Filtres de langages et tri -->
-      <div class="filter-toolbar">
-        <div class="lang-pills" id="lang-pills">
-          <button class="lang-pill active" data-lang="all">Tous les langages</button>
-          <button class="lang-pill" data-lang="typescript">TypeScript</button>
-          <button class="lang-pill" data-lang="python">Python</button>
-          <button class="lang-pill" data-lang="php">PHP</button>
-          <button class="lang-pill" data-lang="javascript">JavaScript</button>
-          <button class="lang-pill" data-lang="flutter">Flutter / Dart</button>
-        </div>
-        <div class="sort-selector">
-          <label for="sort-select">Trier par :</label>
-          <select id="sort-select">
-            <option value="popular">Les plus plébiscités</option>
-            <option value="recent">Les plus récents</option>
-            <option value="downloads">Téléchargements</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- Grille des Composants -->
-      <div class="components-grid" id="components-grid">
-        <!-- Rempli dynamiquement par app.js -->
-      </div>
-    </div>
-  </section>
-
-  <!-- Section 2 : Bourse aux Échanges, Missions & Bounties -->
-  <section class="section section-dark-accent" id="bourse">
-    <div class="container">
-      <div class="section-header">
-        <div>
-          <span class="section-tag section-tag-amber">💰 BOURSE AUX ÉCHANGES</span>
-          <h2 class="section-title">Bounties & Missions Tech Rémunérées</h2>
-          <p class="section-desc">Postulez à des micro-missions et bounties financés par des entreprises et projets tech du continent, rétribués instantanément en devises locales via Mobile Money.</p>
-        </div>
-        <div>
-          <button class="btn btn-amber" onclick="openCreateExchangeModal('bounty')">+ Lancer un Bounty</button>
-        </div>
-      </div>
-
-      <!-- Grille des Bounties -->
-      <div class="bounties-grid" id="bounties-grid">
-        <!-- Rempli dynamiquement par app.js -->
-      </div>
-    </div>
-  </section>
-
-  <!-- Section 3 : Espace Entraide & Troc de Compétences -->
-  <section class="section" id="entraide">
-    <div class="container">
-      <div class="section-header">
-        <div>
-          <span class="section-tag section-tag-cyan">🤝 ENTRAIDE & TROC</span>
-          <h2 class="section-title">Échange de Compétences & Entraide Flash</h2>
-          <p class="section-desc">Besoin d'un coup de main sur un bug critique ou d'une revue d'architecture ? Associez-vous avec un développeur du continent sur le principe de l'échange équitable.</p>
-        </div>
-        <div>
-          <button class="btn btn-outline" onclick="openCreateExchangeModal('help')">+ Demander de l'Aide</button>
-        </div>
-      </div>
-
-      <div class="peer-exchange-grid" id="peer-exchange-grid">
-        <!-- Rempli dynamiquement par app.js -->
-      </div>
-    </div>
-  </section>
-
-  <!-- Section 4 : Annuaire des Développeurs & Profils Africains -->
-  <section class="section section-dark-accent" id="developpeurs">
-    <div class="container">
-      <div class="section-header text-center">
-        <span class="section-tag">👥 COMMUNAUTÉ TECH</span>
-        <h2 class="section-title">Les Développeurs de la Communauté</h2>
-        <p class="section-desc">Entrez en contact direct avec des ingénieurs logiciels, architectes cloud et développeurs mobiles à travers toute l'Afrique.</p>
-      </div>
-
-      <div class="developers-grid" id="developers-grid">
-        <!-- Rempli dynamiquement par app.js -->
-      </div>
-    </div>
-  </section>
-
-  <!-- Footer -->
-  <footer class="main-footer">
-    <div class="container footer-container">
-      <div class="footer-col">
-        <div class="footer-brand">
-          <img src="./assets/logo.jpg" alt="DevCom Logo" class="footer-logo">
-          <span class="footer-brand-title">DevCom Africa</span>
-        </div>
-        <p class="footer-about">
-          La plateforme d'échange panafricaine conçue pour et par les développeurs. Code, bounties en monnaie locale et entraide technique.
-        </p>
-        <div class="footer-flags">
-          <span>🇧🇯 Bénin</span> • <span>🇨🇮 Côte d'Ivoire</span> • <span>🇸🇳 Sénégal</span> • <span>🇳🇬 Nigeria</span> • <span>🇰🇪 Kenya</span> • <span>🇷🇼 Rwanda</span>
-        </div>
-      </div>
-
-      <div class="footer-col">
-        <h4>Écosystème</h4>
-        <ul>
-          <li><a href="#composants">Composants & SDKs</a></li>
-          <li><a href="#bourse">Bourse aux Bounties</a></li>
-          <li><a href="#entraide">Troc de Compétences</a></li>
-          <li><a href="#developpeurs">Annuaire des Développeurs</a></li>
-        </ul>
-      </div>
-
-      <div class="footer-col">
-        <h4>Outils & Intégrations</h4>
-        <ul>
-          <li><a href="javascript:void(0)" onclick="openCreateExchangeModal('component')">Publier un package</a></li>
-          <li><a href="javascript:void(0)" onclick="openMessagesDrawer()">Boîte de messagerie</a></li>
-          <li><a href="./STITCH_PROMPT.md" target="_blank">Spécifications UI Google Stitch</a></li>
-          <li><a href="https://github.com/arcaneai2007/devcom-africa" target="_blank" rel="noopener noreferrer">Code Source GitHub</a></li>
-        </ul>
-      </div>
-
-      <div class="footer-col">
-        <h4>À Propos</h4>
-        <p class="footer-team-desc">Fondé par Modeste YABLA et la communauté open-source africaine pour accélérer l'indépendance technologique du continent.</p>
-        <div class="footer-badge">🌍 100% Développé pour l'Afrique</div>
-      </div>
-    </div>
-
-    <div class="footer-bottom">
-      <div class="container">
-        <p>© 2026 DevCom Africa — Tous droits réservés. Construit pour les devs, par les devs.</p>
-      </div>
-    </div>
-  </footer>
-
-  <!-- ==========================================================================
-       MODAL 1 : Créer un Échange (Multi-types : Composant, Bounty, Entraide)
-       ========================================================================== -->
-  <div class="modal-overlay" id="create-exchange-modal" role="dialog" aria-hidden="true">
-    <div class="modal-card modal-large">
-      <div class="modal-header">
-        <div class="modal-title-wrap">
-          <span class="modal-icon">✨</span>
-          <h3 id="modal-exchange-heading">Créer un Nouvel Échange sur DevCom</h3>
-        </div>
-        <button class="modal-close-btn" id="close-exchange-modal-btn" aria-label="Fermer">✕</button>
-      </div>
-
-      <!-- Type Selector Tabs -->
-      <div class="exchange-type-selector">
-        <button class="type-tab active" data-type="component" id="tab-type-component">⚡ Composant / Code</button>
-        <button class="type-tab" data-type="bounty" id="tab-type-bounty">💰 Mission / Bounty</button>
-        <button class="type-tab" data-type="help" id="tab-type-help">🤝 Entraide / Troc</button>
-      </div>
-
-      <form id="create-exchange-form" class="modal-form">
-        <!-- Champ Titre -->
-        <div class="form-group">
-          <label for="exchange-title">Titre de l'échange</label>
-          <input type="text" id="exchange-title" placeholder="Ex: Webhook signature verifier pour Wave & MoMo" required>
+        <!-- Recherche Globale & Filtre Pays -->
+        <div class="topbar-search-wrap">
+          <span class="search-ico">🔍</span>
+          <input type="text" id="global-search-input" placeholder="Rechercher composants, bounties, devs..." autocomplete="off">
+          <span class="search-kbd">⌘K</span>
         </div>
 
-        <!-- Ligne Catégorie & Langage/Devise -->
-        <div class="form-row">
-          <div class="form-group">
-            <label for="exchange-category">Catégorie</label>
-            <select id="exchange-category" required>
-              <option value="mobile-money">💳 Mobile Money & Fintech</option>
-              <option value="offline">📶 Offline-First & Synchronisation</option>
-              <option value="ussd">📱 USSD & Télécoms</option>
-              <option value="security">🛡️ Auth & KYC</option>
-              <option value="cloud">☁️ Cloud & DevOps</option>
+        <div class="topbar-actions">
+          <div class="country-pill-select">
+            <select id="country-filter" aria-label="Filtrer par pays">
+              <option value="all">🌍 Tous les pays</option>
+              <option value="BJ" selected>🇧🇯 Bénin</option>
+              <option value="CI">🇨🇮 Côte d'Ivoire</option>
+              <option value="SN">🇸🇳 Sénégal</option>
+              <option value="NG">🇳🇬 Nigeria</option>
+              <option value="TG">🇹🇬 Togo</option>
+              <option value="RW">🇷🇼 Rwanda</option>
             </select>
           </div>
 
-          <div class="form-group" id="group-dynamic-field">
-            <label for="exchange-secondary" id="label-dynamic-field">Langage de programmation</label>
-            <input type="text" id="exchange-secondary" placeholder="TypeScript, Python, PHP..." required>
+          <button class="btn btn-primary btn-sm" id="btn-top-create">
+            <span>+</span> Nouvel Échange
+          </button>
+        </div>
+      </header>
+
+      <!-- ==================================================================
+           VUE 1 : CATALOGUE DE COMPOSANTS & APIS (Défaut)
+           ================================================================== -->
+      <section class="view-container active" id="components-view">
+        <div class="view-header">
+          <div>
+            <h1 class="view-title">Composants & APIs Africaines</h1>
+            <p class="view-subtitle">Modules de code, SDKs et intégrations éprouvées pour le continent (Mobile Money, Offline-first, USSD).</p>
+          </div>
+          <button class="btn btn-primary" onclick="openCreateModal('component')">+ Publier un Composant</button>
+        </div>
+
+        <!-- Filtres Horizontaux de la Vue -->
+        <div class="view-filter-bar">
+          <div class="filter-pills" id="component-category-pills">
+            <button class="filter-pill active" data-cat="all">Tous</button>
+            <button class="filter-pill" data-cat="mobile-money">💳 Mobile Money</button>
+            <button class="filter-pill" data-cat="offline">📶 Offline & PWA</button>
+            <button class="filter-pill" data-cat="ussd">📱 USSD & Télécoms</button>
+            <button class="filter-pill" data-cat="security">🛡️ Auth & Sécurité</button>
+          </div>
+
+          <div class="filter-lang-select">
+            <select id="component-lang-select">
+              <option value="all">Tous les langages</option>
+              <option value="typescript">TypeScript</option>
+              <option value="python">Python</option>
+              <option value="javascript">JavaScript</option>
+              <option value="flutter">Flutter / Dart</option>
+            </select>
           </div>
         </div>
 
-        <!-- Description -->
-        <div class="form-group">
-          <label for="exchange-description">Description détaillée</label>
-          <textarea id="exchange-description" rows="3" placeholder="Expliquez ce que fait votre solution ou ce dont vous avez besoin..." required></textarea>
+        <!-- Grille Aérée des Composants -->
+        <div class="items-grid" id="components-items-grid">
+          <!-- Injecté dynamiquement par app.js -->
+        </div>
+      </section>
+
+      <!-- ==================================================================
+           VUE 2 : BOURSE AUX BOUNTIES & MISSIONS
+           ================================================================== -->
+      <section class="view-container" id="bounties-view">
+        <div class="view-header">
+          <div>
+            <h1 class="view-title">Bourse aux Bounties & Missions</h1>
+            <p class="view-subtitle">Missions rémunérées en devises locales avec versement direct par Mobile Money ou Virement.</p>
+          </div>
+          <button class="btn btn-amber" onclick="openCreateModal('bounty')">+ Lancer un Bounty</button>
         </div>
 
-        <!-- Code Source ou Détails Spécifiques -->
-        <div class="form-group" id="group-code-field">
-          <label for="exchange-code">Code source / Implémentation</label>
-          <textarea id="exchange-code" rows="7" placeholder="// Insérez votre code ici ou les spécifications..." required></textarea>
+        <!-- Liste des Bounties -->
+        <div class="bounties-list" id="bounties-items-list">
+          <!-- Injecté dynamiquement par app.js -->
+        </div>
+      </section>
+
+      <!-- ==================================================================
+           VUE 3 : ENTRAIDE & TROC DE COMPÉTENCES
+           ================================================================== -->
+      <section class="view-container" id="peer-view">
+        <div class="view-header">
+          <div>
+            <h1 class="view-title">Entraide & Troc Technique</h1>
+            <p class="view-subtitle">Échangez vos expertises entre développeurs africains (revue de code, aide au débogage, mentorat).</p>
+          </div>
+          <button class="btn btn-outline" onclick="openCreateModal('help')">+ Demander de l'Aide</button>
         </div>
 
-        <div class="modal-footer">
-          <button type="button" class="btn btn-outline" id="btn-cancel-exchange">Annuler</button>
-          <button type="submit" class="btn btn-primary" id="btn-submit-exchange">Publier l'échange</button>
+        <div class="peer-list" id="peer-items-list">
+          <!-- Injecté dynamiquement par app.js -->
         </div>
-      </form>
-    </div>
+      </section>
+
+      <!-- ==================================================================
+           VUE 4 : ANNUAIRE DES DÉVELOPPEURS
+           ================================================================== -->
+      <section class="view-container" id="developers-view">
+        <div class="view-header">
+          <div>
+            <h1 class="view-title">Développeurs de la Communauté</h1>
+            <p class="view-subtitle">Ingénieurs, architectes et développeurs actifs sur la plateforme à travers l'Afrique.</p>
+          </div>
+        </div>
+
+        <div class="devs-grid" id="devs-items-grid">
+          <!-- Injecté dynamiquement par app.js -->
+        </div>
+      </section>
+    </main>
   </div>
 
-  <!-- ==========================================================================
-       MODAL 2 : Bac à Sable / Testeur de Code Interactif
-       ========================================================================== -->
-  <div class="modal-overlay" id="sandbox-modal" role="dialog" aria-hidden="true">
-    <div class="modal-card modal-large">
-      <div class="modal-header">
-        <div class="modal-title-wrap">
-          <span class="modal-icon">🧪</span>
-          <h3 id="sandbox-title">Testeur de Code en Direct</h3>
-        </div>
-        <button class="modal-close-btn" id="close-sandbox-btn" aria-label="Fermer">✕</button>
-      </div>
-      <div class="modal-body">
-        <div class="sandbox-layout">
-          <div class="sandbox-code-view">
-            <div class="code-view-bar">
-              <span class="code-filename" id="sandbox-filename">solution.ts</span>
-              <button class="btn btn-xs btn-copy-sandbox" id="btn-copy-sandbox">Copier</button>
-            </div>
-            <pre><code id="sandbox-code-content" class="language-typescript"></code></pre>
-          </div>
-          <div class="sandbox-execution-panel">
-            <div class="exec-header">
-              <span>Simulation d'Exécution</span>
-              <button class="btn btn-sm btn-primary" id="btn-run-simulation">▶ Exécuter</button>
-            </div>
-            <div class="exec-output" id="exec-output">
-              <span class="exec-idle">Cliquez sur « Exécuter » pour simuler le comportement du composant (requête API, calcul HMAC, synchronisation)...</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ==========================================================================
-       DRAWER 1 : Messagerie Directe & Mise en Relation
-       ========================================================================== -->
-  <div class="drawer-overlay" id="messages-drawer" role="dialog" aria-hidden="true">
-    <div class="drawer-card">
+  <!-- ====================================================================
+       TIROIR DÉTAIL COMPOSANT & BAC À SABLE (Slide-over)
+       ==================================================================== -->
+  <div class="drawer-backdrop" id="detail-drawer" role="dialog" aria-hidden="true">
+    <div class="drawer-panel drawer-panel-wide">
       <div class="drawer-header">
-        <div class="drawer-title-wrap">
-          <span class="modal-icon">💬</span>
-          <h3>Messagerie DevCom</h3>
+        <div class="drawer-heading">
+          <span class="drawer-icon">⚡</span>
+          <div>
+            <h3 id="drawer-comp-title">@devcom/momo-pay</h3>
+            <span class="drawer-meta" id="drawer-comp-meta">TypeScript • Bénin 🇧🇯</span>
+          </div>
         </div>
-        <button class="modal-close-btn" id="close-messages-btn" aria-label="Fermer">✕</button>
+        <button class="drawer-close-btn" id="close-detail-drawer" aria-label="Fermer">✕</button>
       </div>
 
-      <div class="drawer-body chat-drawer-body">
-        <!-- Liste des contacts récents -->
-        <div class="chat-contacts-bar" id="chat-contacts-bar">
-          <button class="contact-pill active" data-user="Amina Diallo">🇸🇳 Amina D.</button>
-          <button class="contact-pill" data-user="Emmanuel Kouassi">🇨🇮 Emmanuel K.</button>
-          <button class="contact-pill" data-user="Chukwudi Okafor">🇳🇬 Chukwudi O.</button>
+      <div class="drawer-content">
+        <div class="drawer-section">
+          <h4>Description</h4>
+          <p id="drawer-comp-desc" class="drawer-desc-text"></p>
         </div>
 
-        <!-- Zone des messages échangés -->
-        <div class="chat-messages-area" id="chat-messages-area">
-          <div class="chat-bubble recipient">
-            <div class="bubble-sender">Amina Diallo (Dakar 🇸🇳)</div>
-            <div class="bubble-text">Salut Modeste ! J'ai vu ton composant pour le webhook MoMo Bénin. Est-ce que tu peux m'aider à l'adapter pour Wave Sénégal ?</div>
-            <div class="bubble-time">14:10</div>
-          </div>
-          <div class="chat-bubble sender">
-            <div class="bubble-sender">Moi (Modeste YABLA)</div>
-            <div class="bubble-text">Salut Amina ! Oui tout à fait, la structure HMAC est similaire, il faut juste adapter les clés du header webhook. Je peux te filer un coup de main !</div>
-            <div class="bubble-time">14:15</div>
+        <div class="drawer-section">
+          <h4>Installation</h4>
+          <div class="cmd-box">
+            <code id="drawer-comp-install">npm i @devcom/momo-pay</code>
+            <button class="btn btn-xs btn-outline" id="btn-copy-install">Copier</button>
           </div>
         </div>
 
-        <!-- Entrée de message -->
-        <form id="chat-send-form" class="chat-input-bar">
-          <input type="text" id="chat-message-input" placeholder="Écrire un message ou partager du code..." autocomplete="off" required>
+        <div class="drawer-section">
+          <div class="section-flex-header">
+            <h4>Code Source</h4>
+            <button class="btn btn-xs btn-outline" id="btn-copy-code">Copier le code</button>
+          </div>
+          <pre class="code-editor-pre"><code id="drawer-comp-code"></code></pre>
+        </div>
+
+        <!-- Bac à sable d'exécution en direct -->
+        <div class="drawer-section">
+          <div class="section-flex-header">
+            <h4>Simulation d'Exécution</h4>
+            <button class="btn btn-sm btn-primary" id="btn-run-sandbox">▶ Lancer le Test</button>
+          </div>
+          <div class="console-box" id="drawer-sandbox-output">
+            Cliquez sur « Lancer le Test » pour simuler l'exécution du composant...
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       TIROIR DE MESSAGERIE (Slide-over)
+       ==================================================================== -->
+  <div class="drawer-backdrop" id="chat-drawer" role="dialog" aria-hidden="true">
+    <div class="drawer-panel">
+      <div class="drawer-header">
+        <div class="drawer-heading">
+          <span class="drawer-icon">💬</span>
+          <div>
+            <h3>Messagerie DevCom</h3>
+            <span class="drawer-meta" id="chat-active-recipient">Amina Diallo (Sénégal 🇸🇳)</span>
+          </div>
+        </div>
+        <button class="drawer-close-btn" id="close-chat-drawer" aria-label="Fermer">✕</button>
+      </div>
+
+      <div class="drawer-content chat-drawer-layout">
+        <!-- Contacts récents -->
+        <div class="chat-contacts-row" id="chat-contacts-row">
+          <button class="contact-tab active" data-name="Amina Diallo">🇸🇳 Amina D.</button>
+          <button class="contact-tab" data-name="Emmanuel Kouassi">🇨🇮 Emmanuel K.</button>
+          <button class="contact-tab" data-name="Chukwudi Okafor">🇳🇬 Chukwudi O.</button>
+        </div>
+
+        <!-- Messages -->
+        <div class="chat-messages-container" id="chat-messages-container">
+          <div class="chat-msg received">
+            <div class="msg-sender">Amina Diallo</div>
+            <div class="msg-body">Salut Modeste ! J'ai vu ton SDK MoMo Bénin. Est-ce qu'on peut s'associer pour adapter la gestion des callbacks pour Wave Sénégal ?</div>
+            <div class="msg-time">14:10</div>
+          </div>
+          <div class="chat-msg sent">
+            <div class="msg-sender">Moi</div>
+            <div class="msg-body">Salut Amina ! Avec plaisir, les structures de signature HMAC sont très proches. Je te partage le code adapté ci-dessous.</div>
+            <div class="msg-time">14:15</div>
+          </div>
+        </div>
+
+        <!-- Input Bar -->
+        <form class="chat-send-bar" id="chat-send-form">
+          <input type="text" id="chat-input" placeholder="Écrire un message à Amina..." autocomplete="off" required>
           <button type="submit" class="btn btn-primary btn-sm">Envoyer</button>
         </form>
       </div>
     </div>
   </div>
 
-  <!-- ==========================================================================
-       DRAWER 2 : Espace Membre / Profil Développeur
-       ========================================================================== -->
-  <div class="drawer-overlay" id="profile-drawer" role="dialog" aria-hidden="true">
-    <div class="drawer-card">
+  <!-- ====================================================================
+       TIROIR PROFIL MEMBRE (Slide-over)
+       ==================================================================== -->
+  <div class="drawer-backdrop" id="profile-drawer" role="dialog" aria-hidden="true">
+    <div class="drawer-panel">
       <div class="drawer-header">
-        <div class="drawer-title-wrap">
-          <span class="modal-icon">👤</span>
-          <h3>Profil Développeur</h3>
+        <div class="drawer-heading">
+          <span class="drawer-icon">👤</span>
+          <div>
+            <h3>Mon Profil</h3>
+            <span class="drawer-meta">Compte Développeur Actif</span>
+          </div>
         </div>
-        <button class="modal-close-btn" id="close-profile-btn" aria-label="Fermer">✕</button>
+        <button class="drawer-close-btn" id="close-profile-drawer" aria-label="Fermer">✕</button>
       </div>
 
-      <div class="drawer-body profile-drawer-body">
-        <div class="profile-hero-card">
-          <div class="profile-avatar-large">MY</div>
-          <h4 class="profile-full-name">Modeste YABLA</h4>
-          <p class="profile-title">Ingénieur Logiciel Fullstack & Architecte Cloud</p>
-          <div class="profile-location">📍 Cotonou, Bénin 🇧🇯</div>
-          
-          <div class="profile-reputation-badge">
-            <span class="dp-icon">⚡</span>
-            <span><strong>1,250</strong> DevPoints (Top 5% Bénin)</span>
+      <div class="drawer-content">
+        <div class="profile-card-top">
+          <div class="profile-avatar-lg">MY</div>
+          <h3>Modeste YABLA</h3>
+          <p class="profile-role">Ingénieur Logiciel Fullstack & Cloud</p>
+          <span class="profile-badge-rep">⚡ 1,250 DevPoints (Top 5% Bénin)</span>
+        </div>
+
+        <div class="drawer-section">
+          <h4>Localisation</h4>
+          <p>📍 Cotonou, Bénin 🇧🇯</p>
+        </div>
+
+        <div class="drawer-section">
+          <h4>Stack Technique</h4>
+          <div class="tags-row">
+            <span class="tag">TypeScript</span>
+            <span class="tag">Next.js / React</span>
+            <span class="tag">Python / FastAPI</span>
+            <span class="tag">Mobile Money APIs</span>
+            <span class="tag">Docker</span>
           </div>
         </div>
 
-        <div class="profile-section">
-          <h5>Stack Technique</h5>
-          <div class="tech-chips-list">
-            <span class="tech-chip">TypeScript</span>
-            <span class="tech-chip">Next.js / React</span>
-            <span class="tech-chip">Python / FastAPI</span>
-            <span class="tech-chip">Mobile Money APIs</span>
-            <span class="tech-chip">Docker</span>
-            <span class="tech-chip">PostgreSQL</span>
-          </div>
-        </div>
-
-        <div class="profile-section">
-          <h5>Mes Échanges Actifs</h5>
-          <ul class="profile-exchanges-list">
+        <div class="drawer-section">
+          <h4>Mes Échanges Publiés</h4>
+          <ul class="clean-list">
             <li>
-              <span>⚡ Webhook MTN MoMo & Moov</span>
-              <span class="status-badge-green">Actif (142 upvotes)</span>
+              <span>⚡ @devcom/momo-pay</span>
+              <span class="badge-success">142 upvotes</span>
             </li>
             <li>
-              <span>📱 Framework USSD Dynamic Menu</span>
-              <span class="status-badge-green">Actif (210 upvotes)</span>
-            </li>
-            <li>
-              <span>💰 Bounty : Template PWA Offline</span>
-              <span class="status-badge-amber">En cours</span>
+              <span>📱 @devcom/ussd-engine</span>
+              <span class="badge-success">210 upvotes</span>
             </li>
           </ul>
-        </div>
-
-        <div class="profile-footer">
-          <button class="btn btn-primary" style="width: 100%;" onclick="openCreateExchangeModal('component')">+ Proposer un nouvel échange</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Toasts de Notification -->
-  <div class="toast-container" id="toast-container"></div>
+  <!-- ====================================================================
+       MODAL : NOUVEL ÉCHANGE (Composant, Bounty ou Entraide)
+       ==================================================================== -->
+  <div class="modal-backdrop" id="create-modal" role="dialog" aria-hidden="true">
+    <div class="modal-box">
+      <div class="modal-top">
+        <h3 id="modal-title">Créer un Nouvel Échange</h3>
+        <button class="drawer-close-btn" id="close-create-modal" aria-label="Fermer">✕</button>
+      </div>
+
+      <!-- Sélecteur de type d'échange -->
+      <div class="modal-type-tabs">
+        <button class="type-tab-btn active" data-type="component" id="tab-btn-comp">⚡ Composant / Code</button>
+        <button class="type-tab-btn" data-type="bounty" id="tab-btn-bounty">💰 Bounty / Mission</button>
+        <button class="type-tab-btn" data-type="help" id="tab-btn-help">🤝 Entraide / Troc</button>
+      </div>
+
+      <form id="create-exchange-form" class="modal-form-content">
+        <div class="input-field">
+          <label for="form-title">Titre de l'échange</label>
+          <input type="text" id="form-title" placeholder="Ex: Webhook validator pour Wave & MoMo" required>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="input-field">
+            <label for="form-category">Catégorie</label>
+            <select id="form-category" required>
+              <option value="mobile-money">💳 Mobile Money & Fintech</option>
+              <option value="offline">📶 Offline & Synchronisation</option>
+              <option value="ussd">📱 USSD & Télécoms</option>
+              <option value="security">🛡️ Auth & Sécurité</option>
+            </select>
+          </div>
+
+          <div class="input-field">
+            <label for="form-extra" id="label-form-extra">Langage de programmation</label>
+            <input type="text" id="form-extra" placeholder="TypeScript, Python, Flutter..." required>
+          </div>
+        </div>
+
+        <div class="input-field">
+          <label for="form-desc">Description</label>
+          <textarea id="form-desc" rows="3" placeholder="Présentation claire de la solution ou du besoin..." required></textarea>
+        </div>
+
+        <div class="input-field" id="field-code-wrap">
+          <label for="form-code" id="label-form-code">Code source ou spécifications</label>
+          <textarea id="form-code" rows="6" placeholder="// Insérez le code ou les critères d'acceptation..." required></textarea>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" id="btn-cancel-create">Annuler</button>
+          <button type="submit" class="btn btn-primary">Publier l'échange</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toasts de notification -->
+  <div class="toast-shelf" id="toast-shelf"></div>
 
   <script src="./app.js"></script>
 </body>
