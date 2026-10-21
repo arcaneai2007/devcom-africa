@@ -1,915 +1,1224 @@
 /**
- * DevCom Africa — Logique & Interactivité (Inspiré de DevBénin)
- * Fonctionnalités : DevSearch, Showroom, Sandbox, Bounties, Entraide & Messagerie
+ * DevCom Africa — Logique & Interactivité (Original & Moderne)
+ * Fonctionnalités :
+ * - Personas Démo (Visiteur, Développeur, Porteur de Projet, Mainteneur)
+ * - Mode Économie de Données (Data-Saver)
+ * - Convertisseur Multi-Devises (FCFA, NGN, KES, USD)
+ * - Hero Live Code Sandbox
+ * - Catalogue Composants & APIs avec Bac à Sable & Copie
+ * - Bounties en Devises Locales & Séquestre
+ * - Espace Entraide & Troc Technique entre Pairs
+ * - Projets Open Source & Preuve de Travail
+ * - Annuaire Panafricain & Messagerie Directe
  */
 
 // ==========================================================================
-// 1. Base de Connaissances DevSearch (Signature DevBénin)
+// 1. ÉTAT GLOBAL DE L'APPLICATION
 // ==========================================================================
-const DEVSEARCH_KB = [
-  {
-    keywords: ["momo", "mtn", "webhook", "signature", "hmac", "benin"],
-    title: "Validation de Webhook MTN MoMo (Bénin & Afrique de l'Ouest)",
-    framework: "Node.js / TypeScript",
-    explanation: "Pour valider les callbacks MTN MoMo, concaténez transactionId, amount et senderPhone séparés par deux-points, puis comparez le hash HMAC-SHA256 avec la signature transmise dans le header.",
-    code: `import crypto from 'crypto';
+const appState = {
+  theme: localStorage.getItem('devcom_theme') || 'dark',
+  dataSaver: localStorage.getItem('devcom_datasaver') === 'true',
+  persona: 'developer',
+  currency: 'FCFA', // 'FCFA', 'NGN', 'KES', 'USD'
+  activeCategory: 'all',
+  searchQuery: '',
+  modalType: 'component',
+  activeChatContact: 'Amina Diallo',
 
-export function verifyMoMoWebhook(payload: any, signature: string, secret: string): boolean {
-  const data = \`\${payload.transactionId}:\${payload.amount}:\${payload.senderPhone}\`;
-  const expectedHash = crypto.createHmac('sha256', secret).update(data).digest('hex');
-  return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedHash));
-}`
+  // Taux de conversion par rapport au FCFA
+  currencyRates: {
+    'FCFA': { symbol: 'FCFA', rate: 1, suffix: true },
+    'NGN': { symbol: '₦', rate: 2.5, suffix: false },
+    'KES': { symbol: 'KSh', rate: 0.22, suffix: false },
+    'USD': { symbol: '$', rate: 0.00164, suffix: false }
   },
-  {
-    keywords: ["wave", "qr", "session", "checkout", "ci", "senegal"],
-    title: "Création de Session Checkout Wave & Génération QR Code",
-    framework: "Python / FastAPI / Django",
-    explanation: "L'API Wave crée une session checkout renvoyant une URL de redirection mobile (deep link wave://) ainsi qu'un QR code SVG scannable par l'application cliente.",
-    code: `import httpx
 
-async def create_wave_checkout(amount: int, order_id: str, api_key: str):
-    url = "https://api.wave.com/v1/checkout/sessions"
-    headers = {"Authorization": f"Bearer {api_key}"}
-    payload = {
-        "amount": str(amount),
-        "currency": "XOF",
-        "client_reference": order_id,
-        "success_url": "https://devcom.africa/payment/success"
+  // Données Hero Terminal
+  heroDemos: {
+    momo: {
+      title: "mtn-momo-c2b.ts",
+      code: `import { MoMoDisbursement } from '@devcom/momo-disbursement';
+
+const momo = new MoMoDisbursement({
+  apiKey: process.env.MOMO_API_KEY!,
+  subscriptionKey: process.env.MOMO_SUB_KEY!,
+  country: 'BJ' // Bénin
+});
+
+// Déclenche une demande de paiement C2B instantanée
+export async function collectMobileMoney(phone: string, amount: number) {
+  const result = await momo.requestToPay({
+    amount: amount,
+    currency: 'XOF',
+    payer: { partyIdType: 'MSISDN', partyId: phone },
+    payerMessage: 'DevCom Bourse & Services'
+  });
+  return result; // Retourne le ReferenceId pour le Webhook
+}`,
+      simulation: `[MOMO GATEWAY] Initialisation de la connexion sécurisée UEMOA...
+[AUTH] Token d'accès OAuth2 généré avec succès (validité 3600s).
+[DISPATCH] Requête C2B transmise vers +229 97 00 00 00 pour 15 000 XOF...
+[USSD PUSH] Invite de confirmation transmise sur le mobile client.
+[WEBHOOK] Callback reçu avec signature HMAC valide : Statut SUCCÈS.
+[SOLDE] 15 000 XOF crédités sur le compte séquestre DevCom.`
+    },
+    wave: {
+      title: "wave-checkout-session.py",
+      code: `import httpx
+from devcom_wave import WaveClient
+
+wave = WaveClient(api_key="wave_ci_secret_live_...")
+
+async def create_wave_session(amount: int, client_ref: str):
+    session = await wave.create_checkout_session(
+        amount_xof=amount,
+        client_reference=client_ref,
+        success_url="https://devcom.africa/escrow/success",
+        error_url="https://devcom.africa/escrow/cancel"
+    )
+    # Renvoie l'URL de deep-link (wave://) et le QR Code SVG scannable
+    return session.launch_url, session.qr_code_svg`,
+      simulation: `[WAVE CLIENT] Appel API vers https://api.wave.com/v1/checkout...
+[SESSION] Session active générée : id=sess_ci_99482019
+[DEEP LINK] wave://checkout/sess_ci_99482019 généré pour mobile.
+[QR CODE] SVG vectoriel disponible pour affichage comptoir ou web.
+[STATUS] 200 OK — En attente du scan par l'application Wave de l'utilisateur.`
+    },
+    ussd: {
+      title: "ussd-menu-router.ts",
+      code: `import { USSDSession, USSDResponse } from '@devcom/ussd-core';
+
+export function routeUSSD(session: USSDSession): USSDResponse {
+  const { text, phoneNumber } = session;
+
+  if (!text) {
+    // Menu initial
+    return USSDResponse.con(
+      "DevCom Africa\\n1. Mes Bounties\\n2. Mon Solde DevPoints\\n3. Code SOS Bug"
+    );
+  }
+
+  if (text === '1') {
+    return USSDResponse.con("Bounties Récentes :\\n1. SDK MoMo (150k)\\n2. Sync PWA (200k)");
+  }
+
+  if (text === '2') {
+    return USSDResponse.end("Votre solde est de 1,450 DP (72,500 FCFA).");
+  }
+
+  return USSDResponse.end("Merci d'utiliser le réseau DevCom Africa (*345#).");
+}`,
+      simulation: `[TELCO GATEWAY] Connexion socket télécom MTN / Moov active (*345#).
+[SESSION] Nouveau canal USSD alloué pour MSISDN: +229 95 11 22 33
+[CON] Envoi du premier écran texte (encodage GSM 7-bit, < 140 cars).
+[INPUT] Touche pressée : '2' (Mon Solde DevPoints).
+[END] Réponse 'Votre solde est de 1,450 DP'. Canal libéré proprement.`
+    },
+    offline: {
+      title: "offline-crdt-sync.js",
+      code: `import { AfriSyncEngine } from '@devcom/offline-crdt-sync';
+
+// Initialise un stockage local chiffré IndexedDB résilient aux coupures
+const sync = new AfriSyncEngine({
+  dbName: 'devcom_cache',
+  conflictResolution: 'last-write-wins-crdt'
+});
+
+window.addEventListener('online', async () => {
+  console.log("Réseau 3G/4G rétabli. Synchronisation de la file d'attente...");
+  const queue = await sync.getPendingQueue();
+  await sync.flushToRemote('https://api.devcom.africa/sync', queue);
+});`,
+      simulation: `[OFFLINE ENGINE] Détection d'instabilité réseau (connexion intermittente).
+[QUEUE] 4 transactions locales enregistrées dans IndexedDB local.
+[EVENT] Événement 'online' reçu du navigateur.
+[CRDT] Résolution des conflits temporels sans perte de données.
+[SYNC] 4/4 requêtes synchronisées avec l'API centrale en arrière-plan.`
     }
-    async with httpx.AsyncClient() as client:
-        res = await client.post(url, json=payload, headers=headers)
-        return res.json() # contient wave_launch_url & qr_code_url`
   },
-  {
-    keywords: ["ussd", "menu", "telco", "format", "session", "mtn", "moov"],
-    title: "Format de Réponse USSD Multi-Opérateurs (*345#)",
-    framework: "Standard Télécom (CON / END)",
-    explanation: "Chaque réponse USSD doit débuter par 'CON' pour maintenir la session ouverte avec un menu, ou par 'END' pour clore l'échange et libérer le canal télécom.",
-    code: `export function handleUSSD(userInput: string, phoneNumber: string): string {
-  if (!userInput) {
-    return "CON Bienvenue sur DevCom USSD\\n1. Mon Solde\\n2. Bounties\\n3. Support";
-  }
-  if (userInput === '1') {
-    return "END Votre solde est de 1,250 DevPoints (62,500 FCFA).";
-  }
-  return "END Choix invalide. Tapez *345# pour recommencer.";
-}`
-  },
-  {
-    keywords: ["offline", "sync", "indexeddb", "pwa", "reseau"],
-    title: "File de Synchronisation Offline-First avec IndexedDB",
-    framework: "JavaScript / Service Worker",
-    explanation: "Stockez les requêtes en échec dans une base locale IndexedDB en mode hors-ligne, et écoutez l'événement 'online' du navigateur pour dépiler et envoyer automatiquement vers le serveur.",
-    code: `window.addEventListener('online', async () => {
-  console.log("Réseau rétabli. Synchronisation des transactions locales...");
-  const pending = await getPendingFromIndexedDB();
-  for (const item of pending) {
-    await fetch('/api/sync', { method: 'POST', body: JSON.stringify(item) });
-  }
-  await clearIndexedDBQueue();
-});`
-  }
-];
 
-// ==========================================================================
-// 2. Données Showroom Composants & APIs
-// ==========================================================================
-const COMPONENTS_LIST = [
-  {
-    id: "momo-pay",
-    title: "@devcom/momo-pay",
-    category: "mobile-money",
-    lang: "TypeScript",
-    country: "🇧🇯 Bénin",
-    author: "Modeste YABLA",
-    upvotes: 142,
-    installCmd: "npm i @devcom/momo-pay",
-    desc: "SDK TypeScript unifié pour MTN MoMo et Moov Money avec validation HMAC timing-safe et retry automatique des callbacks.",
-    code: `import { MoMoClient } from '@devcom/momo-pay';
+  // Données Composants
+  components: [
+    {
+      id: "comp-1",
+      title: "@devcom/orange-money-webpay",
+      category: "fintech",
+      lang: "TypeScript",
+      country: "🇸🇳 Sénégal",
+      author: "Amina Diallo",
+      upvotes: 188,
+      installCmd: "npm i @devcom/orange-money-webpay",
+      desc: "SDK complet pour l'API WebPay et Max It d'Orange Money. Gestion native des callbacks IPN, tokens temporaires et validation d'intégrité.",
+      code: `import { OrangeMoneyClient } from '@devcom/orange-money-webpay';
 
-const client = new MoMoClient({
+const om = new OrangeMoneyClient({
+  clientId: process.env.OM_CLIENT_ID!,
+  clientSecret: process.env.OM_SECRET!,
+  merchantKey: process.env.OM_MERCHANT_KEY!,
+  currency: 'XOF'
+});
+
+export async function initiatePayment(orderId: string, amount: number) {
+  return await om.createPaymentSession({
+    orderId,
+    amount,
+    returnUrl: 'https://monapp.com/order/confirm',
+    cancelUrl: 'https://monapp.com/order/cancel'
+  });
+}`,
+      simulation: `[ORANGE MONEY] Initialisation de session WebPay...
+[AUTH] OAuth2 Bearer token obtenu auprès de la passerelle Orange SN.
+[SESSION] Création de commande ID #OM-SN-882910 réussie.
+[URL] Redirection client générée vers https://api.orange.sn/webpay/pay?token=...
+[STATUS] 200 OK — Session prête.`
+    },
+    {
+      id: "comp-2",
+      title: "@devcom/momo-disbursement",
+      category: "fintech",
+      lang: "TypeScript",
+      country: "🇧🇯 Bénin",
+      author: "Modeste YABLA",
+      upvotes: 215,
+      installCmd: "npm i @devcom/momo-disbursement",
+      desc: "Passerelle unifiée MTN Mobile Money et Moov Money pour l'Afrique de l'Ouest. Signature HMAC timing-safe et retry exponentiel automatique.",
+      code: `import { MoMoDisbursement } from '@devcom/momo-disbursement';
+
+const client = new MoMoDisbursement({
   subscriptionKey: process.env.MOMO_KEY!,
   apiUser: process.env.MOMO_USER!,
   apiKey: process.env.MOMO_SECRET!,
   environment: 'production'
 });
 
-export async function requestPayment(phone: string, amount: number) {
-  return await client.requestToPay({
-    amount: amount,
+export async function payDeveloperBounty(phone: string, amountCfa: number) {
+  return await client.transfer({
+    amount: amountCfa,
     currency: 'XOF',
-    payer: { partyIdType: 'MSISDN', partyId: phone },
-    payerMessage: 'Abonnement DevCom'
+    recipientPhone: phone,
+    note: 'Paiement de mission DevCom Africa'
   });
 }`,
-    simulation: `[MOMO-PAY] Connexion aux passerelles MTN MoMo & Moov Bénin...
-[REQUEST] Demande C2B : 15 000 XOF vers +229 97 00 00 00
-[DISPATCH] Notification Push USSD envoyée sur le terminal client...
-[WEBHOOK] Callback reçu : TxId #BJ-88392019-OK
-[STATUS]  Paiement validé avec succès (Code 200). Solde crédité.`
-  },
-  {
-    id: "wave-sdk",
-    title: "devcom-wave-sdk",
-    category: "mobile-money",
-    lang: "Python",
-    country: "🇨🇮 Côte d'Ivoire",
-    author: "Emmanuel Kouassi",
-    upvotes: 184,
-    installCmd: "pip install devcom-wave",
-    desc: "Client Python pour intégrer les paiements Wave instantanés avec génération automatique de QR Code et deep links mobiles.",
-    code: `from devcom_wave import WaveCheckoutSession
+      simulation: `[MOMO DISBURSEMENT] Connexion aux passerelles MTN MoMo & Moov Bénin...
+[DISBURSE] Virement B2C de 150 000 XOF vers +229 97 00 00 00...
+[CONFIRMATION] Reçu du réseau télécom : Ref #BJ-MOMO-772910-OK.
+[STATUS] Transfert exécuté avec succès. Fonds reçus instantanément.`
+    },
+    {
+      id: "comp-3",
+      title: "devcom-wave-checkout",
+      category: "fintech",
+      lang: "Python",
+      country: "🇨🇮 Côte d'Ivoire",
+      author: "Emmanuel Kouassi",
+      upvotes: 164,
+      installCmd: "pip install devcom-wave",
+      desc: "Client Python asynchrone pour les encaissements instantanés Wave. Génération de QR codes SVG hors-ligne et gestion des webhooks signés.",
+      code: `from devcom_wave import WaveCheckoutSession
 
-wave = WaveCheckoutSession(api_key="wave_ci_live_secret_...")
+wave = WaveCheckoutSession(api_key="wave_ci_live_...")
 
-def create_order_payment(order_id: str, amount_cfa: int):
+def create_checkout(order_id: str, amount_xof: int):
     return wave.create_session(
-        amount=amount_cfa,
+        amount=amount_xof,
         currency="XOF",
-        success_url=f"https://devcom.africa/orders/{order_id}/success"
+        success_url=f"https://monapp.ci/checkout/{order_id}/success"
     )`,
-    simulation: `[WAVE] Connexion aux passerelles Wave CI & SN...
-[SESSION] Création de session pour 25 000 XOF...
-[LINK] Deep Link généré : wave://checkout/sess_839210
-[QR] QR Code scannable disponible sur CDN.
-[RESULT]  Session active, prête pour redirection mobile.`
-  },
-  {
-    id: "offline-sync",
-    title: "@devcom/offline-sync",
-    category: "offline",
-    lang: "JavaScript",
-    country: "🇸🇳 Sénégal",
-    author: "Amina Diallo",
-    upvotes: 98,
-    installCmd: "npm i @devcom/offline-sync",
-    desc: "Moteur de mise en cache IndexedDB et réplication résiliente en arrière-plan pour réseaux 3G/4G intermittents.",
-    code: `import { AfriSyncEngine } from '@devcom/offline-sync';
+      simulation: `[WAVE CI] Session créée pour 25 000 XOF.
+[DEEP LINK] wave://checkout/sess_ci_4482910 actif.
+[QR CODE] QR code haute résolution généré. Prêt pour affichage web.`
+    },
+    {
+      id: "comp-4",
+      title: "devcom-ussd-core",
+      category: "telecom",
+      lang: "Node.js / TS",
+      country: "🇳🇬 Nigeria",
+      author: "Chukwudi Okafor",
+      upvotes: 142,
+      installCmd: "npm i devcom-ussd-core",
+      desc: "Moteur de création d'arborescences USSD multi-opérateurs (*345#) avec gestion de session en mémoire ou Redis et support des téléphones basiques.",
+      code: `import { USSDMenuRouter } from 'devcom-ussd-core';
 
-const sync = new AfriSyncEngine({
-  dbName: 'afri_app_cache',
-  autoRetryInterval: 5000,
-  syncEndpoint: '/api/v1/sync'
+const router = new USSDMenuRouter();
+
+router.start((session) => {
+  return session.con("Bienvenue sur DevCom Africa\\n1. Catalogue\\n2. Bounties\\n3. Aide");
 });
 
-export async function submitDataOffline(data) {
-  await sync.queueTask({ action: 'CREATE_RECORD', payload: data });
-}`,
-    simulation: `[OFFLINE-SYNC] Moteur initialisé sur IndexedDB.
-[NETWORK] État réseau : HORS-LIGNE (Coupure data simulée)
-[CACHE] Action sauvegardée dans la file locale.
-[NETWORK] Réseau rétabli (4G détectée) !
-[SYNC] Envoi des données en arrière-plan vers le serveur...
-[SUCCESS]  100% des données locales répliquées sans conflit.`
-  },
-  {
-    id: "ussd-engine",
-    title: "@devcom/ussd-engine",
-    category: "ussd",
-    lang: "TypeScript",
-    country: "🇧🇯 Bénin",
-    author: "Modeste YABLA",
-    upvotes: 210,
-    installCmd: "npm i @devcom/ussd-engine",
-    desc: "Framework robuste de routage de menus USSD multi-opérateurs (*345#) sans perte d'état de session.",
-    code: `import { USSDRouter } from '@devcom/ussd-engine';
+router.on('1', (session) => {
+  return session.end("Consultez https://devcom.africa pour le catalogue complet !");
+});`,
+      simulation: `[USSD ROUTER] Session démarrée sur canal télécom GSM.
+[STATE] Réponse 'CON' transmise au terminal (session active).
+[EVENT] Saisie utilisateur traitée : '1'.
+[RESULT] Réponse 'END' envoyée. Session fermée proprement.`
+    },
+    {
+      id: "comp-5",
+      title: "@devcom/offline-crdt-sync",
+      category: "offline",
+      lang: "JavaScript",
+      country: "🇷🇼 Rwanda",
+      author: "Grace Uwase",
+      upvotes: 119,
+      installCmd: "npm i @devcom/offline-crdt-sync",
+      desc: "Bibliothèque de synchronisation offline-first basée sur les CRDTs pour bases de données locales IndexedDB, sans conflits lors des reconnexions.",
+      code: `import { CRDTSyncManager } from '@devcom/offline-crdt-sync';
 
-const router = new USSDRouter();
-router.onRoot((session) => session.con("Bienvenue sur DevCom\\n1. Mon Solde\\n2. Bounties"));
-router.onOption('1', (session) => session.end("Votre solde : 1,250 DP."));`,
-    simulation: `[USSD-ROUTER] Passerelle USSD initialisée (*345#)...
-[USER] Appel entrant : +229 97 12 34 56
-[RESPONSE] CON Bienvenue sur DevCom\\n1. Mon Solde\\n2. Bounties
-[INPUT] Touche '1' pressée...
-[RESPONSE] END Votre solde : 1,250 DP.
-[STATUS]  Session clôturée avec succès.`
-  },
-  {
-    id: "sms-router",
-    title: "devcom-sms-router",
-    category: "security",
-    lang: "Python",
-    country: "🇹🇬 Togo",
-    author: "Yao Mensah",
-    upvotes: 89,
-    installCmd: "pip install devcom-sms-router",
-    desc: "Routeur intelligent d'envoi de SMS transactionnels minimisant les coûts télécoms au Bénin, Togo, CI et Sénégal.",
-    code: `from devcom_sms_router import SmartSMSBroker
+const syncManager = new CRDTSyncManager({
+  storageKey: 'offline_tasks',
+  endpoint: 'https://api.devcom.africa/v1/sync'
+});
 
-broker = SmartSMSBroker()
-def send_otp(phone: str):
-    return broker.dispatch_sms(destination=phone, message="Code : 928301")`,
-    simulation: `[SMS-ROUTER] Analyse du numéro destinataire : +228 90 00 00 00 (Togo)
-[ALGO] Détection de la route la plus économique...
-[STATUS]  SMS expédié en 380ms. Code généré : 928301.`
-  },
-  {
-    id: "flutter-pay",
-    title: "flutter_african_pay",
-    category: "mobile-money",
-    lang: "Flutter",
-    country: "🇳🇬 Nigeria",
-    author: "Chukwudi Okafor",
-    upvotes: 156,
-    installCmd: "flutter pub add flutter_african_pay",
-    desc: "Widget Flutter clé en main prenant en charge MTN MoMo, Wave, Orange Money et cartes bancaires africaines.",
-    code: `import 'package:flutter_african_pay/flutter_african_pay.dart';
+await syncManager.saveRecord({ id: 'item-1', data: 'Contenu modifié hors-ligne' });`,
+      simulation: `[CRDT SYNC] Donnée écrite en local avec vecteur d'horloge logique.
+[OFFLINE] Connexion perdue : sauvegarde sécurisée dans IndexedDB.
+[ONLINE] Connexion rétablie : réconciliation automatique sans écrasement.`
+    },
+    {
+      id: "comp-6",
+      title: "@devcom/webhook-hmac-guard",
+      category: "security",
+      lang: "TypeScript",
+      country: "🇧🇯 Bénin",
+      author: "Modeste YABLA",
+      upvotes: 177,
+      installCmd: "npm i @devcom/webhook-hmac-guard",
+      desc: "Middleware de validation de signatures HMAC timing-safe pour tous les webhooks télécoms et fintechs d'Afrique (MTN, Wave, Orange, Hub2).",
+      code: `import { createHmacGuard } from '@devcom/webhook-hmac-guard';
 
-AfricanPaySheet.show(context, amount: 15000, currency: "XOF");`,
-    simulation: `[FLUTTER-PAY] Affichage du composant Modal Bottom Sheet...
-[UI] Rendu des logos MTN MoMo, Wave et Moov Money en SVG.
-[CALLBACK] Validation de transaction #CI-994827 reçue !`
-  }
-];
+export const guard = createHmacGuard({
+  algorithm: 'sha256',
+  secret: process.env.WEBHOOK_SECRET!,
+  headerName: 'x-signature-token'
+});`,
+      simulation: `[SECURITY GUARD] Requête webhook reçue.
+[VERIFY] Calcul du hash HMAC-SHA256 sur le payload brut.
+[COMPARE] Comparaison en temps constant (timing-safe).
+[AUTH] Signature validée avec succès. Attaque par temporisation évitée.`
+    }
+  ],
 
-// ==========================================================================
-// 3. Données Bounties & Missions
-// ==========================================================================
-const BOUNTIES_LIST = [
-  {
-    id: "bounty-1",
-    reward: "150 000 FCFA",
-    title: "SDK Flutter pour intégration Wave avec Deep Links & QR",
-    payoutMethod: "Wave & MTN MoMo",
-    desc: "Développer un package Flutter open-source permettant de déclencher des paiements Wave sans redirection web externe.",
-    difficulty: "Intermédiaire",
-    applicants: 4,
-    deadline: "15 nov. 2026",
-    company: "AfriTech Labs"
-  },
-  {
-    id: "bounty-2",
-    reward: "80 000 FCFA",
-    title: "Template Dashboard PWA ultra-léger (<120 KB)",
-    payoutMethod: "Moov Money",
-    desc: "Concevoir un template Tailwind CSS optimisé pour une consommation data minimale sur smartphones Android d'entrée de gamme.",
-    difficulty: "Débutant / Intermédiaire",
-    applicants: 6,
-    deadline: "10 nov. 2026",
-    company: "DevCom Community"
-  },
-  {
-    id: "bounty-3",
-    reward: "250 000 FCFA",
-    title: "Connecteur S3 Stockage Objet Haute Résilience",
-    payoutMethod: "Virement / MoMo",
-    desc: "Créer un middleware Next.js & FastAPI assurant la réplication automatique de documents et médias sur datacenters régionaux.",
-    difficulty: "Avancé",
-    applicants: 3,
-    deadline: "20 nov. 2026",
-    company: "CloudWest Africa"
-  }
-];
+  // Données Bounties (montants de base en FCFA)
+  bounties: [
+    {
+      id: "bounty-1",
+      amountCfa: 250000,
+      title: "Intégration Passerelle Wave + MTN MoMo pour Pharmacie en Ligne",
+      company: "PharmaTech Cotonou & Abidjan",
+      difficulty: "Intermédiaire",
+      deadline: "28 nov. 2026",
+      applicants: 4,
+      desc: "Développement d'un connecteur unifié dans une application NestJS pour accepter Wave CI et MTN MoMo Bénin avec gestion automatisée des reçus par SMS."
+    },
+    {
+      id: "bounty-2",
+      amountCfa: 180000,
+      title: "Arborescence USSD pour Consultation des Prix Agricoles du Marché",
+      company: "AgriConnect Bénin",
+      difficulty: "Tous niveaux",
+      deadline: "15 déc. 2026",
+      applicants: 7,
+      desc: "Mise en place d'un menu USSD (*345*10#) permettant aux maraîchers de consulter les cours des denrées vivrières à Parakou et Malanville."
+    },
+    {
+      id: "bounty-3",
+      amountCfa: 350000,
+      title: "Moteur de Cache Offline & Sync Bidirectionnelle pour Cliniques Rurales",
+      company: "AfriHealth Solutions",
+      difficulty: "Expert",
+      deadline: "5 déc. 2026",
+      applicants: 3,
+      desc: "Conception d'un module Flutter / SQLite capable d'enregistrer des consultations médicales sans réseau et de synchroniser les dossiers dès le retour de la 3G."
+    },
+    {
+      id: "bounty-4",
+      amountCfa: 400000,
+      title: "Audit de Sécurité & Détection de Fraude sur API Microfinance",
+      company: "KrediFintech Dakar",
+      difficulty: "Expert",
+      deadline: "20 déc. 2026",
+      applicants: 2,
+      desc: "Audit approfondi des flux de décaissement Mobile Money, protection contre les attaques de replay et tests de pénétration sur API FastAPI."
+    }
+  ],
 
-// ==========================================================================
-// 4. Données Entraide & Développeurs
-// ==========================================================================
-const PEER_LIST = [
-  {
-    id: "peer-1",
-    author: "Koffi A.",
-    country: "🇧🇯 Bénin",
-    tag: "Troc Technique",
-    title: "Audit de sécurité backend Django contre intégration Next.js 14",
-    desc: "J'offre un audit complet des failles et requêtes SQL sur votre backend Django en échange d'une aide sur les Server Components Next.js.",
-    deal: "Offre : 3h d'audit Django | Demande : 3h d'accompagnement Next.js"
-  },
-  {
-    id: "peer-2",
-    author: "Amina Diallo",
-    country: "🇸🇳 Sénégal",
-    tag: "Entraide Flash",
-    title: "Besoin d'un regard critique sur synchronisation IndexedDB offline",
-    desc: "Je bloque sur la résolution de conflits de timestamps lors de la reconnexion. Récompense : 150 DevPoints + mention dans le README du package.",
-    deal: "Récompense : 150 DP + Mentorat Flutter"
-  },
-  {
-    id: "peer-3",
-    author: "Grace Uwase",
-    country: "🇷🇼 Rwanda",
-    tag: "Revue de Code",
-    title: "Revue UI/UX Tailwind CSS pour app fintech bilingue (EN/FR)",
-    desc: "Je propose de restructurer le design system d'une app contre une aide pour configurer une passerelle de paiement MTN MoMo Bénin.",
-    deal: "Offre : Design System complet | Demande : Passerelle MTN MoMo"
-  }
-];
+  // Données Troc Technique (Peer Barter)
+  peers: [
+    {
+      id: "peer-1",
+      name: "Modeste YABLA",
+      initials: "MY",
+      location: "Cotonou 🇧🇯",
+      give: "Architecture Django, Webhooks MoMo & Sécurité API",
+      want: "Débogage et build release Flutter iOS",
+      status: "Disponible ce week-end"
+    },
+    {
+      id: "peer-2",
+      name: "Amina Diallo",
+      initials: "AD",
+      location: "Dakar 🇸🇳",
+      give: "Développement Mobile Flutter & intégrations Wave SN",
+      want: "Optimisation de requêtes PostgreSQL volumineuses",
+      status: "Réponse sous 2h"
+    },
+    {
+      id: "peer-3",
+      name: "Emmanuel Kouassi",
+      initials: "EK",
+      location: "Abidjan 🇨🇮",
+      give: "Conteneurisation Docker, CI/CD GitHub Actions & VPS",
+      want: "Revue de code UI React avec Tailwind / CSS propre",
+      status: "Ouvert aux sessions pair-programming"
+    },
+    {
+      id: "peer-4",
+      name: "Chukwudi Okafor",
+      initials: "CO",
+      location: "Lagos 🇳🇬",
+      give: "Passerelles USSD télécoms & solutions SMS OTP",
+      want: "Support sur conformité RGPD / lois de protection UEMOA",
+      status: "Actif ce soir"
+    }
+  ],
 
-const DEVELOPERS_LIST = [
-  {
-    name: "Modeste YABLA",
-    avatar: "MY",
-    role: "Fullstack & Cloud Architect",
-    country: "🇧🇯 Cotonou, Bénin",
-    skills: ["TypeScript", "Next.js", "Python", "Mobile Money"],
-    dp: 1250
-  },
-  {
-    name: "Amina Diallo",
-    avatar: "AD",
-    role: "Mobile & Flutter Engineer",
-    country: "🇸🇳 Dakar, Sénégal",
-    skills: ["Flutter", "Dart", "IndexedDB", "PWA"],
-    dp: 980
-  },
-  {
-    name: "Emmanuel Kouassi",
-    avatar: "EK",
-    role: "Backend & Fintech Specialist",
-    country: "🇨🇮 Abidjan, Côte d'Ivoire",
-    skills: ["Python", "FastAPI", "Wave", "PostgreSQL"],
-    dp: 1120
-  },
-  {
-    name: "Chukwudi Okafor",
-    avatar: "CO",
-    role: "DevOps & Systems Engineer",
-    country: "🇳🇬 Lagos, Nigeria",
-    skills: ["Go", "Docker", "Kubernetes", "AWS/Cloud"],
-    dp: 1450
-  }
-];
+  // Données Projets Open-Source
+  projects: [
+    {
+      id: "proj-1",
+      name: "afri-geo-address",
+      badge: "Bon premier ticket",
+      stars: 142,
+      contributors: 11,
+      desc: "Bibliothèque de normalisation et géocodage des repères informels pour les livraisons en Afrique de l'Ouest (ex: 'À 50m de la pharmacie du carrefour').",
+      tags: ["TypeScript", "Geolocation", "Node.js", "OpenStreetMap"],
+      lookingFor: "Maintainer · Testeur CI"
+    },
+    {
+      id: "proj-2",
+      name: "open-ussd-simulator",
+      badge: "Tous niveaux",
+      stars: 189,
+      contributors: 16,
+      desc: "Simulateur visuel interactif de combiné téléphonique dans le navigateur pour tester des parcours USSD complexes sans payer de sessions télécoms.",
+      tags: ["JavaScript", "HTML5", "Telecom", "Emulateur"],
+      lookingFor: "Contributeur UI · Rédacteur Docs"
+    },
+    {
+      id: "proj-3",
+      name: "wa-invoice-bot",
+      badge: "Projet Actif",
+      stars: 96,
+      contributors: 8,
+      desc: "Générateur automatique de factures PDF et reçus de paiement envoyé via l'API WhatsApp Cloud pour les commerçants du secteur informel.",
+      tags: ["Python", "FastAPI", "PDFKit", "WhatsApp API"],
+      lookingFor: "Dev Python · Intégrateur MoMo"
+    }
+  ],
 
-// ==========================================================================
-// État Global
-// ==========================================================================
-let state = {
-  components: [...COMPONENTS_LIST],
-  bounties: [...BOUNTIES_LIST],
-  peers: [...PEER_LIST],
-  developers: [...DEVELOPERS_LIST],
-  activeCat: "all",
-  searchKeyword: "",
-  activeSandboxComp: null,
-  activeChatRecipient: "Amina Diallo",
-  modalType: "component"
+  // Annuaire des Talents
+  talents: [
+    {
+      id: "talent-1",
+      name: "Modeste YABLA",
+      initials: "MY",
+      headline: "Fullstack Architect & MoMo Specialist",
+      location: "Cotonou 🇧🇯",
+      points: "1,450 DP",
+      skills: ["TypeScript", "Python", "Mobile Money", "Docker"],
+      proofOfWork: "Auteur de 3 SDKs vérifiés"
+    },
+    {
+      id: "talent-2",
+      name: "Amina Diallo",
+      initials: "AD",
+      headline: "Senior Mobile Engineer",
+      location: "Dakar 🇸🇳",
+      points: "1,280 DP",
+      skills: ["Flutter", "Dart", "Wave SDK", "IndexedDB"],
+      proofOfWork: "14 PRs publiques mergées"
+    },
+    {
+      id: "talent-3",
+      name: "Emmanuel Kouassi",
+      initials: "EK",
+      headline: "Backend & Cloud Engineer",
+      location: "Abidjan 🇨🇮",
+      points: "1,120 DP",
+      skills: ["FastAPI", "PostgreSQL", "CI/CD", "AWS"],
+      proofOfWork: "Contributeur Core AfriSync"
+    },
+    {
+      id: "talent-4",
+      name: "Chukwudi Okafor",
+      initials: "CO",
+      headline: "Telecom & USSD Infrastructure Dev",
+      location: "Lagos 🇳🇬",
+      points: "1,620 DP",
+      skills: ["Go", "Node.js", "USSD Protocols", "Redis"],
+      proofOfWork: "Passerelle USSD 100k users"
+    }
+  ]
 };
 
 // ==========================================================================
-// Initialisation
+// 2. INITIALISATION AU CHARGEMENT DU DOM
 // ==========================================================================
 document.addEventListener("DOMContentLoaded", () => {
   initTheme();
+  initDataSaver();
+  initCurrency();
+  initPersonaSwitcher();
+  initHeroTerminal();
   renderComponents();
   renderBounties();
   renderPeers();
-  renderDevelopers();
-  initDevSearch();
-  initEventListeners();
+  renderProjects();
+  renderTalents();
+  setupEventListeners();
 });
 
 // ==========================================================================
-// Gestion du Thème Dark / Light
+// 3. THÈME SOMBRE / CLAIR
 // ==========================================================================
 function initTheme() {
-  const saved = localStorage.getItem("devcom_theme") || "dark";
-  document.documentElement.setAttribute("data-theme", saved);
+  document.documentElement.setAttribute('data-theme', appState.theme);
+  updateThemeIcon();
 
-  const btn = document.getElementById("theme-toggle");
-  if (btn) {
-    btn.addEventListener("click", () => {
-      const cur = document.documentElement.getAttribute("data-theme");
-      const next = cur === "dark" ? "light" : "dark";
-      document.documentElement.setAttribute("data-theme", next);
-      localStorage.setItem("devcom_theme", next);
-      showToast(`Mode ${next === "dark" ? "Sombre" : "Clair"} activé`);
+  const themeToggle = document.getElementById("theme-toggle-btn");
+  if (themeToggle) {
+    themeToggle.addEventListener("click", () => {
+      appState.theme = appState.theme === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', appState.theme);
+      localStorage.setItem('devcom_theme', appState.theme);
+      updateThemeIcon();
+      showToast(appState.theme === 'dark' ? "Mode Sombre activé 🌙" : "Mode Clair activé ☀️");
+    });
+  }
+}
+
+function updateThemeIcon() {
+  const icon = document.getElementById("theme-icon");
+  if (icon) {
+    icon.textContent = appState.theme === 'dark' ? "🌙" : "☀️";
+  }
+}
+
+// ==========================================================================
+// 4. MODE ÉCONOMIE DE DONNÉES (DATA-SAVER)
+// ==========================================================================
+function initDataSaver() {
+  if (appState.dataSaver) {
+    document.body.classList.add('data-saver-active');
+  }
+  updateDataSaverUI();
+
+  const toggleBtn = document.getElementById("data-saver-toggle");
+  if (toggleBtn) {
+    toggleBtn.addEventListener("click", () => {
+      appState.dataSaver = !appState.dataSaver;
+      localStorage.setItem('devcom_datasaver', appState.dataSaver);
+      if (appState.dataSaver) {
+        document.body.classList.add('data-saver-active');
+        showToast("⚡ Mode Économie Data activé (chargement ultra-rapide) !");
+      } else {
+        document.body.classList.remove('data-saver-active');
+        showToast("Mode standard restauré.");
+      }
+      updateDataSaverUI();
+    });
+  }
+}
+
+function updateDataSaverUI() {
+  const statusLabel = document.getElementById("data-saver-status");
+  const toggleBtn = document.getElementById("data-saver-toggle");
+  if (statusLabel) {
+    statusLabel.textContent = appState.dataSaver ? "ON" : "OFF";
+  }
+  if (toggleBtn) {
+    if (appState.dataSaver) {
+      toggleBtn.classList.add('active');
+    } else {
+      toggleBtn.classList.remove('active');
+    }
+  }
+}
+
+// ==========================================================================
+// 5. CONVERTISSEUR MULTI-DEVISES
+// ==========================================================================
+function initCurrency() {
+  const currencyBtn = document.getElementById("currency-toggle-btn");
+  if (currencyBtn) {
+    currencyBtn.addEventListener("click", () => {
+      const currencies = ['FCFA', 'NGN', 'KES', 'USD'];
+      const currentIndex = currencies.indexOf(appState.currency);
+      appState.currency = currencies[(currentIndex + 1) % currencies.length];
+      
+      const label = document.getElementById("current-currency-label");
+      if (label) label.textContent = appState.currency;
+
+      renderBounties();
+      updateHeroMetrics();
+      showToast(`Devise d'affichage : ${appState.currency}`);
+    });
+  }
+}
+
+function formatAmount(amountCfa) {
+  const info = appState.currencyRates[appState.currency];
+  const converted = Math.round(amountCfa * info.rate);
+  const formattedNumber = converted.toLocaleString('fr-FR');
+  return info.suffix ? `${formattedNumber} ${info.symbol}` : `${info.symbol}${formattedNumber}`;
+}
+
+function updateHeroMetrics() {
+  const metricEl = document.getElementById("hero-bounties-amount");
+  if (metricEl) {
+    metricEl.textContent = formatAmount(28400000);
+  }
+}
+
+// ==========================================================================
+// 6. PERSONA SWITCHER (MODE DÉMO)
+// ==========================================================================
+function initPersonaSwitcher() {
+  const select = document.getElementById("persona-select");
+  const badge = document.getElementById("persona-welcome-badge");
+
+  if (select) {
+    select.addEventListener("change", (e) => {
+      appState.persona = e.target.value;
+      if (appState.persona === 'visitor') {
+        if (badge) badge.textContent = "Découvrez l'écosystème open-source africain";
+        showToast("Vue Visiteur : découvrez librement les ressources et briques tech.");
+      } else if (appState.persona === 'developer') {
+        if (badge) badge.textContent = "Bienvenue Modeste YABLA (Solde : 1,450 DevPoints)";
+        showToast("Vue Développeur Membre : vos accès aux trocs et aux bounties sont actifs.");
+      } else if (appState.persona === 'founder') {
+        if (badge) badge.textContent = "Espace Porteur de Projet : 1.2M FCFA en séquestre";
+        showToast("Vue Startup : déposez un nouveau bounty ou recrutez un contributeur.");
+      } else if (appState.persona === 'maintainer') {
+        if (badge) badge.textContent = "Mainteneur : 4 tickets en attente de revue";
+        showToast("Vue Mainteneur : gérez les PRs et demandes de contributeurs.");
+      }
     });
   }
 }
 
 // ==========================================================================
-// Moteur DevSearch (Signature DevBénin)
+// 7. HERO LIVE CODE TERMINAL
 // ==========================================================================
-function initDevSearch() {
-  const input = document.getElementById("devsearch-query-input");
-  const runBtn = document.getElementById("btn-run-devsearch");
-  const resultBox = document.getElementById("devsearch-result-content");
-  const resultStatus = document.getElementById("devsearch-result-status");
+function initHeroTerminal() {
+  const tabs = document.querySelectorAll("#hero-terminal-tabs .terminal-tab-btn");
+  const codeEl = document.getElementById("hero-terminal-code");
+  const runBtn = document.getElementById("btn-run-hero-demo");
 
-  function search(q) {
-    if (!q || !q.trim()) return;
-    const lower = q.toLowerCase();
+  let currentTab = "momo";
 
-    // Recherche dans la base DevSearch
-    const match = DEVSEARCH_KB.find(item => 
-      item.keywords.some(k => lower.includes(k)) || item.title.toLowerCase().includes(lower)
-    );
-
-    if (match) {
-      resultStatus.textContent = `Résultat vérifié : ${match.framework}`;
-      resultBox.innerHTML = `
-        <h4 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; color: var(--primary);">${escapeHtml(match.title)}</h4>
-        <p style="margin-bottom: 12px; color: var(--text-muted); font-size: 0.92rem;">${escapeHtml(match.explanation)}</p>
-        <div style="background: #08080A; border: 1px solid var(--border-glass); border-radius: var(--radius-sm); padding: 12px; font-family: var(--font-code); font-size: 0.82rem; color: var(--accent-cyan); overflow-x: auto;">
-          <pre><code>${escapeHtml(match.code)}</code></pre>
-        </div>
-        <div style="margin-top: 12px; display: flex; justify-content: flex-end;">
-          <button class="btn btn-xs btn-outline rounded-full" onclick="copyText('${escapeHtml(match.code.replace(/\n/g, '\\n').replace(/'/g, "\\'"))}')">Copier le code 📋</button>
-        </div>
-      `;
-    } else {
-      resultStatus.textContent = "Résultat issu de la communauté";
-      resultBox.innerHTML = `
-        <p>🔍 <strong>Recherche :</strong> "${escapeHtml(q)}"</p>
-        <p style="color: var(--text-muted); margin-top: 6px;">Consultez la documentation détaillée ou posez votre question directement à la communauté dans l'onglet Entraide.</p>
-      `;
+  function setHeroTab(tabKey) {
+    currentTab = tabKey;
+    tabs.forEach(t => t.classList.toggle("active", t.dataset.tab === tabKey));
+    if (codeEl && appState.heroDemos[tabKey]) {
+      codeEl.textContent = appState.heroDemos[tabKey].code;
     }
   }
 
-  if (runBtn && input) {
-    runBtn.addEventListener("click", () => search(input.value));
-    input.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") search(input.value);
+  tabs.forEach(btn => {
+    btn.addEventListener("click", () => setHeroTab(btn.dataset.tab));
+  });
+
+  // Premier chargement
+  setHeroTab("momo");
+
+  if (runBtn) {
+    runBtn.addEventListener("click", () => {
+      const demo = appState.heroDemos[currentTab];
+      if (!demo) return;
+
+      openSandboxModal({
+        title: demo.title,
+        lang: "TypeScript / Python",
+        code: demo.code,
+        simulation: demo.simulation
+      });
     });
   }
-
-  document.querySelectorAll(".sugg-chip").forEach(chip => {
-    chip.addEventListener("click", () => {
-      const q = chip.dataset.query;
-      if (input) input.value = q;
-      search(q);
-    });
-  });
 }
 
 // ==========================================================================
-// Rendu Showroom Composants
+// 8. RENDU DES COMPOSANTS & APIS
 // ==========================================================================
 function renderComponents() {
-  const container = document.getElementById("components-grid");
+  const container = document.getElementById("components-grid-container");
   if (!container) return;
 
-  const filtered = state.components.filter(c => {
-    if (state.activeCat !== "all" && c.category !== state.activeCat) return false;
-    if (state.searchKeyword) {
-      const q = state.searchKeyword.toLowerCase();
-      return c.title.toLowerCase().includes(q) || c.desc.toLowerCase().includes(q) || c.lang.toLowerCase().includes(q);
-    }
-    return true;
+  const filtered = appState.components.filter(c => {
+    const matchCategory = appState.activeCategory === 'all' || c.category === appState.activeCategory;
+    const query = appState.searchQuery.toLowerCase();
+    const matchSearch = !query || 
+      c.title.toLowerCase().includes(query) || 
+      c.desc.toLowerCase().includes(query) ||
+      c.lang.toLowerCase().includes(query) ||
+      c.author.toLowerCase().includes(query);
+    return matchCategory && matchSearch;
   });
 
   if (filtered.length === 0) {
     container.innerHTML = `
-      <div style="grid-column: 1/-1; text-align: center; padding: 48px; background: var(--bg-card); border-radius: var(--radius-md); border: 1px solid var(--border-glass);">
-        <p style="color: var(--text-muted);">🔍 Aucun composant ne correspond à cette recherche.</p>
+      <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-dim);">
+        <p style="font-size: 16px;">Aucun module trouvé pour « ${escapeHtml(appState.searchQuery)} » dans cette catégorie.</p>
+        <button class="btn btn-outline btn-sm btn-pill" style="margin-top: 12px;" onclick="resetComponentFilters()">Réinitialiser les filtres</button>
       </div>
     `;
     return;
   }
 
   container.innerHTML = filtered.map(comp => `
-    <article class="showroom-card">
-      <div>
-        <div class="showroom-top">
-          <span class="tag-cat">${comp.category.toUpperCase()}</span>
-          <span style="font-size: 0.8rem; color: var(--text-faint);">${comp.country}</span>
+    <article class="component-card">
+      <div class="card-top-header">
+        <div>
+          <h3 class="comp-pkg-title">${escapeHtml(comp.title)}</h3>
+          <div class="comp-author-meta">
+            <span>Par <strong>${escapeHtml(comp.author)}</strong></span>
+            <span>•</span>
+            <span>${escapeHtml(comp.country)}</span>
+          </div>
         </div>
-
-        <h3 class="showroom-title">${escapeHtml(comp.title)}</h3>
-        <p class="showroom-desc">${escapeHtml(comp.desc)}</p>
-
-        <div class="cmd-strip">
-          <code>${escapeHtml(comp.installCmd)}</code>
-          <button class="copy-mini-btn" onclick="copyText('${escapeHtml(comp.installCmd)}')" title="Copier">📋</button>
-        </div>
+        <button class="upvote-badge-btn" onclick="handleUpvote('${comp.id}')" title="Voter pour ce composant">
+          <span>▲</span>
+          <span id="upvotes-${comp.id}">${comp.upvotes}</span>
+        </button>
       </div>
 
-      <div class="showroom-footer">
-        <span class="author-txt">${escapeHtml(comp.author)} • ${comp.lang}</span>
-        <div style="display: flex; gap: 8px;">
-          <button class="btn btn-xs btn-outline rounded-full" onclick="handleUpvote('${comp.id}')">
-            ▲ ${comp.upvotes}
-          </button>
-          <button class="btn btn-xs btn-primary rounded-full" onclick="openSandbox('${comp.id}')">
-            Tester 🧪
-          </button>
-        </div>
+      <p class="comp-description">${escapeHtml(comp.desc)}</p>
+
+      <div class="comp-install-box">
+        <code>${escapeHtml(comp.installCmd)}</code>
+        <button class="copy-mini-btn" onclick="copyText('${escapeHtml(comp.installCmd)}')">Copier</button>
+      </div>
+
+      <div class="comp-footer-actions">
+        <span class="lang-tech-badge">${escapeHtml(comp.lang)}</span>
+        <button class="btn btn-primary btn-sm btn-pill" onclick="triggerSandboxById('${comp.id}')">
+          🧪 Tester dans le Sandbox
+        </button>
       </div>
     </article>
-  `).join('');
+  `).join("");
 }
 
+window.resetComponentFilters = function() {
+  appState.activeCategory = 'all';
+  appState.searchQuery = '';
+  const searchInput = document.getElementById("comp-search-input");
+  if (searchInput) searchInput.value = '';
+  document.querySelectorAll("#comp-category-filters .filter-pill").forEach(p => {
+    p.classList.toggle("active", p.dataset.filter === 'all');
+  });
+  renderComponents();
+};
+
+window.handleUpvote = function(id) {
+  const comp = appState.components.find(c => c.id === id);
+  if (!comp) return;
+  comp.upvotes += 1;
+  const countEl = document.getElementById(`upvotes-${id}`);
+  if (countEl) countEl.textContent = comp.upvotes;
+  showToast(`+1 vote enregistré pour ${comp.title} !`);
+};
+
+window.copyText = function(text) {
+  navigator.clipboard.writeText(text).then(() => {
+    showToast("Commande copiée dans le presse-papier !");
+  });
+};
+
 // ==========================================================================
-// Rendu Bounties
+// 9. RENDU DES BOUNTIES (MISSIONS RÉMUNÉRÉES)
 // ==========================================================================
 function renderBounties() {
-  const container = document.getElementById("bounties-grid");
+  const container = document.getElementById("bounties-grid-container");
   if (!container) return;
 
-  container.innerHTML = state.bounties.map(b => `
-    <article class="bounty-card-devbenin">
-      <div>
-        <div class="bounty-val-row">
-          <span class="bounty-amount">${b.reward}</span>
-          <span class="bounty-pill-pay">💳 ${b.payoutMethod}</span>
-        </div>
-
-        <h3 class="bounty-name">${escapeHtml(b.title)}</h3>
-        <p class="bounty-text">${escapeHtml(b.desc)}</p>
+  container.innerHTML = appState.bounties.map(b => `
+    <article class="bounty-card">
+      <div class="bounty-reward-row">
+        <span class="bounty-amount">${formatAmount(b.amountCfa)}</span>
+        <span class="escrow-verified-pill">🛡️ Séquestre Garanti</span>
       </div>
 
-      <div class="bounty-row-footer">
-        <span style="color: var(--text-faint);">⏳ ${b.deadline} • 👥 ${b.applicants} candidats</span>
-        <button class="btn btn-sm btn-amber rounded-full" onclick="applyBounty('${escapeHtml(b.title)}')">
-          Postuler ↗
+      <h3 class="bounty-title">${escapeHtml(b.title)}</h3>
+      <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5;">${escapeHtml(b.desc)}</p>
+
+      <div class="bounty-specs-row">
+        <span>Niveau : <strong>${escapeHtml(b.difficulty)}</strong></span>
+        <span>•</span>
+        <span>Échéance : ${escapeHtml(b.deadline)}</span>
+        <span>•</span>
+        <span>${b.applicants} candidats</span>
+      </div>
+
+      <div class="bounty-footer">
+        <span style="font-size: 12px; color: var(--text-dim);">${escapeHtml(b.company)}</span>
+        <button class="btn btn-solar btn-sm btn-pill" onclick="applyToBounty('${b.id}')">
+          Postuler au Bounty ↗
         </button>
       </div>
     </article>
-  `).join('');
+  `).join("");
 }
 
+window.applyToBounty = function(id) {
+  const bounty = appState.bounties.find(b => b.id === id);
+  if (!bounty) return;
+
+  const contact = prompt(`Postuler à la mission :\n"${bounty.title}"\nMontant : ${formatAmount(bounty.amountCfa)}\n\nEntrez votre email ou profil GitHub :`);
+  if (contact) {
+    bounty.applicants += 1;
+    renderBounties();
+    showToast("Candidature transmise au porteur du projet avec succès !");
+  }
+};
+
 // ==========================================================================
-// Rendu Entraide & Troc
+// 10. RENDU DU TROC TECHNIQUE ENTRE PAIRS
 // ==========================================================================
 function renderPeers() {
-  const container = document.getElementById("peer-grid");
+  const container = document.getElementById("peer-grid-container");
   if (!container) return;
 
-  container.innerHTML = state.peers.map(p => `
-    <article class="peer-card-box">
+  container.innerHTML = appState.peers.map(p => `
+    <article class="peer-card">
+      <div class="peer-header">
+        <div class="peer-avatar">${p.initials}</div>
+        <div class="peer-user-info">
+          <h4>${escapeHtml(p.name)}</h4>
+          <span class="peer-location">${escapeHtml(p.location)} • <span style="color: var(--accent-mint); font-weight: 500;">${escapeHtml(p.status)}</span></span>
+        </div>
+      </div>
+
+      <div class="peer-exchange-box">
+        <div class="exchange-give">
+          <span>🤝</span>
+          <span><strong>J'offre :</strong> ${escapeHtml(p.give)}</span>
+        </div>
+        <div class="exchange-want">
+          <span>🎯</span>
+          <span><strong>Je cherche :</strong> ${escapeHtml(p.want)}</span>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; padding-top: 6px;">
+        <button class="btn btn-outline btn-sm btn-pill" onclick="openChatWith('${p.name}')">
+          Proposer un Échange 💬
+        </button>
+      </div>
+    </article>
+  `).join("");
+}
+
+// ==========================================================================
+// 11. RENDU DES PROJETS OPEN-SOURCE
+// ==========================================================================
+function renderProjects() {
+  const container = document.getElementById("projects-grid-container");
+  if (!container) return;
+
+  container.innerHTML = appState.projects.map(proj => `
+    <article class="project-card">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span class="project-badge-tag">${escapeHtml(proj.badge)}</span>
+        <span style="font-size: 12px; color: var(--text-dim); font-weight: 600;">★ ${proj.stars} stars</span>
+      </div>
+
+      <h3 class="project-card-title">${escapeHtml(proj.name)}</h3>
+      <p style="font-size: 13.5px; color: var(--text-muted); line-height: 1.5;">${escapeHtml(proj.desc)}</p>
+
+      <div class="project-tags-list">
+        ${proj.tags.map(t => `<span class="project-mini-tag">${escapeHtml(t)}</span>`).join("")}
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid var(--border-subtle); font-size: 12px;">
+        <span style="color: var(--accent-solar); font-weight: 600;">Recherche : ${escapeHtml(proj.lookingFor)}</span>
+        <button class="btn btn-outline btn-sm btn-pill" onclick="openProjectModal('${proj.name}')">
+          Contribuer ↗
+        </button>
+      </div>
+    </article>
+  `).join("");
+}
+
+window.openProjectModal = function(name) {
+  showToast(`Dépôt open-source « ${name} » : PRs publiques ouvertes aux contributeurs !`);
+};
+
+// ==========================================================================
+// 12. RENDU DE L'ANNUAIRE DES TALENTS
+// ==========================================================================
+function renderTalents() {
+  const container = document.getElementById("devs-grid-container");
+  if (!container) return;
+
+  container.innerHTML = appState.talents.map(t => `
+    <article class="dev-profile-card">
+      <div class="dev-avatar-wrap">
+        <div class="dev-large-avatar">${t.initials}</div>
+        <span class="online-status-dot" title="En ligne"></span>
+      </div>
+
       <div>
-        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-          <span class="tag-cat" style="background: var(--accent-cyan-bg); color: var(--accent-cyan);">${p.tag}</span>
-          <span style="font-size: 0.8rem; color: var(--text-faint);">${p.country} • ${p.author}</span>
-        </div>
-
-        <h3 class="showroom-title">${escapeHtml(p.title)}</h3>
-        <p class="showroom-desc">${escapeHtml(p.desc)}</p>
-
-        <div class="deal-strip">
-          <strong>Accord proposé :</strong> ${escapeHtml(p.deal)}
-        </div>
+        <h3 class="dev-name">${escapeHtml(t.name)}</h3>
+        <span class="dev-headline">${escapeHtml(t.headline)}</span>
+        <div style="font-size: 12px; color: var(--text-dim); margin-top: 3px;">${escapeHtml(t.location)}</div>
       </div>
 
-      <div style="display: flex; justify-content: flex-end; gap: 8px; padding-top: 14px; border-top: 1px solid var(--border-glass);">
-        <button class="btn btn-sm btn-outline rounded-full" onclick="openChat('${p.author}')">
-          💬 Contacter
-        </button>
+      <span class="dev-points-badge">${t.points} • ${escapeHtml(t.proofOfWork)}</span>
+
+      <div class="dev-skills-row">
+        ${t.skills.map(s => `<span class="lang-tech-badge" style="font-size: 11px;">${escapeHtml(s)}</span>`).join("")}
       </div>
+
+      <button class="btn btn-primary btn-sm btn-pill" style="width: 100%; margin-top: 4px;" onclick="openChatWith('${t.name}')">
+        Contacter en Direct 💬
+      </button>
     </article>
-  `).join('');
+  `).join("");
 }
 
 // ==========================================================================
-// Rendu Développeurs
+// 13. BAC À SABLE (SANDBOX MODAL)
 // ==========================================================================
-function renderDevelopers() {
-  const container = document.getElementById("devs-grid");
-  if (!container) return;
-
-  container.innerHTML = state.developers.map(d => `
-    <article class="dev-avatar-box">
-      <div class="dev-circle-lg">${d.avatar}</div>
-      <h3 class="dev-name-title">${escapeHtml(d.name)}</h3>
-      <p class="dev-role-txt">${escapeHtml(d.role)}</p>
-      <div class="dev-country-txt">${d.country}</div>
-
-      <div class="skills-tags-row">
-        ${d.skills.map(s => `<span class="skill-micro-tag">${escapeHtml(s)}</span>`).join('')}
-      </div>
-
-      <div class="dev-box-footer">
-        <span style="color: var(--primary); font-weight: 700; font-size: 0.82rem;">⚡ ${d.dp} DP</span>
-        <button class="btn btn-xs btn-outline rounded-full" onclick="openChat('${escapeHtml(d.name)}')">
-          Message
-        </button>
-      </div>
-    </article>
-  `).join('');
-}
-
-// ==========================================================================
-// Bac à Sable / Testeur de Code
-// ==========================================================================
-window.openSandbox = function(id) {
-  const comp = state.components.find(c => c.id === id);
+window.triggerSandboxById = function(id) {
+  const comp = appState.components.find(c => c.id === id);
   if (!comp) return;
 
-  state.activeSandboxComp = comp;
-  document.getElementById("sandbox-title").textContent = comp.title;
-  document.getElementById("sandbox-meta").textContent = `${comp.lang} • ${comp.country} • Par ${comp.author}`;
-  document.getElementById("sandbox-lang-tag").textContent = comp.lang;
-  document.getElementById("sandbox-code-view").textContent = comp.code;
-  document.getElementById("sandbox-console-output").textContent = "Cliquez sur « Exécuter » pour simuler l'exécution du composant...";
+  openSandboxModal({
+    title: comp.title,
+    lang: comp.lang,
+    code: comp.code,
+    simulation: comp.simulation
+  });
+};
 
+function openSandboxModal(data) {
   const modal = document.getElementById("sandbox-modal");
-  modal.classList.add("open");
+  const title = document.getElementById("sandbox-modal-pkg-title");
+  const lang = document.getElementById("sandbox-modal-lang");
+  const codeBody = document.getElementById("sandbox-modal-code-body");
+  const logs = document.getElementById("sandbox-modal-console-logs");
+  const runBtn = document.getElementById("btn-run-sandbox-modal");
+  const copyBtn = document.getElementById("btn-copy-sandbox-code");
+
+  if (!modal) return;
+
+  if (title) title.textContent = data.title;
+  if (lang) lang.textContent = data.lang;
+  if (codeBody) codeBody.textContent = data.code;
+  if (logs) logs.textContent = "Cliquez sur « Exécuter dans la Console » pour déclencher l'appel et observer la réponse...";
+
+  if (runBtn) {
+    runBtn.onclick = () => {
+      logs.textContent = "Exécution en cours...\n";
+      setTimeout(() => {
+        logs.textContent = data.simulation || "[EXEC] Exécution réussie sans erreurs.";
+        showToast("Simulation exécutée avec succès !");
+      }, 400);
+    };
+  }
+
+  if (copyBtn) {
+    copyBtn.onclick = () => {
+      copyText(data.code);
+    };
+  }
+
+  modal.classList.add("active");
   modal.setAttribute("aria-hidden", "false");
-};
+}
 
-function closeSandbox() {
+function closeSandboxModal() {
   const modal = document.getElementById("sandbox-modal");
-  modal.classList.remove("open");
-  modal.setAttribute("aria-hidden", "true");
+  if (modal) {
+    modal.classList.remove("active");
+    modal.setAttribute("aria-hidden", "true");
+  }
 }
 
 // ==========================================================================
-// Messagerie Directe
+// 14. MODAL CRÉER UN ÉCHANGE (MULTI-TYPES)
 // ==========================================================================
-window.openChat = function(recipientName) {
-  state.activeChatRecipient = recipientName;
-  document.getElementById("chat-recipient-name").textContent = recipientName;
-  document.getElementById("chat-input").placeholder = `Écrire un message à ${recipientName.split(' ')[0]}...`;
-
-  const drawer = document.getElementById("chat-drawer");
-  drawer.classList.add("open");
-  drawer.setAttribute("aria-hidden", "false");
-
-  const dot = document.getElementById("unread-dot");
-  if (dot) dot.style.display = "none";
-};
-
-function closeChat() {
-  const drawer = document.getElementById("chat-drawer");
-  drawer.classList.remove("open");
-  drawer.setAttribute("aria-hidden", "true");
-}
-
-// ==========================================================================
-// Modal Multi-Types : Créer un Échange
-// ==========================================================================
-window.openCreateModal = function(type = "component") {
-  state.modalType = type;
-  document.querySelectorAll(".type-tab-btn").forEach(b => b.classList.remove("active"));
-  const activeBtn = document.querySelector(`.type-tab-btn[data-type="${type}"]`);
-  if (activeBtn) activeBtn.classList.add("active");
-
-  updateModalFields(type);
-
+window.openCreateModal = function(type = 'component') {
+  appState.modalType = type;
   const modal = document.getElementById("create-modal");
-  modal.classList.add("open");
+  const tabs = document.querySelectorAll("#create-modal .modal-tab-item");
+  const extraLabel = document.getElementById("label-create-extra");
+  const extraInput = document.getElementById("create-extra");
+
+  if (!modal) return;
+
+  tabs.forEach(t => {
+    t.classList.toggle("active", t.dataset.type === type);
+  });
+
+  if (type === 'component') {
+    if (extraLabel) extraLabel.textContent = "Langage / Stack";
+    if (extraInput) extraInput.placeholder = "TypeScript, Python, Go...";
+  } else if (type === 'bounty') {
+    if (extraLabel) extraLabel.textContent = "Récompense estimée (FCFA)";
+    if (extraInput) extraInput.placeholder = "200000";
+  } else if (type === 'help') {
+    if (extraLabel) extraLabel.textContent = "Ce que vous offrez en échange";
+    if (extraInput) extraInput.placeholder = "Architecture Docker contre aide Flutter...";
+  } else if (type === 'project') {
+    if (extraLabel) extraLabel.textContent = "Rôle ou profil recherché";
+    if (extraInput) extraInput.placeholder = "Maintainer, Testeur...";
+  }
+
+  modal.classList.add("active");
   modal.setAttribute("aria-hidden", "false");
 };
 
 function closeCreateModal() {
   const modal = document.getElementById("create-modal");
-  modal.classList.remove("open");
-  modal.setAttribute("aria-hidden", "true");
-}
-
-function updateModalFields(type) {
-  const labelExtra = document.getElementById("label-form-extra");
-  const inputExtra = document.getElementById("form-extra");
-  const labelCode = document.getElementById("label-form-code");
-  const inputCode = document.getElementById("form-code");
-
-  if (type === "component") {
-    labelExtra.textContent = "Langage de programmation";
-    inputExtra.placeholder = "TypeScript, Python, Flutter...";
-    labelCode.textContent = "Code source du module";
-    inputCode.placeholder = "// Insérez votre code ici...";
-  } else if (type === "bounty") {
-    labelExtra.textContent = "Montant & Devise (ex: 150 000 FCFA)";
-    inputExtra.placeholder = "Montant en FCFA / Mobile Money";
-    labelCode.textContent = "Cahier des charges & Livrables";
-    inputCode.placeholder = "Détaillez le travail attendu...";
-  } else if (type === "help") {
-    labelExtra.textContent = "Ce que vous offrez en contrepartie";
-    inputExtra.placeholder = "Ex: 2h de revue de code, mentorat...";
-    labelCode.textContent = "Détail du besoin technique";
-    inputCode.placeholder = "Expliquez le problème à résoudre...";
+  if (modal) {
+    modal.classList.remove("active");
+    modal.setAttribute("aria-hidden", "true");
   }
 }
 
 // ==========================================================================
-// Gestionnaires d'Événements
+// 15. MESSAGERIE DIRECTE (CHAT DRAWER)
 // ==========================================================================
-function initEventListeners() {
-  // Filtres Catégories
-  document.querySelectorAll("#category-filter-pills .pill-btn").forEach(btn => {
+window.openChatWith = function(name) {
+  appState.activeChatContact = name;
+  const drawer = document.getElementById("chat-drawer");
+  const recipient = document.getElementById("chat-recipient-indicator");
+
+  if (recipient) {
+    recipient.textContent = `● Discussion avec ${name}`;
+  }
+
+  if (drawer) {
+    drawer.classList.add("active");
+    drawer.setAttribute("aria-hidden", "false");
+  }
+};
+
+function closeChatDrawer() {
+  const drawer = document.getElementById("chat-drawer");
+  if (drawer) {
+    drawer.classList.remove("active");
+    drawer.setAttribute("aria-hidden", "true");
+  }
+}
+
+// ==========================================================================
+// 16. EVENT LISTENERS
+// ==========================================================================
+function setupEventListeners() {
+  // Filtres de catégories de composants
+  const categoryButtons = document.querySelectorAll("#comp-category-filters .filter-pill");
+  categoryButtons.forEach(btn => {
     btn.addEventListener("click", () => {
-      document.querySelectorAll("#category-filter-pills .pill-btn").forEach(b => b.classList.remove("active"));
+      categoryButtons.forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
-      state.activeCat = btn.dataset.cat;
+      appState.activeCategory = btn.dataset.filter;
       renderComponents();
     });
   });
 
-  // Recherche Composants
-  const compSearch = document.getElementById("component-search-input");
-  if (compSearch) {
-    compSearch.addEventListener("input", (e) => {
-      state.searchKeyword = e.target.value.trim();
+  // Recherche temps réel composants
+  const searchInput = document.getElementById("comp-search-input");
+  if (searchInput) {
+    searchInput.addEventListener("input", (e) => {
+      appState.searchQuery = e.target.value.trim();
       renderComponents();
     });
   }
 
-  // Modales & Bac à sable
-  const closeSandboxBtn = document.getElementById("close-sandbox-btn");
-  if (closeSandboxBtn) closeSandboxBtn.addEventListener("click", closeSandbox);
+  // Fermetures Modales
+  const closeSandboxBtn = document.getElementById("close-sandbox-modal-btn");
+  if (closeSandboxBtn) closeSandboxBtn.addEventListener("click", closeSandboxModal);
 
-  const copyCodeBtn = document.getElementById("btn-copy-code");
-  if (copyCodeBtn) {
-    copyCodeBtn.addEventListener("click", () => {
-      if (state.activeSandboxComp) {
-        copyText(state.activeSandboxComp.code);
-      }
-    });
-  }
-
-  const runSandboxBtn = document.getElementById("btn-run-sandbox");
-  if (runSandboxBtn) {
-    runSandboxBtn.addEventListener("click", () => {
-      const out = document.getElementById("sandbox-console-output");
-      out.textContent = "⏳ Exécution du conteneur de simulation en cours...";
-      setTimeout(() => {
-        if (state.activeSandboxComp && state.activeSandboxComp.simulation) {
-          out.textContent = state.activeSandboxComp.simulation;
-        } else {
-          out.textContent = "[SUCCESS] Exécution complétée sans erreur.";
-        }
-        showToast("Simulation complétée avec succès !");
-      }, 400);
-    });
-  }
-
-  // Messagerie
-  const btnOpenMsg = document.getElementById("btn-open-messages");
-  if (btnOpenMsg) btnOpenMsg.addEventListener("click", () => openChat("Amina Diallo"));
-
-  const closeChatBtn = document.getElementById("close-chat-btn");
-  if (closeChatBtn) closeChatBtn.addEventListener("click", closeChat);
-
-  document.querySelectorAll(".contact-pill").forEach(p => {
-    p.addEventListener("click", () => {
-      document.querySelectorAll(".contact-pill").forEach(pill => pill.classList.remove("active"));
-      p.classList.add("active");
-      openChat(p.dataset.user);
-    });
-  });
-
-  const chatForm = document.getElementById("chat-form");
-  if (chatForm) {
-    chatForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const input = document.getElementById("chat-input");
-      const msg = input.value.trim();
-      if (!msg) return;
-
-      const flow = document.getElementById("chat-messages-flow");
-      const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-      const bubble = document.createElement("div");
-      bubble.className = "chat-msg msg-out";
-      bubble.innerHTML = `
-        <div class="msg-author">Moi</div>
-        <div class="msg-bubble">${escapeHtml(msg)}</div>
-        <div class="msg-timestamp">${timeStr}</div>
-      `;
-      flow.appendChild(bubble);
-      input.value = "";
-      flow.scrollTop = flow.scrollHeight;
-
-      // Réponse automatique
-      setTimeout(() => {
-        const reply = document.createElement("div");
-        reply.className = "chat-msg msg-in";
-        reply.innerHTML = `
-          <div class="msg-author">${state.activeChatRecipient}</div>
-          <div class="msg-bubble">Parfait ! J'ai bien reçu ton message, je jette un coup d'œil et je te réponds avec les précisions techniques.</div>
-          <div class="msg-timestamp">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
-        `;
-        flow.appendChild(reply);
-        flow.scrollTop = flow.scrollHeight;
-      }, 1000);
-    });
-  }
-
-  // Modal Création
-  const closeCreateBtn = document.getElementById("close-create-btn");
-  const cancelCreateBtn = document.getElementById("btn-cancel-create");
+  const closeCreateBtn = document.getElementById("close-create-modal-btn");
   if (closeCreateBtn) closeCreateBtn.addEventListener("click", closeCreateModal);
+
+  const cancelCreateBtn = document.getElementById("btn-cancel-create-modal");
   if (cancelCreateBtn) cancelCreateBtn.addEventListener("click", closeCreateModal);
 
-  document.querySelectorAll(".type-tab-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      document.querySelectorAll(".type-tab-btn").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      state.modalType = btn.dataset.type;
-      updateModalFields(btn.dataset.type);
+  const closeChatBtn = document.getElementById("close-chat-drawer-btn");
+  if (closeChatBtn) closeChatBtn.addEventListener("click", closeChatDrawer);
+
+  const openChatBtn = document.getElementById("btn-open-chat");
+  if (openChatBtn) {
+    openChatBtn.addEventListener("click", () => openChatWith(appState.activeChatContact));
+  }
+
+  // Onglets dans la modale de création
+  const modalTypeTabs = document.querySelectorAll("#create-modal .modal-tab-item");
+  modalTypeTabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      openCreateModal(tab.dataset.type);
     });
   });
 
-  const formCreate = document.getElementById("create-exchange-form");
-  if (formCreate) {
-    formCreate.addEventListener("submit", (e) => {
+  // Soumission Formulaire Création
+  const createForm = document.getElementById("create-modal-form");
+  if (createForm) {
+    createForm.addEventListener("submit", (e) => {
       e.preventDefault();
-      const title = document.getElementById("form-title").value.trim();
-      const cat = document.getElementById("form-category").value;
-      const extra = document.getElementById("form-extra").value.trim();
-      const desc = document.getElementById("form-desc").value.trim();
-      const codeOrDetails = document.getElementById("form-code").value.trim();
+      const title = document.getElementById("create-title").value.trim();
+      const cat = document.getElementById("create-category").value;
+      const extra = document.getElementById("create-extra").value.trim();
+      const desc = document.getElementById("create-desc").value.trim();
+      const codeOrContent = document.getElementById("create-code").value.trim();
 
-      if (state.modalType === "component") {
-        const newComp = {
+      if (appState.modalType === 'component') {
+        appState.components.unshift({
           id: "comp-" + Date.now(),
           title: title,
           category: cat,
-          lang: extra,
+          lang: extra || "TypeScript",
           country: "🇧🇯 Bénin",
           author: "Modeste YABLA",
           upvotes: 1,
-          installCmd: `npm i @devcom/${title.toLowerCase().replace(/[^a-z0-9]/g, '-')}`,
+          installCmd: `npm i ${title.toLowerCase().replace(/[^a-z0-9]/g, '-')}`,
           desc: desc,
-          code: codeOrDetails,
-          simulation: `[DEVCOM] Exécution du module réussie.`
-        };
-        state.components.unshift(newComp);
+          code: codeOrContent,
+          simulation: `[DEVCOM] Module « ${title} » exécuté avec succès.`
+        });
         renderComponents();
-        showToast("Composant publié avec succès sur DevCom Africa !");
-      } else if (state.modalType === "bounty") {
-        const newBounty = {
+        showToast("Composant publié sur le catalogue avec succès !");
+      } else if (appState.modalType === 'bounty') {
+        const amount = parseInt(extra) || 200000;
+        appState.bounties.unshift({
           id: "bounty-" + Date.now(),
-          reward: extra || "100 000 FCFA",
+          amountCfa: amount,
           title: title,
-          payoutMethod: "Mobile Money",
-          desc: desc,
+          company: "Modeste YABLA (Startup)",
           difficulty: "Intermédiaire",
+          deadline: "31 déc. 2026",
           applicants: 0,
-          deadline: "30 nov. 2026",
-          company: "Modeste YABLA"
-        };
-        state.bounties.unshift(newBounty);
+          desc: desc
+        });
         renderBounties();
-        showToast("Bounty publié et ouvert aux candidatures !");
-      } else if (state.modalType === "help") {
-        const newPeer = {
+        showToast("Bounty déposé et séquestre ouvert !");
+      } else if (appState.modalType === 'help') {
+        appState.peers.unshift({
           id: "peer-" + Date.now(),
-          author: "Modeste YABLA",
-          country: "🇧🇯 Bénin",
-          tag: "Troc Technique",
-          title: title,
-          desc: desc,
-          deal: extra
-        };
-        state.peers.unshift(newPeer);
+          name: "Modeste YABLA",
+          initials: "MY",
+          location: "Cotonou 🇧🇯",
+          give: extra,
+          want: desc,
+          status: "Publié à l'instant"
+        });
         renderPeers();
-        showToast("Demande d'entraide publiée dans le flux !");
+        showToast("Demande de troc technique publiée dans le flux !");
+      } else if (appState.modalType === 'project') {
+        appState.projects.unshift({
+          id: "proj-" + Date.now(),
+          name: title,
+          badge: "Nouveau Projet",
+          stars: 1,
+          contributors: 1,
+          desc: desc,
+          tags: [extra || "Open Source"],
+          lookingFor: "Contributeurs"
+        });
+        renderProjects();
+        showToast("Projet open-source ajouté avec succès !");
       }
 
-      formCreate.reset();
+      createForm.reset();
       closeCreateModal();
     });
   }
 
-  // Menu Mobile
-  const mobileToggle = document.getElementById("mobile-toggle-btn");
-  const navMenu = document.getElementById("nav-menu");
-  if (mobileToggle && navMenu) {
-    mobileToggle.addEventListener("click", () => {
-      const isVisible = navMenu.style.display === "flex";
-      navMenu.style.display = isVisible ? "none" : "flex";
-      navMenu.style.flexDirection = "column";
-      navMenu.style.position = "absolute";
-      navMenu.style.top = "70px";
-      navMenu.style.left = "0";
-      navMenu.style.right = "0";
-      navMenu.style.background = "var(--bg-card)";
-      navMenu.style.padding = "20px";
-      navMenu.style.borderBottom = "1px solid var(--border-glass)";
+  // Soumission Formulaire Chat
+  const chatForm = document.getElementById("chat-message-form");
+  const chatInput = document.getElementById("chat-user-input");
+  const chatFlow = document.getElementById("chat-messages-flow");
+
+  if (chatForm && chatInput && chatFlow) {
+    chatForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const text = chatInput.value.trim();
+      if (!text) return;
+
+      const userMsg = document.createElement("div");
+      userMsg.className = "chat-bubble chat-bubble-out";
+      userMsg.innerHTML = `${escapeHtml(text)}<span style="display: block; font-size: 10px; color: rgba(255,255,255,0.7); margin-top: 4px;">À l'instant</span>`;
+      chatFlow.appendChild(userMsg);
+      chatInput.value = "";
+      chatFlow.scrollTop = chatFlow.scrollHeight;
+
+      // Réponse automatique de démonstration
+      setTimeout(() => {
+        const replyMsg = document.createElement("div");
+        replyMsg.className = "chat-bubble chat-bubble-in";
+        replyMsg.innerHTML = `<strong>${escapeHtml(appState.activeChatContact)} :</strong><br>Super, bien reçu ! Je regarde ton extrait de code et je te réponds avec les ajustements nécessaires.<span style="display: block; font-size: 10px; color: var(--text-dim); margin-top: 4px;">À l'instant</span>`;
+        chatFlow.appendChild(replyMsg);
+        chatFlow.scrollTop = chatFlow.scrollHeight;
+      }, 1200);
+    });
+  }
+
+  // Sélecteur de contacts dans le drawer
+  const contactButtons = document.querySelectorAll("[data-chat-contact]");
+  contactButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      contactButtons.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      openChatWith(btn.dataset.chatContact);
+    });
+  });
+
+  // Mobile Menu Toggle
+  const mobileMenuBtn = document.getElementById("mobile-menu-toggle");
+  const navLinks = document.getElementById("main-nav-links");
+  if (mobileMenuBtn && navLinks) {
+    mobileMenuBtn.addEventListener("click", () => {
+      const isVisible = navLinks.style.display === "flex";
+      navLinks.style.display = isVisible ? "none" : "flex";
+      navLinks.style.flexDirection = "column";
+      navLinks.style.position = "absolute";
+      navLinks.style.top = "68px";
+      navLinks.style.left = "0";
+      navLinks.style.right = "0";
+      navLinks.style.background = "var(--bg-surface)";
+      navLinks.style.padding = "20px";
+      navLinks.style.borderBottom = "1px solid var(--border-subtle)";
+      navLinks.style.zIndex = "40";
     });
   }
 }
 
 // ==========================================================================
-// Utilitaires
+// 17. UTILITAIRES : TOASTS & SANITIZATION
 // ==========================================================================
-window.handleUpvote = function(id) {
-  const comp = state.components.find(c => c.id === id);
-  if (!comp) return;
-  comp.upvotes += 1;
-  renderComponents();
-  showToast(`+1 pour ${comp.title}`);
-};
+function showToast(message) {
+  const shelf = document.getElementById("toast-shelf");
+  if (!shelf) return;
 
-window.copyText = function(text) {
-  navigator.clipboard.writeText(text).then(() => {
-    showToast("Copié dans le presse-papier !");
-  });
-};
+  const toast = document.createElement("div");
+  toast.className = "toast-item";
+  toast.innerHTML = `<span>⚡</span><span>${escapeHtml(message)}</span>`;
+  shelf.appendChild(toast);
 
-window.applyBounty = function(title) {
-  const email = prompt(`Postuler au bounty :\n"${title}"\n\nIndiquez votre email ou identifiant GitHub :`);
-  if (email) {
-    showToast(`Candidature envoyée pour "${title.slice(0, 25)}..." !`);
-  }
-};
+  setTimeout(() => {
+    toast.style.opacity = "0";
+    toast.style.transform = "translateY(16px)";
+    toast.style.transition = "all 0.25s ease";
+    setTimeout(() => toast.remove(), 250);
+  }, 3200);
+}
 
 function escapeHtml(str) {
   if (!str) return "";
   return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-}
-
-function showToast(msg) {
-  const shelf = document.getElementById("toast-shelf");
-  if (!shelf) return;
-  const t = document.createElement("div");
-  t.className = "toast-msg";
-  t.textContent = msg;
-  shelf.appendChild(t);
-  setTimeout(() => {
-    t.style.opacity = "0";
-    t.style.transform = "translateY(20px)";
-    t.style.transition = "all 0.25s ease";
-    setTimeout(() => t.remove(), 250);
-  }, 3000);
 }
