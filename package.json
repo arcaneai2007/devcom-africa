@@ -5,8 +5,7 @@
   "description": "DevCom Africa — La plateforme d'échange pour développeurs en Afrique : composants Mobile Money, SDKs open-source, missions rémunérées et entraide technique.",
   "scripts": {
     "dev": "python -m http.server 3000",
-    "serve": "python -m http.server 3000",
-    "build": "echo 'Build OK for Vercel Edge deployment'"
+    "serve": "python -m http.server 3000"
   },
   "keywords": [
     "devcom",
