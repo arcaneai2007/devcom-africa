@@ -13,6 +13,16 @@
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="./styles.css">
+  <script>
+    (function() {
+      try {
+        const saved = localStorage.getItem('devcom_theme');
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const theme = saved || (prefersDark ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {}
+    })();
+  </script>
 </head>
 <body>
 
@@ -35,16 +45,19 @@
         <div class="persona-select-wrap">
           <label for="persona-select">Vue Démo :</label>
           <select id="persona-select" class="styled-select-sm" aria-label="Profil de démonstration">
-            <option value="visitor">👤 Visiteur</option>
-            <option value="developer" selected>💻 Développeur Membre</option>
-            <option value="founder">🏢 Porteur de Projet</option>
-            <option value="maintainer">🌍 Mainteneur Open Source</option>
+            <option value="visitor">Visiteur</option>
+            <option value="developer" selected>Développeur Membre</option>
+            <option value="founder">Porteur de Projet</option>
+            <option value="maintainer">Mainteneur Open Source</option>
           </select>
         </div>
 
         <!-- Mode Économie de Données (Data-Saver) -->
         <button class="data-saver-toggle-btn" id="data-saver-toggle" title="Activer/Désactiver l'économie de bande passante">
-          <span>⚡ Économie Data :</span>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" class="svg-icon">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+          </svg>
+          <span>Économie Data :</span>
           <strong id="data-saver-status">OFF</strong>
         </button>
 
@@ -52,7 +65,9 @@
         <button class="currency-btn" id="currency-toggle-btn" title="Changer la devise d'affichage">
           <span>Devise :</span>
           <strong id="current-currency-label">FCFA</strong>
-          <span>▾</span>
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="svg-icon">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
         </button>
       </div>
     </div>
@@ -86,29 +101,44 @@
             <a href="#entraide" class="nav-item">ENTRAIDE</a>
             <a href="#projets" class="nav-item">PROJETS</a>
             <a href="#talents" class="nav-item">TALENTS</a>
+            <a href="#faq" class="nav-item">FAQ & RÈGLES</a>
           </nav>
 
           <!-- Actions Rapides -->
           <div class="nav-actions">
             <!-- Bascule Thème Sombre / Clair -->
             <button class="icon-action-btn" id="theme-toggle-btn" title="Basculer thème sombre / clair" aria-label="Thème">
-              <span id="theme-icon">🌙</span>
+              <span id="theme-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                </svg>
+              </span>
             </button>
 
             <!-- Messagerie Directe -->
             <button class="icon-action-btn" id="btn-open-chat" title="Messagerie directe" aria-label="Messages">
-              <span>💬</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              </svg>
               <span class="badge-counter" id="unread-count">2</span>
             </button>
 
             <!-- CTA Fluorescent Lime Pill (Signature Aeline) -->
             <button class="btn btn-lime-cta" onclick="openCreateModal('component')">
-              + PUBLIER UN ÉCHANGE
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;">
+                <line x1="12" y1="5" x2="12" y2="19"/>
+                <line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+              <span>PUBLIER UN ÉCHANGE</span>
             </button>
 
             <!-- Toggle Mobile -->
             <button class="mobile-nav-toggle" id="mobile-menu-toggle" aria-label="Menu Mobile">
-              ☰
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12"/>
+                <line x1="3" y1="6" x2="21" y2="6"/>
+                <line x1="3" y1="18" x2="21" y2="18"/>
+              </svg>
             </button>
           </div>
         </div>
@@ -141,7 +171,12 @@
           </a>
           <a href="#bounties" class="btn btn-lime-hero">
             COMMENCER
-            <span class="btn-arrow-circle">↗</span>
+            <span class="btn-arrow-circle">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="7" y1="17" x2="17" y2="7"/>
+                <polyline points="7 7 17 7 17 17"/>
+              </svg>
+            </span>
           </a>
         </div>
 
@@ -161,18 +196,18 @@
                   <path d="M0,28 Q20,30 35,18 T70,12 T100,5"/>
                 </svg>
               </div>
-              <div class="fc-stat">99.8% Succès</div>
+              <div class="fc-stat">99.8% Succès IPN</div>
             </div>
 
             <!-- Carte 2 : Wave Card & Revenue -->
             <div class="fan-card fan-card-2">
               <div class="fc-header">
-                <span class="fc-badge-wave">Wave</span>
+                <span class="fc-badge-wave">Wave CI/SN</span>
                 <span class="fc-subtext">Checkout</span>
               </div>
               <div class="fc-price-row">
                 <span class="fc-big-val">1,200 $</span>
-                <span class="fc-label">bounty payé</span>
+                <span class="fc-label">bounty sous séquestre</span>
               </div>
               <div class="fc-bar-progress">
                 <div class="fc-bar-fill"></div>
@@ -183,20 +218,20 @@
             <div class="fan-card fan-card-3">
               <div class="fc-profile-img-wrap">
                 <img src="./assets/african_dev_hero.jpg" alt="Amina Diallo - Dev" class="fc-profile-img">
-                <div class="fc-online-dot"></div>
+                <div class="fc-online-dot" title="En ligne"></div>
               </div>
               <div class="fc-profile-info">
                 <strong>Amina Diallo</strong>
-                <span>Backend Senior • 🇸🇳</span>
+                <span>Backend Senior • Sénégal</span>
               </div>
-              <div class="fc-chip-earned">2,870 pts</div>
+              <div class="fc-chip-earned">2,870 pts • Top 1%</div>
             </div>
 
             <!-- Carte 4 : Analytics & Decision Chart (Centre) -->
             <div class="fan-card fan-card-4 fan-card-center">
               <div class="fc-header">
-                <span class="fc-tag">Intelligence</span>
-                <span class="fc-subtext">Every Decision</span>
+                <span class="fc-tag">Passerelle USSD</span>
+                <span class="fc-subtext">Telco GSM</span>
               </div>
               <div class="fc-chart-bars">
                 <div class="bar bar-1"></div>
@@ -205,42 +240,51 @@
                 <div class="bar bar-4"></div>
                 <div class="bar bar-5"></div>
               </div>
-              <div class="fc-footer-label">USSD *345# Live API</div>
+              <div class="fc-footer-label">Session active *345#</div>
             </div>
 
             <!-- Carte 5 : Dark Card Expertise & Escrow -->
             <div class="fan-card fan-card-5 fan-card-dark">
               <div class="fc-header">
-                <span class="fc-lime-badge">Expertise ✦</span>
+                <span class="fc-lime-badge">
+                  Séquestre Escrow
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                  </svg>
+                </span>
               </div>
               <div class="fc-dark-desc">
-                Combines Strategy, Mobile Money Data, and Escrow Security.
+                Paiements bloqués sous séquestre Mobile Money et libérés à la fusion de la PR.
               </div>
-              <div class="fc-dark-tag">100% Séquestre Garanti</div>
+              <div class="fc-dark-tag">100% Garanti UEMOA</div>
             </div>
 
             <!-- Carte 6 : Data Training & Offline Sync -->
             <div class="fan-card fan-card-6 fan-card-cyan">
-              <div class="fc-icon-circle">+</div>
-              <div class="fc-title-white">Offline Sync</div>
-              <div class="fc-subtext-white">SQLite & Background sync</div>
+              <div class="fc-icon-circle">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+              </div>
+              <div class="fc-title-white">Offline-First</div>
+              <div class="fc-subtext-white">CRDTs & SQLite résilient aux coupures 2G/3G</div>
             </div>
 
             <!-- Carte 7 : Data Metrics 520k+ -->
             <div class="fan-card fan-card-7">
               <div class="fc-mini-tabs">
-                <span class="active">Smarter</span>
-                <span>Growth</span>
+                <span class="active">Bounties</span>
+                <span>SDKs</span>
               </div>
-              <div class="fc-metric-large" id="hero-bounties-amount">520k+</div>
-              <div class="fc-metric-sub">Requêtes / mois</div>
+              <div class="fc-metric-large" id="hero-bounties-amount">28.4M</div>
+              <div class="fc-metric-sub">FCFA versés aux devs</div>
             </div>
 
             <!-- Carte 8 : Mobile UI Screen -->
             <div class="fan-card fan-card-8">
               <div class="fc-mobile-notch"></div>
-              <div class="fc-mobile-text">DevCom App</div>
-              <div class="fc-mobile-pill">4.9 ★</div>
+              <div class="fc-mobile-text">DevCom PWA</div>
+              <div class="fc-mobile-pill">
+                4.9 ★
+              </div>
               <div class="fc-mobile-graph"></div>
             </div>
 
@@ -250,7 +294,13 @@
         <!-- Social Proof Rating sous les cartes -->
         <div class="hero-social-proof">
           <span class="proof-text">Noté 4.9/5 par plus de 2,400 développeurs africains</span>
-          <div class="stars-row">★★★★★</div>
+          <div class="stars-row">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
         </div>
 
       </div>
@@ -258,35 +308,92 @@
   </div>
 
   <!-- ====================================================================
-       3. LOGO TICKER / PARTENAIRES & TECHS (Fond Blanc Épuré)
+       3. LOGO TICKER / PARTENAIRES & TECHS (Défilement Continu & Épuré)
        ==================================================================== -->
   <section class="partners-marquee-section">
-    <div class="container">
-      <div class="partners-marquee-inner">
+    <div class="marquee-wrapper">
+      <div class="marquee-track">
         <span class="partner-logo-item">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
-          <strong>GitHub</strong>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+          <strong>GitHub Africa</strong>
         </span>
         <span class="partner-logo-item">
+          <span class="partner-dot-badge dot-yellow"></span>
           <strong>MTN MoMo API</strong>
         </span>
         <span class="partner-logo-item">
-          <strong>Wave CI/SN</strong>
+          <span class="partner-dot-badge dot-cyan"></span>
+          <strong>Wave CI / SN</strong>
         </span>
         <span class="partner-logo-item">
-          <strong>Orange Money</strong>
+          <span class="partner-dot-badge dot-orange"></span>
+          <strong>Orange Money Max It</strong>
         </span>
         <span class="partner-logo-item">
+          <span class="partner-dot-badge dot-blue"></span>
+          <strong>Moov Money Flooz</strong>
+        </span>
+        <span class="partner-logo-item">
+          <span class="partner-dot-badge dot-green"></span>
+          <strong>Paystack Africa</strong>
+        </span>
+        <span class="partner-logo-item">
+          <span class="partner-dot-badge dot-purple"></span>
           <strong>Flutterwave</strong>
         </span>
         <span class="partner-logo-item">
-          <strong>Paystack</strong>
+          <span class="partner-dot-badge dot-mint"></span>
+          <strong>M-Pesa Safaricom</strong>
         </span>
         <span class="partner-logo-item">
-          <strong>Python Africa</strong>
+          <span class="partner-dot-badge dot-lime"></span>
+          <strong>Python Africa &amp; Djangonauts</strong>
         </span>
         <span class="partner-logo-item">
-          <strong>Flutter & Dart</strong>
+          <span class="partner-dot-badge dot-indigo"></span>
+          <strong>GDG Panafricain</strong>
+        </span>
+      </div>
+      <div class="marquee-track" aria-hidden="true">
+        <span class="partner-logo-item">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+          <strong>GitHub Africa</strong>
+        </span>
+        <span class="partner-logo-item">
+          <span class="partner-dot-badge dot-yellow"></span>
+          <strong>MTN MoMo API</strong>
+        </span>
+        <span class="partner-logo-item">
+          <span class="partner-dot-badge dot-cyan"></span>
+          <strong>Wave CI / SN</strong>
+        </span>
+        <span class="partner-logo-item">
+          <span class="partner-dot-badge dot-orange"></span>
+          <strong>Orange Money Max It</strong>
+        </span>
+        <span class="partner-logo-item">
+          <span class="partner-dot-badge dot-blue"></span>
+          <strong>Moov Money Flooz</strong>
+        </span>
+        <span class="partner-logo-item">
+          <span class="partner-dot-badge dot-green"></span>
+          <strong>Paystack Africa</strong>
+        </span>
+        <span class="partner-logo-item">
+          <span class="partner-dot-badge dot-purple"></span>
+          <strong>Flutterwave</strong>
+        </span>
+        <span class="partner-logo-item">
+          <span class="partner-dot-badge dot-mint"></span>
+          <strong>M-Pesa Safaricom</strong>
+        </span>
+        <span class="partner-logo-item">
+          <span class="partner-dot-badge dot-lime"></span>
+          <strong>Python Africa &amp; Djangonauts</strong>
+        </span>
+        <span class="partner-logo-item">
+          <span class="partner-dot-badge dot-indigo"></span>
+          <strong>GDG Panafricain</strong>
         </span>
       </div>
     </div>
@@ -346,10 +453,10 @@
           <div class="bento-huge-number">100%</div>
 
           <div class="bento-avatar-stack">
-            <span class="b-avatar a-1">🇲🇬</span>
-            <span class="b-avatar a-2">🇨🇮</span>
-            <span class="b-avatar a-3">🇸🇳</span>
-            <span class="b-avatar a-4">🇧🇯</span>
+            <span class="b-avatar a-1" title="Madagascar">MG</span>
+            <span class="b-avatar a-2" title="Côte d'Ivoire">CI</span>
+            <span class="b-avatar a-3" title="Sénégal">SN</span>
+            <span class="b-avatar a-4" title="Bénin">BJ</span>
           </div>
 
           <p class="bento-testimonial-quote">
@@ -363,7 +470,7 @@
           <!-- Bento Carte 3 (Fluorescent Lime) -->
           <div class="bento-card bento-card-lime">
             <div class="bento-card-label text-dark">Micro-Bounties</div>
-            <div class="bento-huge-number text-dark">520k+</div>
+            <div class="bento-huge-number text-dark" id="bento-bounties-amount">520 000 FCFA</div>
             <p class="bento-desc text-dark">
               FCFA distribués chaque mois pour financer les contributions, corrections et modules open-source.
             </p>
@@ -376,7 +483,13 @@
                 <div class="bento-card-label text-dim">Nations Connectées</div>
                 <div class="bento-huge-number text-white">24+</div>
               </div>
-              <div class="bento-globe-icon">🌍</div>
+              <div class="bento-globe-icon">
+                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="2" y1="12" x2="22" y2="12"/>
+                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                </svg>
+              </div>
             </div>
           </div>
 
@@ -428,7 +541,8 @@
           <div class="terminal-footer-action">
             <span class="terminal-hint-text">Exécution instantanée sans configuration</span>
             <button class="btn btn-lime-sm btn-pill" id="btn-run-hero-demo">
-              ▶ Simuler l'Appel API
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              <span>Simuler l'Appel API</span>
             </button>
           </div>
         </div>
@@ -459,14 +573,28 @@
         <div class="filter-search-toolbar">
           <div class="filter-pills-group" id="comp-category-filters">
             <button class="filter-pill active" data-filter="all">Tous les modules</button>
-            <button class="filter-pill" data-filter="fintech">💳 Fintech & Mobile Money</button>
-            <button class="filter-pill" data-filter="telecom">📱 Télécoms & USSD</button>
-            <button class="filter-pill" data-filter="offline">📶 Offline & Sync</button>
-            <button class="filter-pill" data-filter="security">🛡️ Sécurité & Webhooks</button>
+            <button class="filter-pill" data-filter="fintech">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+              <span>Fintech & Mobile Money</span>
+            </button>
+            <button class="filter-pill" data-filter="telecom">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+              <span>Télécoms & USSD</span>
+            </button>
+            <button class="filter-pill" data-filter="offline">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+              <span>Offline & Sync</span>
+            </button>
+            <button class="filter-pill" data-filter="security">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <span>Sécurité & Webhooks</span>
+            </button>
           </div>
 
           <div class="search-field-wrap">
-            <span class="search-field-icon">🔍</span>
+            <span class="search-field-icon">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </span>
             <input type="text" id="comp-search-input" placeholder="Rechercher un module (ex: MoMo, Wave, USSD...)" autocomplete="off">
           </div>
         </div>
@@ -555,13 +683,102 @@
             <span class="section-pill-tag">Réseau Développeurs</span>
             <h2 class="section-title">Talents & Contributeurs Actifs</h2>
             <p class="section-desc">
-              Profils vérifiés par leurs contributions concrètes à travers le continent (Bénin 🇧🇯, Côte d'Ivoire 🇨🇮, Sénégal 🇸🇳, Nigeria 🇳🇬, Rwanda 🇷🇼...).
+              Profils vérifiés par leurs contributions concrètes à travers le continent (Bénin, Côte d'Ivoire, Sénégal, Nigeria, Rwanda...).
             </p>
           </div>
         </div>
 
         <!-- Grille Développeurs (Injecté par app.js) -->
         <div class="devs-grid" id="devs-grid-container"></div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         11. SECTION MANIFESTE & QUESTIONS FRÉQUENTES (FAQ)
+         ==================================================================== -->
+    <section class="section-wrapper section-wrapper-alt" id="faq">
+      <div class="container">
+        <div class="section-lead-row" style="text-align: center; justify-content: center; margin-bottom: 44px;">
+          <div style="max-width: 760px; margin: 0 auto;">
+            <span class="section-pill-tag pill-tag-mint">Transparence & Règles du Jeu</span>
+            <h2 class="section-title">Comment Fonctionne DevCom Africa ?</h2>
+            <p class="section-desc">
+              Découvrez les règles d'or qui encadrent les échanges de code, le séquestre en devises locales et la collaboration sans barrière entre développeurs africains.
+            </p>
+          </div>
+        </div>
+
+        <div class="faq-accordion-container">
+          <details class="faq-item" open>
+            <summary class="faq-question">
+              <span class="faq-q-text">Comment les bounties sont-ils sécurisés et payés en monnaie locale (FCFA, NGN, KES) ?</span>
+              <span class="faq-chevron">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="6 9 12 15 18 9"/></svg>
+              </span>
+            </summary>
+            <div class="faq-answer">
+              <p>
+                Lorsqu'une startup publie un bounty, les fonds sont prélevés via Mobile Money (Wave, MTN MoMo, Orange Money) et consignés sous un compte séquestre (escrow) vérifié. Le développeur travaille en confiance : dès que sa Pull Request est auditée et validée, les fonds lui sont automatiquement transférés sur son portefeuille Mobile Money, sans friction bancaire ni commissions excessives.
+              </p>
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary class="faq-question">
+              <span class="faq-q-text">Comment fonctionne le Troc Technique entre pairs sans barrière financière ?</span>
+              <span class="faq-chevron">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="6 9 12 15 18 9"/></svg>
+              </span>
+            </summary>
+            <div class="faq-answer">
+              <p>
+                Le Troc Technique repose sur l'échange direct de compétences et d'heures d'ingénierie : un architecte backend propose 2 heures d'audit de sécurité Django en échange de 2 heures d'aide sur une UI Flutter. Chaque échange validé rapporte des <strong>DevPoints (DP)</strong> qui propulsent votre réputation dans l'annuaire panafricain.
+              </p>
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary class="faq-question">
+              <span class="faq-q-text">Pourquoi concevoir des modules "Offline-First" et "USSD" pour le continent ?</span>
+              <span class="faq-chevron">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="6 9 12 15 18 9"/></svg>
+              </span>
+            </summary>
+            <div class="faq-answer">
+              <p>
+                Plus de 60% des utilisateurs africains font face à des réseaux mobiles 2G/3G intermittents ou utilisent des téléphones basiques sans navigateur web. Les SDKs de DevCom intègrent nativement des CRDTs (bases SQLite & IndexedDB locales) pour une synchronisation sans heurt dès la reconnexion, et des passerelles de menus USSD (*345#) pour connecter les services critiques sans Internet.
+              </p>
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary class="faq-question">
+              <span class="faq-q-text">En quoi la « Preuve de Travail » (Proof of Work) supplante-t-elle le CV classique ?</span>
+              <span class="faq-chevron">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="6 9 12 15 18 9"/></svg>
+              </span>
+            </summary>
+            <div class="faq-answer">
+              <p>
+                Sur DevCom Africa, pas de déclarations invérifiables : votre profil reflète vos Pull Requests GitHub publiques mergées, vos paquets vérifiés par la communauté et vos avis d'entraide réels. C'est le passeport technique le plus authentique pour collaborer avec des startups internationales.
+              </p>
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary class="faq-question">
+              <span class="faq-q-text">Les composants et SDKs publiés sont-ils libres pour des projets commerciaux ?</span>
+              <span class="faq-chevron">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="6 9 12 15 18 9"/></svg>
+              </span>
+            </summary>
+            <div class="faq-answer">
+              <p>
+                Absolument. Les composants sont distribués sous licences libres permissives (MIT ou Apache 2.0). Vous pouvez les importer directement dans vos applications de production (`npm i ...`, `pip install ...`) en toute sérénité.
+              </p>
+            </div>
+          </details>
+        </div>
       </div>
     </section>
   </main>
@@ -586,7 +803,8 @@
             Créée pour connecter, mutualiser les briques logicielles et propulser les talents tech continentaux.
           </p>
           <div class="footer-sub-badge">
-            🌍 Panafricain • Conçu à Cotonou 🇧🇯 • Open Source
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            <span>Panafricain • Conçu à Cotonou • Open Source</span>
           </div>
         </div>
 
@@ -598,6 +816,7 @@
             <a href="#entraide">Troc Technique</a>
             <a href="#projets">Projets Open Source</a>
             <a href="#talents">Annuaire des Développeurs</a>
+            <a href="#faq">FAQ & Règles du Jeu</a>
           </div>
         </div>
 
@@ -606,7 +825,10 @@
           <div class="footer-links-list">
             <a href="javascript:void(0)" onclick="openCreateModal('component')">Publier un module</a>
             <a href="javascript:void(0)" onclick="openCreateModal('bounty')">Déposer un bounty</a>
-            <a href="https://github.com/arcaneai2007/devcom-africa" target="_blank" rel="noopener noreferrer">Code Source sur GitHub ↗</a>
+            <a href="https://github.com/arcaneai2007/devcom-africa" target="_blank" rel="noopener noreferrer">
+              Code Source sur GitHub
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+            </a>
             <a href="./STITCH_PROMPT.md" target="_blank">Spécifications UI Google Stitch</a>
           </div>
         </div>
@@ -614,10 +836,22 @@
         <div class="footer-col">
           <h4>Valeurs & Engagements</h4>
           <div class="footer-links-list">
-            <span>🛡️ Preuve de travail réelle</span>
-            <span>⚡ Optimisé faible bande-passante</span>
-            <span>💰 Séquestre Mobile Money vérifié</span>
-            <span>🤝 Collaboration sans barrière</span>
+            <span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              Preuve de travail réelle
+            </span>
+            <span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              Optimisé faible bande-passante
+            </span>
+            <span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              Séquestre Mobile Money vérifié
+            </span>
+            <span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              Collaboration sans barrière
+            </span>
           </div>
         </div>
       </div>
@@ -639,7 +873,12 @@
           <h3 class="modal-header-title" id="sandbox-modal-pkg-title">@devcom/momo-disbursement</h3>
           <span class="modal-header-sub" id="sandbox-modal-pkg-meta">Bac à sable d'exécution en direct</span>
         </div>
-        <button class="modal-close-btn" id="close-sandbox-modal-btn">✕</button>
+        <button class="modal-close-btn" id="close-sandbox-modal-btn" aria-label="Fermer">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
       </div>
 
       <div class="modal-body-sandbox">
@@ -653,7 +892,10 @@
         <div class="modal-console-area">
           <div class="modal-console-header">
             <span class="modal-console-title">Console de Simulation</span>
-            <button class="btn btn-primary btn-sm btn-pill" id="btn-run-sandbox-modal">▶ Exécuter dans la Console</button>
+            <button class="btn btn-primary btn-sm btn-pill" id="btn-run-sandbox-modal">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              <span>Exécuter dans la Console</span>
+            </button>
           </div>
           <div class="modal-console-logs" id="sandbox-modal-console-logs">
 Cliquez sur « Exécuter dans la Console » pour déclencher l'appel et observer la réponse...
@@ -670,15 +912,32 @@ Cliquez sur « Exécuter dans la Console » pour déclencher l'appel et observer
     <div class="modal-card">
       <div class="modal-header-bar">
         <h3 class="modal-header-title">Publier sur DevCom Africa</h3>
-        <button class="modal-close-btn" id="close-create-modal-btn">✕</button>
+        <button class="modal-close-btn" id="close-create-modal-btn" aria-label="Fermer">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
       </div>
 
       <!-- Onglets du Type de Publication -->
       <div class="modal-tabs-strip">
-        <button class="modal-tab-item active" data-type="component" data-tab="component">📦 Composant / API</button>
-        <button class="modal-tab-item" data-type="bounty" data-tab="bounty">💰 Bounty Rémunéré</button>
-        <button class="modal-tab-item" data-type="help" data-tab="help">🤝 Troc Technique</button>
-        <button class="modal-tab-item" data-type="project" data-tab="project">🚀 Projet Collaboratif</button>
+        <button class="modal-tab-item active" data-type="component" data-tab="component">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+          <span>Composant / API</span>
+        </button>
+        <button class="modal-tab-item" data-type="bounty" data-tab="bounty">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><line x1="12" y1="6" x2="12" y2="8"/><line x1="12" y1="16" x2="12" y2="18"/></svg>
+          <span>Bounty Rémunéré</span>
+        </button>
+        <button class="modal-tab-item" data-type="help" data-tab="help">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span>Troc Technique</span>
+        </button>
+        <button class="modal-tab-item" data-type="project" data-tab="project">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <span>Projet Collaboratif</span>
+        </button>
       </div>
 
       <!-- Formulaire de Publication Dynamique -->
@@ -733,14 +992,26 @@ Cliquez sur « Exécuter dans la Console » pour déclencher l'appel et observer
           <div class="chat-avatar-mini" id="chat-contact-avatar">AD</div>
           <div>
             <h4 id="chat-contact-name">Amina Diallo</h4>
-            <span class="chat-status-text" id="chat-recipient-indicator">● En ligne • Dakar, Sénégal 🇸🇳</span>
+            <span class="chat-status-text" id="chat-recipient-indicator">● En ligne • Dakar, Sénégal</span>
           </div>
         </div>
-        <button class="modal-close-btn" id="close-chat-drawer-btn">✕</button>
+        <button class="modal-close-btn" id="close-chat-drawer-btn" aria-label="Fermer">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
       </div>
 
       <!-- Flux des Messages -->
       <div class="chat-messages-flow" id="chat-messages-container"></div>
+
+      <!-- Suggestions de Réponses Rapides -->
+      <div class="chat-quick-replies" id="chat-quick-replies">
+        <button type="button" class="quick-chip" onclick="quickSendChat('👋 Salut ! Dispo pour un call tech ce soir ?')">👋 Dispo ce soir</button>
+        <button type="button" class="quick-chip" onclick="quickSendChat('🔍 Peux-tu regarder mon webhook MoMo ?')">🔍 Revue webhook</button>
+        <button type="button" class="quick-chip" onclick="quickSendChat('⚡ Super, je teste ton module de suite !')">⚡ Je teste ton module</button>
+      </div>
 
       <!-- Champ de Saisie de Message -->
       <form class="chat-input-bar" id="chat-form" onsubmit="event.preventDefault(); sendChatMessage();">

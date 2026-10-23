@@ -15,8 +15,18 @@
 // ==========================================================================
 // 1. ÉTAT GLOBAL DE L'APPLICATION
 // ==========================================================================
+function getInitialTheme() {
+  try {
+    const saved = localStorage.getItem('devcom_theme');
+    if (saved === 'dark' || saved === 'light') return saved;
+  } catch (e) {}
+  const domTheme = document.documentElement.getAttribute('data-theme');
+  if (domTheme === 'dark' || domTheme === 'light') return domTheme;
+  return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+}
+
 const appState = {
-  theme: localStorage.getItem('devcom_theme') || 'dark',
+  theme: getInitialTheme(),
   dataSaver: localStorage.getItem('devcom_datasaver') === 'true',
   persona: 'developer',
   currency: 'FCFA', // 'FCFA', 'NGN', 'KES', 'USD'
@@ -144,7 +154,7 @@ window.addEventListener('online', async () => {
       title: "@devcom/orange-money-webpay",
       category: "fintech",
       lang: "TypeScript",
-      country: "🇸🇳 Sénégal",
+      country: "Sénégal",
       author: "Amina Diallo",
       upvotes: 188,
       installCmd: "npm i @devcom/orange-money-webpay",
@@ -177,7 +187,7 @@ export async function initiatePayment(orderId: string, amount: number) {
       title: "@devcom/momo-disbursement",
       category: "fintech",
       lang: "TypeScript",
-      country: "🇧🇯 Bénin",
+      country: "Bénin",
       author: "Modeste YABLA",
       upvotes: 215,
       installCmd: "npm i @devcom/momo-disbursement",
@@ -209,7 +219,7 @@ export async function payDeveloperBounty(phone: string, amountCfa: number) {
       title: "devcom-wave-checkout",
       category: "fintech",
       lang: "Python",
-      country: "🇨🇮 Côte d'Ivoire",
+      country: "Côte d'Ivoire",
       author: "Emmanuel Kouassi",
       upvotes: 164,
       installCmd: "pip install devcom-wave",
@@ -233,7 +243,7 @@ def create_checkout(order_id: str, amount_xof: int):
       title: "devcom-ussd-core",
       category: "telecom",
       lang: "Node.js / TS",
-      country: "🇳🇬 Nigeria",
+      country: "Nigeria",
       author: "Chukwudi Okafor",
       upvotes: 142,
       installCmd: "npm i devcom-ussd-core",
@@ -259,7 +269,7 @@ router.on('1', (session) => {
       title: "@devcom/offline-crdt-sync",
       category: "offline",
       lang: "JavaScript",
-      country: "🇷🇼 Rwanda",
+      country: "Rwanda",
       author: "Grace Uwase",
       upvotes: 119,
       installCmd: "npm i @devcom/offline-crdt-sync",
@@ -281,7 +291,7 @@ await syncManager.saveRecord({ id: 'item-1', data: 'Contenu modifié hors-ligne'
       title: "@devcom/webhook-hmac-guard",
       category: "security",
       lang: "TypeScript",
-      country: "🇧🇯 Bénin",
+      country: "Bénin",
       author: "Modeste YABLA",
       upvotes: 177,
       installCmd: "npm i @devcom/webhook-hmac-guard",
@@ -297,6 +307,63 @@ export const guard = createHmacGuard({
 [VERIFY] Calcul du hash HMAC-SHA256 sur le payload brut.
 [COMPARE] Comparaison en temps constant (timing-safe).
 [AUTH] Signature validée avec succès. Attaque par temporisation évitée.`
+    },
+    {
+      id: "comp-7",
+      title: "devcom-moov-flooz-pay",
+      category: "fintech",
+      lang: "Python / FastAPI",
+      country: "Togo & Bénin",
+      author: "Modeste YABLA",
+      upvotes: 134,
+      installCmd: "pip install devcom-moov-flooz",
+      desc: "Connecteur unifié pour l'API Moov Money Flooz (Push USSD, consultation solde marchand et validation OTP sécurisée).",
+      code: `from devcom_flooz import FloozClient
+
+flooz = FloozClient(
+    merchant_id="FLOOZ_BJ_8820",
+    api_key="secret_live_flooz_..."
+)
+
+async def trigger_flooz_push(phone: str, amount: int):
+    return await flooz.push_payment(
+        msisdn=phone,
+        amount=amount,
+        reference="CMD-99482"
+    )`,
+      simulation: `[FLOOZ GATEWAY] Connexion au serveur Moov Money Afrique de l'Ouest...
+[PUSH USSD] Invite de confirmation transmise au client (+228 90 00 00 00).
+[STATUS] Code PIN validé par l'abonné sur son terminal mobile.
+[CONFIRMATION] Débit effectué avec succès (Réf: FLOOZ-BJ-99482). 200 OK.`
+    },
+    {
+      id: "comp-8",
+      title: "@devcom/sms-hub-africa",
+      category: "telecom",
+      lang: "TypeScript",
+      country: "Kenya & Panafricain",
+      author: "Grace Uwase",
+      upvotes: 153,
+      installCmd: "npm i @devcom/sms-hub-africa",
+      desc: "Routeur de SMS transactionnels multi-opérateurs avec bascule automatique (Safaricom, MTN, Airtel) et délivrabilité garantie > 99%.",
+      code: `import { AfricaSMSHub } from '@devcom/sms-hub-africa';
+
+const sms = new AfricaSMSHub({
+  providers: ['safaricom', 'mtn', 'airtel'],
+  priorityFallback: true
+});
+
+export async function sendOtpCode(to: string, code: string) {
+  return await sms.sendTransactional({
+    recipient: to,
+    message: \`Votre code de vérification DevCom est : \${code}. Valable 5 min.\`,
+    senderId: 'DEVCOM'
+  });
+}`,
+      simulation: `[SMS ROUTER] Sélection du canal télécom optimal pour +254 712 345 678...
+[ROUTE] Opérateur primaire Safaricom alloué (latence 180ms).
+[DISPATCH] SMS envoyé avec SenderID 'DEVCOM'.
+[DELIVERY REPORT] Reçu de remise opérateur reçu (DLR: DELIVERED).`
     }
   ],
 
@@ -315,8 +382,8 @@ export const guard = createHmacGuard({
     {
       id: "bounty-2",
       amountCfa: 180000,
-      title: "Arborescence USSD pour Consultation des Prix Agricoles du Marché",
-      company: "AgriConnect Bénin",
+      title: "Arborescence USSD pour Consultation des Cours Agricoles",
+      company: "AgriConnect Bénin & Niger",
       difficulty: "Tous niveaux",
       deadline: "15 déc. 2026",
       applicants: 7,
@@ -326,7 +393,7 @@ export const guard = createHmacGuard({
       id: "bounty-3",
       amountCfa: 350000,
       title: "Moteur de Cache Offline & Sync Bidirectionnelle pour Cliniques Rurales",
-      company: "AfriHealth Solutions",
+      company: "AfriHealth Solutions Kigali & Dakar",
       difficulty: "Expert",
       deadline: "5 déc. 2026",
       applicants: 3,
@@ -336,11 +403,31 @@ export const guard = createHmacGuard({
       id: "bounty-4",
       amountCfa: 400000,
       title: "Audit de Sécurité & Détection de Fraude sur API Microfinance",
-      company: "KrediFintech Dakar",
+      company: "KrediFintech Dakar & Douala",
       difficulty: "Expert",
       deadline: "20 déc. 2026",
       applicants: 2,
       desc: "Audit approfondi des flux de décaissement Mobile Money, protection contre les attaques de replay et tests de pénétration sur API FastAPI."
+    },
+    {
+      id: "bounty-5",
+      amountCfa: 320000,
+      title: "Passerelle Télémétrie Solaire LoRaWAN vers API Rust & TimescaleDB",
+      company: "SunAfrica Energy Nairobi & Cotonou",
+      difficulty: "Expert",
+      deadline: "18 déc. 2026",
+      applicants: 3,
+      desc: "Création d'un collecteur asynchrone pour 5 000 kits solaires ruraux avec gestion des paquets binaires compacts et alertes de coupure par webhook."
+    },
+    {
+      id: "bounty-6",
+      amountCfa: 220000,
+      title: "Module de Géocodage Repères Informels pour Livreurs à Moto",
+      company: "ZemExpress Lomé & Cotonou",
+      difficulty: "Intermédiaire",
+      deadline: "10 déc. 2026",
+      applicants: 5,
+      desc: "Algorithme de calcul d'itinéraire basé sur les carrefours populaires et pharmacies plutôt que les numéros de rue souvent absents dans les quartiers."
     }
   ],
 
@@ -350,7 +437,7 @@ export const guard = createHmacGuard({
       id: "peer-1",
       name: "Modeste YABLA",
       initials: "MY",
-      location: "Cotonou 🇧🇯",
+      location: "Cotonou, Bénin",
       give: "Architecture Django, Webhooks MoMo & Sécurité API",
       want: "Débogage et build release Flutter iOS",
       status: "Disponible ce week-end"
@@ -359,16 +446,16 @@ export const guard = createHmacGuard({
       id: "peer-2",
       name: "Amina Diallo",
       initials: "AD",
-      location: "Dakar 🇸🇳",
+      location: "Dakar, Sénégal",
       give: "Développement Mobile Flutter & intégrations Wave SN",
-      want: "Optimisation de requêtes PostgreSQL volumineuses",
+      want: "Optimisation de requêtes SQL PostgreSQL volumineuses",
       status: "Réponse sous 2h"
     },
     {
       id: "peer-3",
       name: "Emmanuel Kouassi",
       initials: "EK",
-      location: "Abidjan 🇨🇮",
+      location: "Abidjan, Côte d'Ivoire",
       give: "Conteneurisation Docker, CI/CD GitHub Actions & VPS",
       want: "Revue de code UI React avec Tailwind / CSS propre",
       status: "Ouvert aux sessions pair-programming"
@@ -377,10 +464,28 @@ export const guard = createHmacGuard({
       id: "peer-4",
       name: "Chukwudi Okafor",
       initials: "CO",
-      location: "Lagos 🇳🇬",
+      location: "Lagos, Nigeria",
       give: "Passerelles USSD télécoms & solutions SMS OTP",
       want: "Support sur conformité RGPD / lois de protection UEMOA",
       status: "Actif ce soir"
+    },
+    {
+      id: "peer-5",
+      name: "Grace Uwase",
+      initials: "GU",
+      location: "Kigali, Rwanda",
+      give: "Bases locales SQLite, CRDTs & Progressive Web Apps",
+      want: "Intégration passerelle M-Pesa Daraja & tests de charge",
+      status: "Disponible en soirée"
+    },
+    {
+      id: "peer-6",
+      name: "Jean-Luc Mbia",
+      initials: "JM",
+      location: "Douala, Cameroun",
+      give: "Microservices Go & gRPC haute disponibilité",
+      want: "Conception Design System Figma vers Vanilla CSS moderne",
+      status: "En ligne maintenant"
     }
   ],
 
@@ -415,6 +520,26 @@ export const guard = createHmacGuard({
       desc: "Générateur automatique de factures PDF et reçus de paiement envoyé via l'API WhatsApp Cloud pour les commerçants du secteur informel.",
       tags: ["Python", "FastAPI", "PDFKit", "WhatsApp API"],
       lookingFor: "Dev Python · Intégrateur MoMo"
+    },
+    {
+      id: "proj-4",
+      name: "afri-clinic-offline",
+      badge: "Impact Santé",
+      stars: 128,
+      contributors: 9,
+      desc: "Dossier patient électronique fonctionnant 100% hors-ligne pour les centres de santé ruraux, avec synchronisation CRDT automatique lors de la reconnexion.",
+      tags: ["Flutter", "SQLite", "Offline-First", "CRDT"],
+      lookingFor: "Dev Mobile · UX Designer"
+    },
+    {
+      id: "proj-5",
+      name: "momo-mock-server",
+      badge: "Populaire",
+      stars: 215,
+      contributors: 14,
+      desc: "Émulateur local sans clé API des passerelles MTN MoMo, Wave et Orange Money pour exécuter tests d'intégration et CI/CD sans dépenser d'argent.",
+      tags: ["TypeScript", "Express", "Docker", "Testing"],
+      lookingFor: "Testeur QA · Dev Go"
     }
   ],
 
@@ -425,7 +550,7 @@ export const guard = createHmacGuard({
       name: "Modeste YABLA",
       initials: "MY",
       headline: "Fullstack Architect & MoMo Specialist",
-      location: "Cotonou 🇧🇯",
+      location: "Cotonou, Bénin 🇧🇯",
       points: "1,450 DP",
       skills: ["TypeScript", "Python", "Mobile Money", "Docker"],
       proofOfWork: "Auteur de 3 SDKs vérifiés"
@@ -435,7 +560,7 @@ export const guard = createHmacGuard({
       name: "Amina Diallo",
       initials: "AD",
       headline: "Senior Mobile Engineer",
-      location: "Dakar 🇸🇳",
+      location: "Dakar, Sénégal 🇸🇳",
       points: "1,280 DP",
       skills: ["Flutter", "Dart", "Wave SDK", "IndexedDB"],
       proofOfWork: "14 PRs publiques mergées"
@@ -445,7 +570,7 @@ export const guard = createHmacGuard({
       name: "Emmanuel Kouassi",
       initials: "EK",
       headline: "Backend & Cloud Engineer",
-      location: "Abidjan 🇨🇮",
+      location: "Abidjan, Côte d'Ivoire 🇨🇮",
       points: "1,120 DP",
       skills: ["FastAPI", "PostgreSQL", "CI/CD", "AWS"],
       proofOfWork: "Contributeur Core AfriSync"
@@ -455,10 +580,30 @@ export const guard = createHmacGuard({
       name: "Chukwudi Okafor",
       initials: "CO",
       headline: "Telecom & USSD Infrastructure Dev",
-      location: "Lagos 🇳🇬",
+      location: "Lagos, Nigeria 🇳🇬",
       points: "1,620 DP",
       skills: ["Go", "Node.js", "USSD Protocols", "Redis"],
       proofOfWork: "Passerelle USSD 100k users"
+    },
+    {
+      id: "talent-5",
+      name: "Grace Uwase",
+      initials: "GU",
+      headline: "Offline-First & CRDT Specialist",
+      location: "Kigali, Rwanda 🇷🇼",
+      points: "1,340 DP",
+      skills: ["TypeScript", "CRDTs", "SQLite", "PWA"],
+      proofOfWork: "Auteure de 2 modules IndexedDB"
+    },
+    {
+      id: "talent-6",
+      name: "Jean-Luc Mbia",
+      initials: "JM",
+      headline: "Distributed Systems & Go Engineer",
+      location: "Douala, Cameroun 🇨🇲",
+      points: "1,190 DP",
+      skills: ["Go", "gRPC", "Kubernetes", "Kafka"],
+      proofOfWork: "Maintainer momo-mock-server"
     }
   ]
 };
@@ -484,25 +629,56 @@ document.addEventListener("DOMContentLoaded", () => {
 // 3. THÈME SOMBRE / CLAIR
 // ==========================================================================
 function initTheme() {
-  document.documentElement.setAttribute('data-theme', appState.theme);
-  updateThemeIcon();
+  applyTheme(appState.theme);
 
   const themeToggle = document.getElementById("theme-toggle-btn");
   if (themeToggle) {
     themeToggle.addEventListener("click", () => {
-      appState.theme = appState.theme === 'dark' ? 'light' : 'dark';
-      document.documentElement.setAttribute('data-theme', appState.theme);
-      localStorage.setItem('devcom_theme', appState.theme);
-      updateThemeIcon();
-      showToast(appState.theme === 'dark' ? "Mode Sombre activé 🌙" : "Mode Clair activé ☀️");
+      const nextTheme = appState.theme === 'dark' ? 'light' : 'dark';
+      applyTheme(nextTheme, true);
+      showToast(nextTheme === 'dark' ? "Mode Sombre activé" : "Mode Clair activé");
+    });
+  }
+
+  // Écoute du changement de préférence système (si l'utilisateur n'a pas fixé de choix manuel)
+  if (window.matchMedia) {
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+      try {
+        if (!localStorage.getItem('devcom_theme')) {
+          applyTheme(e.matches ? 'dark' : 'light', false);
+        }
+      } catch (err) {}
     });
   }
 }
 
+function applyTheme(theme, save = false) {
+  appState.theme = theme;
+  document.documentElement.setAttribute('data-theme', theme);
+  document.body.setAttribute('data-theme', theme);
+  if (save) {
+    try {
+      localStorage.setItem('devcom_theme', theme);
+    } catch (e) {}
+  }
+  updateThemeIcon();
+}
+
 function updateThemeIcon() {
   const icon = document.getElementById("theme-icon");
+  const toggleBtn = document.getElementById("theme-toggle-btn");
   if (icon) {
-    icon.textContent = appState.theme === 'dark' ? "🌙" : "☀️";
+    if (appState.theme === 'dark') {
+      // Icône Soleil vectorielle pour passer en clair
+      icon.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`;
+    } else {
+      // Icône Lune vectorielle pour passer en sombre
+      icon.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
+    }
+  }
+  if (toggleBtn) {
+    toggleBtn.setAttribute("title", appState.theme === 'dark' ? "Passer en mode clair" : "Passer en mode sombre");
+    toggleBtn.setAttribute("aria-label", appState.theme === 'dark' ? "Passer en mode clair" : "Passer en mode sombre");
   }
 }
 
@@ -522,7 +698,7 @@ function initDataSaver() {
       localStorage.setItem('devcom_datasaver', appState.dataSaver);
       if (appState.dataSaver) {
         document.body.classList.add('data-saver-active');
-        showToast("⚡ Mode Économie Data activé (chargement ultra-rapide) !");
+        showToast("Mode Économie Data activé (chargement ultra-rapide) !");
       } else {
         document.body.classList.remove('data-saver-active');
         showToast("Mode standard restauré.");
@@ -551,6 +727,7 @@ function updateDataSaverUI() {
 // 5. CONVERTISSEUR MULTI-DEVISES
 // ==========================================================================
 function initCurrency() {
+  updateHeroMetrics();
   const currencyBtn = document.getElementById("currency-toggle-btn");
   if (currencyBtn) {
     currencyBtn.addEventListener("click", () => {
@@ -579,6 +756,10 @@ function updateHeroMetrics() {
   const metricEl = document.getElementById("hero-bounties-amount");
   if (metricEl) {
     metricEl.textContent = formatAmount(28400000);
+  }
+  const bentoEl = document.getElementById("bento-bounties-amount");
+  if (bentoEl) {
+    bentoEl.textContent = formatAmount(520000);
   }
 }
 
@@ -689,7 +870,7 @@ function renderComponents() {
           </div>
         </div>
         <button class="upvote-badge-btn" onclick="handleUpvote('${comp.id}')" title="Voter pour ce composant">
-          <span>▲</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
           <span id="upvotes-${comp.id}">${comp.upvotes}</span>
         </button>
       </div>
@@ -704,7 +885,8 @@ function renderComponents() {
       <div class="comp-footer-actions">
         <span class="lang-tech-badge">${escapeHtml(comp.lang)}</span>
         <button class="btn btn-primary btn-sm btn-pill" onclick="triggerSandboxById('${comp.id}')">
-          🧪 Tester dans le Sandbox
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <span>Tester dans le Sandbox</span>
         </button>
       </div>
     </article>
@@ -744,20 +926,28 @@ function renderBounties() {
   const container = document.getElementById("bounties-grid-container");
   if (!container) return;
 
-  container.innerHTML = appState.bounties.map(b => `
+  container.innerHTML = appState.bounties.map(b => {
+    let diffClass = "diff-yellow";
+    if (b.difficulty === "Tous niveaux" || b.difficulty === "Débutant") diffClass = "diff-green";
+    else if (b.difficulty === "Expert") diffClass = "diff-red";
+
+    return `
     <article class="bounty-card">
       <div class="bounty-reward-row">
         <span class="bounty-amount">${formatAmount(b.amountCfa)}</span>
-        <span class="escrow-verified-pill">🛡️ Séquestre Garanti</span>
+        <span class="escrow-verified-pill">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span>Séquestre Garanti</span>
+        </span>
       </div>
 
       <h3 class="bounty-title">${escapeHtml(b.title)}</h3>
-      <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5;">${escapeHtml(b.desc)}</p>
+      <p style="font-size: 13.5px; color: var(--text-muted); line-height: 1.55;">${escapeHtml(b.desc)}</p>
 
       <div class="bounty-specs-row">
-        <span>Niveau : <strong>${escapeHtml(b.difficulty)}</strong></span>
+        <span><span class="diff-tag ${diffClass}">${escapeHtml(b.difficulty)}</span></span>
         <span>•</span>
-        <span>Échéance : ${escapeHtml(b.deadline)}</span>
+        <span>Échéance : <strong>${escapeHtml(b.deadline)}</strong></span>
         <span>•</span>
         <span>${b.applicants} candidats</span>
       </div>
@@ -765,23 +955,23 @@ function renderBounties() {
       <div class="bounty-footer">
         <span style="font-size: 12px; color: var(--text-dim);">${escapeHtml(b.company)}</span>
         <button class="btn btn-solar btn-sm btn-pill" onclick="applyToBounty('${b.id}')">
-          Postuler au Bounty ↗
+          <span>Postuler au Bounty</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
         </button>
       </div>
     </article>
-  `).join("");
+  `;
+  }).join("");
 }
 
 window.applyToBounty = function(id) {
   const bounty = appState.bounties.find(b => b.id === id);
   if (!bounty) return;
 
-  const contact = prompt(`Postuler à la mission :\n"${bounty.title}"\nMontant : ${formatAmount(bounty.amountCfa)}\n\nEntrez votre email ou profil GitHub :`);
-  if (contact) {
-    bounty.applicants += 1;
-    renderBounties();
-    showToast("Candidature transmise au porteur du projet avec succès !");
-  }
+  bounty.applicants += 1;
+  renderBounties();
+  const applicantName = appState.persona === 'developer' ? 'Modeste YABLA' : 'votre profil';
+  showToast(`🛡️ Candidature enregistrée pour ${applicantName} ! Séquestre de ${formatAmount(bounty.amountCfa)} garanti.`);
 };
 
 // ==========================================================================
@@ -803,18 +993,23 @@ function renderPeers() {
 
       <div class="peer-exchange-box">
         <div class="exchange-give">
-          <span>🤝</span>
+          <span class="exchange-icon-chip">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </span>
           <span><strong>J'offre :</strong> ${escapeHtml(p.give)}</span>
         </div>
         <div class="exchange-want">
-          <span>🎯</span>
+          <span class="exchange-icon-chip">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+          </span>
           <span><strong>Je cherche :</strong> ${escapeHtml(p.want)}</span>
         </div>
       </div>
 
       <div style="display: flex; justify-content: flex-end; padding-top: 6px;">
         <button class="btn btn-outline btn-sm btn-pill" onclick="openChatWith('${p.name}')">
-          Proposer un Échange 💬
+          <span>Proposer un Échange</span>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
         </button>
       </div>
     </article>
@@ -832,7 +1027,10 @@ function renderProjects() {
     <article class="project-card">
       <div style="display: flex; justify-content: space-between; align-items: center;">
         <span class="project-badge-tag">${escapeHtml(proj.badge)}</span>
-        <span style="font-size: 12px; color: var(--text-dim); font-weight: 600;">★ ${proj.stars} stars</span>
+        <span style="font-size: 12px; color: var(--text-dim); font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          ${proj.stars} stars
+        </span>
       </div>
 
       <h3 class="project-card-title">${escapeHtml(proj.name)}</h3>
@@ -845,7 +1043,8 @@ function renderProjects() {
       <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid var(--border-subtle); font-size: 12px;">
         <span style="color: var(--accent-solar); font-weight: 600;">Recherche : ${escapeHtml(proj.lookingFor)}</span>
         <button class="btn btn-outline btn-sm btn-pill" onclick="openProjectModal('${proj.name}')">
-          Contribuer ↗
+          <span>Contribuer</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
         </button>
       </div>
     </article>
@@ -883,7 +1082,8 @@ function renderTalents() {
       </div>
 
       <button class="btn btn-primary btn-sm btn-pill" style="width: 100%; margin-top: 4px;" onclick="openChatWith('${t.name}')">
-        Contacter en Direct 💬
+        <span>Contacter en Direct</span>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
       </button>
     </article>
   `).join("");
@@ -993,19 +1193,131 @@ function closeCreateModal() {
 // ==========================================================================
 // 15. MESSAGERIE DIRECTE (CHAT DRAWER)
 // ==========================================================================
+appState.chatThreads = {
+  "Amina Diallo": [
+    { sender: "Amina Diallo", text: "Salut ! J'ai vu ton profil sur DevCom Africa. Tu as pu tester l'intégration avec le webhook Wave CI ?", time: "Aujourd'hui à 14:20" }
+  ],
+  "Modeste YABLA": [
+    { sender: "Modeste YABLA", text: "Hello ! Si tu as besoin d'un coup de main sur l'architecture Django ou les signatures HMAC MTN MoMo, fais-moi signe !", time: "Hier à 18:45" }
+  ],
+  "Emmanuel Kouassi": [
+    { sender: "Emmanuel Kouassi", text: "Salut camarade ! Je finalise le conteneur Docker pour le gateway MoMo. Tu as une dispo ce soir pour du pair-programming ?", time: "11:15" }
+  ],
+  "Chukwudi Okafor": [
+    { sender: "Chukwudi Okafor", text: "Hello! We are testing the USSD menu router for Nigeria telecom networks. Let me know if you want to collaborate on the SMS gateway fallback.", time: "Hier à 16:30" }
+  ],
+  "Grace Uwase": [
+    { sender: "Grace Uwase", text: "Muraho ! Je teste les conflits CRDT en mode offline sur IndexedDB. On peut s'échanger nos retours d'expérience sur la synchronisation ?", time: "10:05" }
+  ],
+  "Jean-Luc Mbia": [
+    { sender: "Jean-Luc Mbia", text: "Salut ! Je prépare le microservice gRPC pour les paiements en zone CEMAC. Intéressé par un échange technique ?", time: "09:30" }
+  ]
+};
+
 window.openChatWith = function(name) {
-  appState.activeChatContact = name;
+  appState.activeChatContact = name || 'Amina Diallo';
   const drawer = document.getElementById("chat-drawer");
   const recipient = document.getElementById("chat-recipient-indicator");
+  const nameEl = document.getElementById("chat-contact-name");
+  const avatarEl = document.getElementById("chat-contact-avatar");
 
   if (recipient) {
-    recipient.textContent = `● Discussion avec ${name}`;
+    recipient.textContent = `● Discussion avec ${appState.activeChatContact} • En ligne`;
   }
+  if (nameEl) {
+    nameEl.textContent = appState.activeChatContact;
+  }
+  if (avatarEl) {
+    const initials = appState.activeChatContact.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
+    avatarEl.textContent = initials;
+  }
+
+  // Initialise le fil de discussion s'il n'existe pas encore
+  if (!appState.chatThreads[appState.activeChatContact]) {
+    appState.chatThreads[appState.activeChatContact] = [
+      {
+        sender: appState.activeChatContact,
+        text: `Salut ! Ravi d'échanger avec toi sur DevCom Africa. Sur quoi travailles-tu en ce moment ?`,
+        time: "À l'instant"
+      }
+    ];
+  }
+
+  renderChatMessages();
 
   if (drawer) {
     drawer.classList.add("active");
     drawer.setAttribute("aria-hidden", "false");
   }
+};
+
+function renderChatMessages() {
+  const chatFlow = document.getElementById("chat-messages-container") || document.getElementById("chat-messages-flow");
+  if (!chatFlow) return;
+
+  const thread = appState.chatThreads[appState.activeChatContact] || [];
+  chatFlow.innerHTML = thread.map(msg => {
+    const isMe = msg.sender === 'me';
+    return `
+      <div class="chat-bubble ${isMe ? 'chat-bubble-out' : 'chat-bubble-in'}">
+        ${!isMe ? `<strong>${escapeHtml(msg.sender)} :</strong><br>` : ''}
+        ${escapeHtml(msg.text)}
+        <span style="display: block; font-size: 10px; color: ${isMe ? 'rgba(255,255,255,0.7)' : 'var(--text-dim)'}; margin-top: 4px;">${escapeHtml(msg.time)}</span>
+      </div>
+    `;
+  }).join("");
+
+  chatFlow.scrollTop = chatFlow.scrollHeight;
+}
+
+window.quickSendChat = function(text) {
+  const chatInput = document.getElementById("chat-input-field") || document.getElementById("chat-user-input");
+  if (chatInput) {
+    chatInput.value = text;
+    window.sendChatMessage();
+  }
+};
+
+window.sendChatMessage = function() {
+  const chatInput = document.getElementById("chat-input-field") || document.getElementById("chat-user-input");
+  if (!chatInput) return;
+
+  const text = chatInput.value.trim();
+  if (!text) return;
+
+  if (!appState.chatThreads[appState.activeChatContact]) {
+    appState.chatThreads[appState.activeChatContact] = [];
+  }
+
+  appState.chatThreads[appState.activeChatContact].push({
+    sender: 'me',
+    text: text,
+    time: "À l'instant"
+  });
+
+  chatInput.value = "";
+  renderChatMessages();
+
+  // Réponses automatiques contextualisées
+  setTimeout(() => {
+    let reply = `Super, bien reçu ! Je regarde ton message et je te réponds avec les détails techniques.`;
+    const lower = text.toLowerCase();
+    if (lower.includes("webhook") || lower.includes("momo")) {
+      reply = `Très bien ! Pour les webhooks MoMo, vérifie bien que tu renvoies un statut HTTP 200 immédiat avant de traiter le payload en tâche de fond pour éviter les timeouts opérateurs.`;
+    } else if (lower.includes("call") || lower.includes("dispo")) {
+      reply = `Parfait, je suis connecté ce soir à partir de 19h GMT sur Google Meet ou Discord !`;
+    } else if (lower.includes("module") || lower.includes("test")) {
+      reply = `Excellent ! N'hésite pas à ouvrir une PR sur le repo si tu trouves une amélioration ou un cas d'usage limite.`;
+    }
+
+    appState.chatThreads[appState.activeChatContact].push({
+      sender: appState.activeChatContact,
+      text: reply,
+      time: "À l'instant"
+    });
+    renderChatMessages();
+    showToast(`Nouveau message de ${appState.activeChatContact}`);
+  }, 750);
 };
 
 function closeChatDrawer() {
@@ -1083,7 +1395,7 @@ function setupEventListeners() {
           title: title,
           category: cat,
           lang: extra || "TypeScript",
-          country: "🇧🇯 Bénin",
+          country: "Bénin",
           author: "Modeste YABLA",
           upvotes: 1,
           installCmd: `npm i ${title.toLowerCase().replace(/[^a-z0-9]/g, '-')}`,
@@ -1112,7 +1424,7 @@ function setupEventListeners() {
           id: "peer-" + Date.now(),
           name: "Modeste YABLA",
           initials: "MY",
-          location: "Cotonou 🇧🇯",
+          location: "Cotonou, Bénin",
           give: extra,
           want: desc,
           status: "Publié à l'instant"
@@ -1140,60 +1452,35 @@ function setupEventListeners() {
   }
 
   // Soumission Formulaire Chat
-  const chatForm = document.getElementById("chat-message-form");
-  const chatInput = document.getElementById("chat-user-input");
-  const chatFlow = document.getElementById("chat-messages-flow");
-
-  if (chatForm && chatInput && chatFlow) {
+  const chatForm = document.getElementById("chat-form") || document.getElementById("chat-message-form");
+  if (chatForm) {
     chatForm.addEventListener("submit", (e) => {
       e.preventDefault();
-      const text = chatInput.value.trim();
-      if (!text) return;
-
-      const userMsg = document.createElement("div");
-      userMsg.className = "chat-bubble chat-bubble-out";
-      userMsg.innerHTML = `${escapeHtml(text)}<span style="display: block; font-size: 10px; color: rgba(255,255,255,0.7); margin-top: 4px;">À l'instant</span>`;
-      chatFlow.appendChild(userMsg);
-      chatInput.value = "";
-      chatFlow.scrollTop = chatFlow.scrollHeight;
-
-      // Réponse automatique de démonstration
-      setTimeout(() => {
-        const replyMsg = document.createElement("div");
-        replyMsg.className = "chat-bubble chat-bubble-in";
-        replyMsg.innerHTML = `<strong>${escapeHtml(appState.activeChatContact)} :</strong><br>Super, bien reçu ! Je regarde ton extrait de code et je te réponds avec les ajustements nécessaires.<span style="display: block; font-size: 10px; color: var(--text-dim); margin-top: 4px;">À l'instant</span>`;
-        chatFlow.appendChild(replyMsg);
-        chatFlow.scrollTop = chatFlow.scrollHeight;
-      }, 1200);
+      window.sendChatMessage();
     });
   }
-
-  // Sélecteur de contacts dans le drawer
-  const contactButtons = document.querySelectorAll("[data-chat-contact]");
-  contactButtons.forEach(btn => {
-    btn.addEventListener("click", () => {
-      contactButtons.forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      openChatWith(btn.dataset.chatContact);
-    });
-  });
 
   // Mobile Menu Toggle
   const mobileMenuBtn = document.getElementById("mobile-menu-toggle");
   const navLinks = document.getElementById("main-nav-links");
   if (mobileMenuBtn && navLinks) {
-    mobileMenuBtn.addEventListener("click", () => {
-      const isVisible = navLinks.style.display === "flex";
-      navLinks.style.display = isVisible ? "none" : "flex";
-      navLinks.style.flexDirection = "column";
-      navLinks.style.position = "absolute";
-      navLinks.style.top = "68px";
-      navLinks.style.left = "0";
-      navLinks.style.right = "0";
-      navLinks.style.background = "var(--bg-surface)";
-      navLinks.style.padding = "20px";
-      navLinks.style.borderBottom = "1px solid var(--border-subtle)";
-      navLinks.style.zIndex = "40";
+    mobileMenuBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      navLinks.classList.toggle("mobile-menu-active");
+    });
+
+    // Fermer le menu lors du clic sur un lien
+    navLinks.querySelectorAll("a").forEach(link => {
+      link.addEventListener("click", () => {
+        navLinks.classList.remove("mobile-menu-active");
+      });
+    });
+
+    // Fermer si clic à l'extérieur
+    document.addEventListener("click", (e) => {
+      if (!navLinks.contains(e.target) && e.target !== mobileMenuBtn) {
+        navLinks.classList.remove("mobile-menu-active");
+      }
     });
   }
 }
@@ -1207,7 +1494,7 @@ function showToast(message) {
 
   const toast = document.createElement("div");
   toast.className = "toast-item";
-  toast.innerHTML = `<span>⚡</span><span>${escapeHtml(message)}</span>`;
+  toast.innerHTML = `<span class="toast-icon-svg"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span><span>${escapeHtml(message)}</span>`;
   shelf.appendChild(toast);
 
   setTimeout(() => {
