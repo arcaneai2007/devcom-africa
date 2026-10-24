@@ -111,7 +111,7 @@ html, body, .main-navbar, .hero-rounded-card, .bento-card, .component-card,
     radial-gradient(circle at 85% 25%, rgba(99, 102, 241, 0.16), transparent 50%),
     radial-gradient(circle at 15% 75%, rgba(212, 246, 61, 0.08), transparent 40%),
     linear-gradient(180deg, rgba(12, 17, 29, 0.94) 0%, rgba(7, 11, 20, 0.98) 100%),
-    url('./assets/sky_clouds_hero.jpg');
+    url('https://i.ibb.co/LD1J8KL2/sky-clouds-hero.jpg');
   background-repeat: no-repeat;
   background-position: center bottom;
   background-size: cover;
@@ -376,7 +376,7 @@ h1, h2, h3, h4, h5, h6 {
   margin: 0 auto;
   border-radius: 36px;
   background-color: #0284c7;
-  background-image: linear-gradient(180deg, rgba(2, 132, 199, 0.72) 0%, rgba(3, 105, 161, 0.82) 45%, rgba(2, 132, 199, 0.88) 100%), url('./assets/sky_clouds_hero.jpg');
+  background-image: linear-gradient(180deg, rgba(2, 132, 199, 0.72) 0%, rgba(3, 105, 161, 0.82) 45%, rgba(2, 132, 199, 0.88) 100%), url('https://i.ibb.co/LD1J8KL2/sky-clouds-hero.jpg');
   background-repeat: no-repeat;
   background-position: center bottom;
   background-size: cover;
