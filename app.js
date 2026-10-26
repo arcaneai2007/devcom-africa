@@ -1576,6 +1576,11 @@ function setupEventListeners() {
     if (chatDrawer && chatDrawer.classList.contains('active')) { closeChatDrawer(); return; }
     if (navLinks && navLinks.classList.contains('mobile-menu-active')) {
       navLinks.classList.remove('mobile-menu-active');
+      const mobileBtn = document.getElementById("mobile-menu-toggle");
+      if (mobileBtn) {
+        mobileBtn.setAttribute('aria-expanded', 'false');
+        mobileBtn.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>`;
+      }
     }
   });
 
@@ -1695,10 +1700,14 @@ function setupEventListeners() {
   const mobileMenuBtn = document.getElementById("mobile-menu-toggle");
   const navLinks = document.getElementById("main-nav-links");
   if (mobileMenuBtn && navLinks) {
+    const hamburgerSvg = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>`;
+    const closeSvg = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
+
     mobileMenuBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       const isOpen = navLinks.classList.toggle("mobile-menu-active");
       mobileMenuBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      mobileMenuBtn.innerHTML = isOpen ? closeSvg : hamburgerSvg;
     });
 
     // Fermer le menu lors du clic sur un lien
@@ -1706,6 +1715,7 @@ function setupEventListeners() {
       link.addEventListener("click", () => {
         navLinks.classList.remove("mobile-menu-active");
         mobileMenuBtn.setAttribute('aria-expanded', 'false');
+        mobileMenuBtn.innerHTML = hamburgerSvg;
       });
     });
 
@@ -1714,6 +1724,7 @@ function setupEventListeners() {
       if (!navLinks.contains(e.target) && e.target !== mobileMenuBtn) {
         navLinks.classList.remove("mobile-menu-active");
         mobileMenuBtn.setAttribute('aria-expanded', 'false');
+        mobileMenuBtn.innerHTML = hamburgerSvg;
       }
     });
   }

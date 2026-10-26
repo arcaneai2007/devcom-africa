@@ -207,11 +207,22 @@ html {
   font-size: 15px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  overflow-x: clip !important;
+  overflow-x: hidden !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
   min-height: 100vh;
-  overflow-x: hidden;
+  min-height: 100dvh;
+  overflow-x: clip !important;
+  overflow-x: hidden !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  position: relative;
   background-color: var(--bg-app);
   transition: background-color var(--trans-normal), color var(--trans-normal);
   display: flex;
@@ -368,6 +379,11 @@ h1, h2, h3, h4, h5, h6 {
 .hero-canvas-wrapper {
   padding: 16px 20px 0 20px;
   background-color: var(--bg-app);
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 .hero-rounded-card {
@@ -383,6 +399,8 @@ h1, h2, h3, h4, h5, h6 {
   min-height: 720px;
   position: relative;
   overflow: hidden;
+  overflow-x: clip;
+  contain: paint;
   color: #ffffff;
   box-shadow: 0 25px 60px -15px rgba(2, 132, 199, 0.25);
   display: flex;
@@ -666,7 +684,8 @@ h1, h2, h3, h4, h5, h6 {
   align-items: center;
   margin-top: 20px;
   margin-bottom: 34px;
-  overflow: visible;
+  overflow: hidden;
+  overflow-x: clip;
   padding: 30px 10px 15px;
 }
 
@@ -1019,14 +1038,21 @@ h1, h2, h3, h4, h5, h6 {
   border-bottom: 1px solid var(--border-subtle);
   padding: 24px 0;
   overflow: hidden;
+  overflow-x: clip;
   position: relative;
+  width: 100%;
+  max-width: 100vw;
+  contain: paint;
 }
 
 .marquee-wrapper {
   display: flex;
   width: 100%;
+  max-width: 100%;
   overflow: hidden;
+  overflow-x: clip;
   user-select: none;
+  contain: paint;
   mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
   -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
 }
@@ -2728,6 +2754,22 @@ h1, h2, h3, h4, h5, h6 {
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    min-height: 38px;
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: #ffffff;
+    cursor: pointer;
+    padding: 0;
+    transition: all var(--trans-fast);
+  }
+  .mobile-nav-toggle:hover {
+    background: rgba(255, 255, 255, 0.25);
   }
 
   /* Masquer le CTA "Publier" dans la navbar sur tablette */
@@ -2775,36 +2817,53 @@ h1, h2, h3, h4, h5, h6 {
     padding: 5px 14px;
   }
 
-  /* Fan de cartes : scroll horizontal sur mobile */
+  /* Fan de cartes : Rail de défilement horizontal fluide et natif Android / iOS */
   .hero-cards-showcase-wrap {
-    overflow-x: auto;
-    overflow-y: visible;
-    justify-content: flex-start;
-    padding: 16px 16px 10px;
-    perspective: none;
-    -webkit-overflow-scrolling: touch;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    scroll-snap-type: x mandatory;
     scrollbar-width: none;
+    display: flex;
+    justify-content: flex-start !important;
+    padding: 16px 16px 22px !important;
+    perspective: none !important;
+    touch-action: pan-x;
+    overscroll-behavior-x: contain;
     margin-bottom: 20px;
   }
   .hero-cards-showcase-wrap::-webkit-scrollbar {
-    display: none;
+    display: none !important;
   }
   .hero-cards-arc {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    justify-content: flex-start !important;
+    align-items: stretch !important;
+    width: max-content !important;
+    gap: 12px !important;
+    min-height: auto !important;
     transform: none !important;
-    transform-style: flat;
-    gap: 12px;
-    min-height: auto;
-    align-items: stretch;
+    transform-style: flat !important;
+    padding: 0 4px !important;
   }
-  .fan-card {
+  .fan-card,
+  .fan-card-1, .fan-card-2, .fan-card-3, .fan-card-4,
+  .fan-card-5, .fan-card-6, .fan-card-7, .fan-card-8 {
     transform: none !important;
-    width: 148px;
-    min-height: 190px;
-    flex-shrink: 0;
+    scroll-snap-align: start;
+    flex-shrink: 0 !important;
+    width: 154px !important;
+    min-height: 196px !important;
+    margin: 0 !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22) !important;
   }
   .fan-card:hover {
-    transform: translateY(-6px) !important;
-    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.25) !important;
+    transform: translateY(-4px) !important;
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.28) !important;
   }
 
   /* Hero social proof */
@@ -3045,21 +3104,24 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 14px;
   }
 
-  /* Fan de cartes — scroll discret */
+  /* Fan de cartes — Rail swipe fluide optimisé Android */
   .hero-cards-showcase-wrap {
-    padding: 12px 8px 8px;
+    padding: 12px 14px 18px !important;
     margin-bottom: 16px;
+    scroll-padding-left: 14px;
   }
   .hero-cards-arc {
-    gap: 10px;
+    gap: 12px !important;
+    justify-content: flex-start !important;
+    width: max-content !important;
   }
   .fan-card {
-    width: 130px;
-    min-height: 170px;
-    padding: 12px 10px;
+    width: 146px !important;
+    min-height: 188px !important;
+    padding: 14px 12px !important;
     border-radius: 16px;
   }
-  .fc-title { font-size: 12px; }
+  .fc-title { font-size: 12.5px; }
   .fc-big-val { font-size: 18px; }
   .fc-metric-large { font-size: 20px; }
   .fc-profile-img-wrap,
@@ -3124,13 +3186,13 @@ h1, h2, h3, h4, h5, h6 {
   }
   .filter-pill svg { display: none; }
 
-  /* Grilles de contenu — 1 colonne */
+  /* Grilles de contenu — 1 colonne sur mobile pour confort de lecture */
   .components-card-grid,
   .bounties-grid,
   .peer-grid,
-  .projects-grid { grid-template-columns: 1fr; }
+  .projects-grid,
   .devs-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
     gap: 14px;
   }
 
@@ -3139,9 +3201,14 @@ h1, h2, h3, h4, h5, h6 {
   .peer-card,
   .project-card { padding: 18px; }
   .bounty-card { padding: 20px; }
-  .dev-profile-card { padding: 20px 14px; }
+  .dev-profile-card { padding: 20px 16px; }
   .dev-large-avatar { width: 56px; height: 56px; font-size: 18px; }
-  .dev-name { font-size: 14.5px; }
+  .dev-name { font-size: 15px; }
+
+  /* Prévention du zoom automatique gênant sur Android / iOS */
+  input, select, textarea {
+    font-size: 16px !important;
+  }
 
   /* FAQ */
   .faq-question {
@@ -3161,12 +3228,14 @@ h1, h2, h3, h4, h5, h6 {
   .main-footer { padding: 40px 0 28px; }
   .footer-col h4 { margin-bottom: 12px; }
 
-  /* Modals */
+  /* Modals — Bottom Sheet optimisée clavier Android */
   .modal-overlay { padding: 8px; align-items: flex-end; }
   .modal-card {
     border-radius: var(--radius-md) var(--radius-md) 0 0;
-    max-height: 92vh;
+    max-height: 88vh;
+    max-height: 88dvh;
     border-bottom: none;
+    overscroll-behavior: contain;
   }
   .modal-card-lg { max-width: 100%; }
   .modal-header-bar {
@@ -3182,8 +3251,10 @@ h1, h2, h3, h4, h5, h6 {
   /* Chat Drawer */
   .chat-drawer-panel {
     max-width: 100%;
-    max-height: 88vh;
+    max-height: 85vh;
+    max-height: 85dvh;
     border-radius: 20px 20px 0 0;
+    overscroll-behavior: contain;
   }
   .chat-messages-flow { padding: 16px; }
   .chat-input-bar { padding: 12px 14px; }
@@ -3204,7 +3275,7 @@ h1, h2, h3, h4, h5, h6 {
 
   /* Utility bar */
   .top-utility-bar { font-size: 11px; }
-  .pulse-live-indicator span:last-child { display: none; } /* Masque le texte, garde le dot */
+  .pulse-live-indicator span:last-child { display: none; }
   .pulse-live-indicator {
     padding: 3px 8px;
     gap: 4px;
@@ -3212,31 +3283,50 @@ h1, h2, h3, h4, h5, h6 {
 
   /* Navbar */
   .brand-name { font-size: 15px; letter-spacing: -0.3px; }
-  .nav-actions { gap: 5px; }
-  .icon-action-btn { width: 32px; height: 32px; }
-  .btn-lime-cta { display: none; } /* Masqué sur très petit écran — accessible via menu */
-  .mobile-nav-toggle { padding: 2px; }
+  .nav-actions { gap: 6px; }
+  .icon-action-btn { width: 36px; height: 36px; }
+  .btn-lime-cta { display: none; }
+  .mobile-nav-toggle {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    min-height: 36px;
+    padding: 0;
+  }
 
-  /* Burger menu élargi */
+  /* Burger menu élargi & scrollable */
   .nav-links.mobile-menu-active {
-    top: 60px;
+    top: calc(100% + 8px);
     left: 8px;
     right: 8px;
-    padding: 14px;
-    gap: 4px;
+    padding: 12px;
+    gap: 5px;
+    border-radius: 18px;
+    max-height: calc(100vh - 90px);
+    max-height: calc(100dvh - 90px);
+    overflow-y: auto;
   }
 
   /* Hero */
   .hero-canvas-wrapper { padding: 6px 6px 0; }
-  .hero-rounded-card { border-radius: 16px; }
+  .hero-rounded-card { border-radius: 18px; }
   .hero-core-content { padding: 24px 14px 18px; }
   .hero-headline { font-size: clamp(24px, 9vw, 32px); }
   .hero-subtitle { font-size: 13.5px; }
   .btn-frosted-hero, .btn-lime-hero { padding: 13px 20px; font-size: 13px; }
 
-  /* Fan cards encore plus compacts */
-  .fan-card { width: 118px; min-height: 155px; padding: 10px 9px; border-radius: 14px; }
-  .hero-cards-arc { gap: 8px; }
+  /* Fan cards lisibles et confortables sur Android */
+  .fan-card {
+    width: 142px !important;
+    min-height: 184px !important;
+    padding: 12px 11px !important;
+    border-radius: 16px;
+  }
+  .hero-cards-arc {
+    gap: 10px !important;
+    justify-content: flex-start !important;
+    width: max-content !important;
+  }
 
   /* Sections */
   .section-wrapper { padding: 36px 0; }
@@ -3249,9 +3339,6 @@ h1, h2, h3, h4, h5, h6 {
   .bento-card { padding: 18px; border-radius: 18px; }
   .bento-huge-number { font-size: 30px; letter-spacing: -1px; }
   .bf-stat { font-size: 22px; }
-
-  /* Grilles développeurs — 1 colonne sur petit mobile */
-  .devs-grid { grid-template-columns: 1fr; }
 
   /* Terminal */
   .terminal-tab-btn { padding: 8px 10px; font-size: 11px; }
@@ -3271,13 +3358,17 @@ h1, h2, h3, h4, h5, h6 {
   .hero-core-content { padding: 20px 12px 16px; }
 
   .brand-name { font-size: 14px; }
-  .icon-action-btn { width: 30px; height: 30px; }
+  .icon-action-btn { width: 34px; height: 34px; }
 
   .section-title { font-size: 18px; }
   .bento-grand-title { font-size: 19px; }
   .bento-huge-number { font-size: 26px; }
 
-  .fan-card { width: 108px; min-height: 145px; }
+  .fan-card {
+    width: 136px !important;
+    min-height: 178px !important;
+    padding: 11px 10px !important;
+  }
 
   .filter-pill { padding: 5px 10px; font-size: 11.5px; }
 
@@ -3287,6 +3378,191 @@ h1, h2, h3, h4, h5, h6 {
   .modal-overlay { padding: 0; }
   .modal-card {
     border-radius: 16px 16px 0 0;
-    max-height: 95vh;
+    max-height: 90vh;
+    max-height: 90dvh;
   }
 }
+
+/* ==========================================================================
+   22. MODERN SAAS POLISH & MICRO-INTERACTIONS
+   - Scrollbar custom épurée (light & dark)
+   - Selection textuelle colorée
+   - Scroll-margin pour les ancres
+   - Shimmer effects & hover lift sur les cartes
+   - Focus-visible accessible & soigné
+   - Micro-animations de clic et press
+   ========================================================================== */
+
+/* Défilement fluide global */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Offset d'ancrage pour la navigation sticky */
+section[id],
+div[id],
+aside[id] {
+  scroll-margin-top: 86px;
+}
+
+/* Scrollbar Personnalisée Ultra-Épurée */
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-surface);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.4);
+  border-radius: var(--radius-pill);
+  border: 2px solid var(--bg-surface);
+  transition: background var(--trans-fast);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--sky-blue);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-track {
+  background: #080a0f;
+}
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border: 2px solid #080a0f;
+}
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: var(--sky-blue-light);
+}
+
+/* Sélection de texte vibrante */
+::selection {
+  background: rgba(56, 189, 248, 0.28);
+  color: #0369a1;
+}
+[data-theme="dark"] ::selection {
+  background: rgba(56, 189, 248, 0.35);
+  color: #ffffff;
+}
+
+/* Focus Visible accessible & stylisé */
+:focus-visible {
+  outline: 2px solid var(--sky-blue);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* Micro-interaction tactile au clic (Tactile Press) */
+button:active:not(:disabled),
+.btn-lime-cta:active,
+.btn-frosted-hero:active,
+.btn-lime-hero:active,
+.filter-pill:active,
+.icon-action-btn:active {
+  transform: scale(0.97);
+  transition: transform 0.08s ease;
+}
+
+/* Effet Shimmer subtil au survol sur les boutons d'appel à l'action principaux */
+.btn-lime-hero,
+.btn-lime-cta {
+  position: relative;
+  overflow: hidden;
+}
+.btn-lime-hero::after,
+.btn-lime-cta::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -70%;
+  width: 45%;
+  height: 200%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    transparent 100%
+  );
+  transform: rotate(25deg);
+  pointer-events: none;
+  opacity: 0;
+}
+.btn-lime-hero:hover::after,
+.btn-lime-cta:hover::after {
+  left: 150%;
+  opacity: 1;
+  transition: left 0.75s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
+}
+
+/* Élévation 3D et lueurs ambiantes sur les cartes */
+.component-card,
+.bounty-card,
+.peer-card,
+.project-card,
+.dev-profile-card {
+  transition: transform var(--trans-normal), box-shadow var(--trans-normal), border-color var(--trans-normal);
+}
+.component-card:hover,
+.bounty-card:hover,
+.peer-card:hover,
+.project-card:hover,
+.dev-profile-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 36px -10px rgba(2, 132, 199, 0.12), 0 4px 16px rgba(0, 0, 0, 0.04);
+  border-color: rgba(2, 132, 199, 0.32);
+}
+[data-theme="dark"] .component-card:hover,
+[data-theme="dark"] .bounty-card:hover,
+[data-theme="dark"] .peer-card:hover,
+[data-theme="dark"] .project-card:hover,
+[data-theme="dark"] .dev-profile-card:hover {
+  box-shadow: 0 20px 42px -12px rgba(0, 0, 0, 0.75), 0 0 25px rgba(56, 189, 248, 0.1);
+  border-color: rgba(56, 189, 248, 0.38);
+}
+
+/* Accordéon FAQ avec feedback lumineux au survol */
+.faq-item {
+  transition: border-color var(--trans-fast), background-color var(--trans-fast), box-shadow var(--trans-fast);
+}
+.faq-item:hover {
+  border-color: rgba(2, 132, 199, 0.25);
+}
+[data-theme="dark"] .faq-item:hover {
+  border-color: rgba(56, 189, 248, 0.3);
+}
+.faq-item.active {
+  border-color: rgba(2, 132, 199, 0.45);
+  box-shadow: 0 6px 20px rgba(2, 132, 199, 0.06);
+}
+[data-theme="dark"] .faq-item.active {
+  border-color: rgba(56, 189, 248, 0.45);
+  box-shadow: 0 8px 24px rgba(56, 189, 248, 0.08);
+}
+
+/* Toast flottant haute fidélité */
+.toast-msg {
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.16), 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* ==========================================================================
+   23. VERROUILLAGE ANTI-DÉBORDEMENT GLOBAL (Mobile & Android Shield)
+   Garantit qu'aucun conteneur ou enfant ne peut étendre le viewport au-delà de 100%
+   ========================================================================== */
+section, header, footer, aside, nav, main {
+  max-width: 100vw;
+  box-sizing: border-box;
+}
+
+pre, code {
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+.terminal-body pre,
+.terminal-body code {
+  white-space: pre;
+  word-break: normal;
+}
+
+
