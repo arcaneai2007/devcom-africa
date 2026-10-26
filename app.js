@@ -34,6 +34,8 @@ const appState = {
   searchQuery: '',
   modalType: 'component',
   activeChatContact: 'Amina Diallo',
+  votedComponents: new Set(), // Protection anti double-vote
+  unreadCount: 2, // Compteur messages non lus
 
   // Taux de conversion par rapport au FCFA
   currencyRates: {
@@ -623,6 +625,8 @@ document.addEventListener("DOMContentLoaded", () => {
   renderProjects();
   renderTalents();
   setupEventListeners();
+  initNetworkTicker();
+  updateUnreadBadge();
 });
 
 // ==========================================================================
@@ -750,6 +754,34 @@ function formatAmount(amountCfa) {
   const converted = Math.round(amountCfa * info.rate);
   const formattedNumber = converted.toLocaleString('fr-FR');
   return info.suffix ? `${formattedNumber} ${info.symbol}` : `${info.symbol}${formattedNumber}`;
+}
+
+// ==========================================================================
+// 5B. TICKER RÉSEAU (Rotation automatique des messages)
+// ==========================================================================
+function initNetworkTicker() {
+  const ticker = document.getElementById('network-ticker');
+  if (!ticker) return;
+
+  const messages = [
+    '24 pays connectés • 2,450+ devs actifs',
+    '6 bounties actifs • 1.4M FCFA en séquestre',
+    '120+ composants open-source vérifiés',
+    'Dernier commit il y a 3 min par Amina Diallo',
+    '42 trocs techniques en cours ce mois',
+    'Nouveau projet : afri-geo-address v2.0 publié'
+  ];
+  let idx = 0;
+
+  setInterval(() => {
+    ticker.style.opacity = '0';
+    ticker.style.transition = 'opacity 0.3s ease';
+    setTimeout(() => {
+      idx = (idx + 1) % messages.length;
+      ticker.textContent = messages[idx];
+      ticker.style.opacity = '1';
+    }, 320);
+  }, 4000);
 }
 
 function updateHeroMetrics() {
@@ -905,19 +937,59 @@ window.resetComponentFilters = function() {
 };
 
 window.handleUpvote = function(id) {
+  // Anti double-vote : on utilise l'ID de session (pas de compte réel)
+  if (appState.votedComponents.has(id)) {
+    showToast('Vous avez déjà voté pour ce composant.');
+    return;
+  }
   const comp = appState.components.find(c => c.id === id);
   if (!comp) return;
+  appState.votedComponents.add(id);
   comp.upvotes += 1;
   const countEl = document.getElementById(`upvotes-${id}`);
-  if (countEl) countEl.textContent = comp.upvotes;
+  if (countEl) {
+    countEl.textContent = comp.upvotes;
+    // Animation visuelle du bouton
+    const btn = countEl.closest('.upvote-badge-btn');
+    if (btn) {
+      btn.style.color = 'var(--accent-solar)';
+      btn.style.borderColor = 'var(--accent-solar)';
+      btn.style.background = 'var(--accent-solar-subtle)';
+      btn.disabled = true;
+      btn.title = 'Déjà voté';
+    }
+  }
   showToast(`+1 vote enregistré pour ${comp.title} !`);
 };
 
 window.copyText = function(text) {
-  navigator.clipboard.writeText(text).then(() => {
-    showToast("Commande copiée dans le presse-papier !");
-  });
+  // Fallback pour HTTP ou navigateurs anciens
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => {
+      showToast('Commande copiée dans le presse-papier !');
+    }).catch(() => {
+      _fallbackCopy(text);
+    });
+  } else {
+    _fallbackCopy(text);
+  }
 };
+
+function _fallbackCopy(text) {
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('Commande copiée !');
+  } catch (e) {
+    showToast('Impossible de copier automatiquement. Copiez manuellement.');
+  }
+}
 
 // ==========================================================================
 // 9. RENDU DES BOUNTIES (MISSIONS RÉMUNÉRÉES)
@@ -930,6 +1002,9 @@ function renderBounties() {
     let diffClass = "diff-yellow";
     if (b.difficulty === "Tous niveaux" || b.difficulty === "Débutant") diffClass = "diff-green";
     else if (b.difficulty === "Expert") diffClass = "diff-red";
+
+    const btnText = b._applied ? '✓ Candidature envoyée' : 'Postuler au Bounty';
+    const btnDisabled = b._applied ? 'disabled style="opacity:0.7;cursor:default"' : '';
 
     return `
     <article class="bounty-card">
@@ -949,13 +1024,13 @@ function renderBounties() {
         <span>•</span>
         <span>Échéance : <strong>${escapeHtml(b.deadline)}</strong></span>
         <span>•</span>
-        <span>${b.applicants} candidats</span>
+        <span id="bounty-count-${b.id}">${b.applicants} candidats</span>
       </div>
 
       <div class="bounty-footer">
         <span style="font-size: 12px; color: var(--text-dim);">${escapeHtml(b.company)}</span>
-        <button class="btn btn-solar btn-sm btn-pill" onclick="applyToBounty('${b.id}')">
-          <span>Postuler au Bounty</span>
+        <button id="bounty-btn-${b.id}" class="btn btn-solar btn-sm btn-pill" onclick="applyToBounty('${b.id}')" ${btnDisabled}>
+          <span>${btnText}</span>
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
         </button>
       </div>
@@ -968,8 +1043,25 @@ window.applyToBounty = function(id) {
   const bounty = appState.bounties.find(b => b.id === id);
   if (!bounty) return;
 
+  // Anti double-candidature
+  if (bounty._applied) {
+    showToast('Vous avez déjà postulé à ce bounty.');
+    return;
+  }
+  bounty._applied = true;
   bounty.applicants += 1;
-  renderBounties();
+
+  // Mise à jour ciblée sans recréer tout le DOM
+  const countEl = document.getElementById(`bounty-count-${id}`);
+  if (countEl) countEl.textContent = `${bounty.applicants} candidats`;
+  const btn = document.getElementById(`bounty-btn-${id}`);
+  if (btn) {
+    btn.textContent = '✓ Candidature envoyée';
+    btn.disabled = true;
+    btn.style.opacity = '0.7';
+    btn.style.cursor = 'default';
+  }
+
   const applicantName = appState.persona === 'developer' ? 'Modeste YABLA' : 'votre profil';
   showToast(`🛡️ Candidature enregistrée pour ${applicantName} ! Séquestre de ${formatAmount(bounty.amountCfa)} garanti.`);
 };
@@ -1122,22 +1214,43 @@ function openSandboxModal(data) {
 
   if (runBtn) {
     runBtn.onclick = () => {
-      logs.textContent = "Exécution en cours...\n";
-      setTimeout(() => {
-        logs.textContent = data.simulation || "[EXEC] Exécution réussie sans erreurs.";
-        showToast("Simulation exécutée avec succès !");
-      }, 400);
+      if (!logs) return;
+      logs.textContent = '';
+      runBtn.disabled = true;
+      runBtn.style.opacity = '0.6';
+
+      const simText = data.simulation || "[EXEC] Exécution réussie sans erreurs.";
+      const lines = simText.split('\n');
+      let lineIdx = 0;
+
+      function typeNextLine() {
+        if (lineIdx >= lines.length) {
+          runBtn.disabled = false;
+          runBtn.style.opacity = '1';
+          showToast('Simulation exécutée avec succès !');
+          return;
+        }
+        logs.textContent += (lineIdx > 0 ? '\n' : '') + lines[lineIdx];
+        logs.scrollTop = logs.scrollHeight;
+        lineIdx++;
+        setTimeout(typeNextLine, 160 + Math.random() * 80);
+      }
+
+      setTimeout(typeNextLine, 200);
     };
   }
 
   if (copyBtn) {
-    copyBtn.onclick = () => {
-      copyText(data.code);
-    };
+    copyBtn.onclick = () => copyText(data.code);
   }
 
   modal.classList.add("active");
   modal.setAttribute("aria-hidden", "false");
+  // Focus sur le bouton Fermer pour l'accessibilité
+  setTimeout(() => {
+    const closeBtn = document.getElementById('close-sandbox-modal-btn');
+    if (closeBtn) closeBtn.focus();
+  }, 80);
 }
 
 function closeSandboxModal() {
@@ -1228,7 +1341,7 @@ window.openChatWith = function(name) {
     nameEl.textContent = appState.activeChatContact;
   }
   if (avatarEl) {
-    const initials = appState.activeChatContact.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
+    const initials = appState.activeChatContact.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
     avatarEl.textContent = initials;
   }
 
@@ -1245,11 +1358,31 @@ window.openChatWith = function(name) {
 
   renderChatMessages();
 
+  // Réinitialise le compteur non-lus à l'ouverture du chat
+  appState.unreadCount = 0;
+  updateUnreadBadge();
+
   if (drawer) {
     drawer.classList.add("active");
     drawer.setAttribute("aria-hidden", "false");
+    // Focus sur l'input pour UX mobile
+    setTimeout(() => {
+      const input = document.getElementById('chat-input-field');
+      if (input) input.focus();
+    }, 100);
   }
 };
+
+function updateUnreadBadge() {
+  const badge = document.getElementById('unread-count');
+  if (!badge) return;
+  if (appState.unreadCount > 0) {
+    badge.textContent = appState.unreadCount;
+    badge.style.display = 'flex';
+  } else {
+    badge.style.display = 'none';
+  }
+}
 
 function renderChatMessages() {
   const chatFlow = document.getElementById("chat-messages-container") || document.getElementById("chat-messages-flow");
@@ -1298,16 +1431,36 @@ window.sendChatMessage = function() {
   chatInput.value = "";
   renderChatMessages();
 
+  // Indicateur de frappe
+  const chatFlow = document.getElementById('chat-messages-container');
+  if (chatFlow) {
+    const typingEl = document.createElement('div');
+    typingEl.className = 'chat-bubble chat-bubble-in chat-typing-indicator';
+    typingEl.id = 'chat-typing';
+    typingEl.innerHTML = '<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>';
+    chatFlow.appendChild(typingEl);
+    chatFlow.scrollTop = chatFlow.scrollHeight;
+  }
+
   // Réponses automatiques contextualisées
+  const delay = 700 + Math.random() * 600;
   setTimeout(() => {
+    // Retire l'indicateur de frappe
+    const typingEl = document.getElementById('chat-typing');
+    if (typingEl) typingEl.remove();
+
     let reply = `Super, bien reçu ! Je regarde ton message et je te réponds avec les détails techniques.`;
     const lower = text.toLowerCase();
-    if (lower.includes("webhook") || lower.includes("momo")) {
+    if (lower.includes('webhook') || lower.includes('momo')) {
       reply = `Très bien ! Pour les webhooks MoMo, vérifie bien que tu renvoies un statut HTTP 200 immédiat avant de traiter le payload en tâche de fond pour éviter les timeouts opérateurs.`;
-    } else if (lower.includes("call") || lower.includes("dispo")) {
+    } else if (lower.includes('call') || lower.includes('dispo')) {
       reply = `Parfait, je suis connecté ce soir à partir de 19h GMT sur Google Meet ou Discord !`;
-    } else if (lower.includes("module") || lower.includes("test")) {
+    } else if (lower.includes('module') || lower.includes('test')) {
       reply = `Excellent ! N'hésite pas à ouvrir une PR sur le repo si tu trouves une amélioration ou un cas d'usage limite.`;
+    } else if (lower.includes('flutter') || lower.includes('mobile')) {
+      reply = `Flutter est excellent pour les apps offline-first ! Utilise Hive ou Isar pour le stockage local côté Dart.`;
+    } else if (lower.includes('ussd')) {
+      reply = `Pour l'USSD, rappelle-toi que la session doit répondre en moins de 20 secondes sinon le réseau télécom la coupe automatiquement.`;
     }
 
     appState.chatThreads[appState.activeChatContact].push({
@@ -1316,8 +1469,15 @@ window.sendChatMessage = function() {
       time: "À l'instant"
     });
     renderChatMessages();
-    showToast(`Nouveau message de ${appState.activeChatContact}`);
-  }, 750);
+
+    // Incrémenter non-lus si le tiroir est fermé
+    const drawer = document.getElementById('chat-drawer');
+    if (!drawer || !drawer.classList.contains('active')) {
+      appState.unreadCount++;
+      updateUnreadBadge();
+    }
+    showToast(`💬 Nouveau message de ${appState.activeChatContact}`);
+  }, delay);
 };
 
 function closeChatDrawer() {
@@ -1343,12 +1503,25 @@ function setupEventListeners() {
     });
   });
 
-  // Recherche temps réel composants
+  // Recherche temps réel composants (debounce 200ms)
   const searchInput = document.getElementById("comp-search-input");
   if (searchInput) {
+    let searchDebounce;
     searchInput.addEventListener("input", (e) => {
-      appState.searchQuery = e.target.value.trim();
-      renderComponents();
+      clearTimeout(searchDebounce);
+      searchDebounce = setTimeout(() => {
+        appState.searchQuery = e.target.value.trim();
+        renderComponents();
+      }, 200);
+    });
+    // Touche Escape pour vider la recherche
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        searchInput.value = '';
+        appState.searchQuery = '';
+        renderComponents();
+        searchInput.blur();
+      }
     });
   }
 
@@ -1370,6 +1543,42 @@ function setupEventListeners() {
     openChatBtn.addEventListener("click", () => openChatWith(appState.activeChatContact));
   }
 
+  // Fermeture des modales en cliquant sur l'overlay (fond flouté)
+  const sandboxOverlay = document.getElementById("sandbox-modal");
+  if (sandboxOverlay) {
+    sandboxOverlay.addEventListener("click", (e) => {
+      if (e.target === sandboxOverlay) closeSandboxModal();
+    });
+  }
+  const createOverlay = document.getElementById("create-modal");
+  if (createOverlay) {
+    createOverlay.addEventListener("click", (e) => {
+      if (e.target === createOverlay) closeCreateModal();
+    });
+  }
+  // Fermer le chat drawer en cliquant sur le fond
+  const chatDrawerEl = document.getElementById("chat-drawer");
+  if (chatDrawerEl) {
+    chatDrawerEl.addEventListener("click", (e) => {
+      if (e.target === chatDrawerEl) closeChatDrawer();
+    });
+  }
+
+  // Touche Escape pour fermer toute modale ou tiroir ouverts
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== 'Escape') return;
+    const sandboxModal = document.getElementById("sandbox-modal");
+    const createModal = document.getElementById("create-modal");
+    const chatDrawer = document.getElementById("chat-drawer");
+    const navLinks = document.getElementById("main-nav-links");
+    if (sandboxModal && sandboxModal.classList.contains('active')) { closeSandboxModal(); return; }
+    if (createModal && createModal.classList.contains('active')) { closeCreateModal(); return; }
+    if (chatDrawer && chatDrawer.classList.contains('active')) { closeChatDrawer(); return; }
+    if (navLinks && navLinks.classList.contains('mobile-menu-active')) {
+      navLinks.classList.remove('mobile-menu-active');
+    }
+  });
+
   // Onglets dans la modale de création
   const modalTypeTabs = document.querySelectorAll("#create-modal .modal-tab-item");
   modalTypeTabs.forEach(tab => {
@@ -1378,16 +1587,34 @@ function setupEventListeners() {
     });
   });
 
-  // Soumission Formulaire Création
+  // Soumission Formulaire Création avec validation UX
   const createForm = document.getElementById("create-modal-form");
   if (createForm) {
     createForm.addEventListener("submit", (e) => {
       e.preventDefault();
-      const title = document.getElementById("create-title").value.trim();
+      const titleInput = document.getElementById("create-title");
+      const descInput = document.getElementById("create-desc");
+      const title = titleInput.value.trim();
       const cat = document.getElementById("create-category").value;
       const extra = document.getElementById("create-extra").value.trim();
-      const desc = document.getElementById("create-desc").value.trim();
+      const desc = descInput.value.trim();
       const codeOrContent = document.getElementById("create-code").value.trim();
+
+      // Validation minimale avec feedback visuel
+      if (!title) {
+        titleInput.style.borderColor = 'var(--accent-rose)';
+        titleInput.focus();
+        showToast('⚠️ Le titre est obligatoire.');
+        titleInput.addEventListener('input', () => { titleInput.style.borderColor = ''; }, { once: true });
+        return;
+      }
+      if (!desc) {
+        descInput.style.borderColor = 'var(--accent-rose)';
+        descInput.focus();
+        showToast('⚠️ La description est obligatoire.');
+        descInput.addEventListener('input', () => { descInput.style.borderColor = ''; }, { once: true });
+        return;
+      }
 
       if (appState.modalType === 'component') {
         appState.components.unshift({
@@ -1400,13 +1627,17 @@ function setupEventListeners() {
           upvotes: 1,
           installCmd: `npm i ${title.toLowerCase().replace(/[^a-z0-9]/g, '-')}`,
           desc: desc,
-          code: codeOrContent,
+          code: codeOrContent || `// Code du module ${title}`,
           simulation: `[DEVCOM] Module « ${title} » exécuté avec succès.`
         });
         renderComponents();
-        showToast("Composant publié sur le catalogue avec succès !");
+        showToast("✅ Composant publié sur le catalogue avec succès !");
       } else if (appState.modalType === 'bounty') {
         const amount = parseInt(extra) || 200000;
+        if (isNaN(amount) || amount <= 0) {
+          showToast('⚠️ Montant invalide. Entrez une valeur numérique en FCFA.');
+          return;
+        }
         appState.bounties.unshift({
           id: "bounty-" + Date.now(),
           amountCfa: amount,
@@ -1418,19 +1649,19 @@ function setupEventListeners() {
           desc: desc
         });
         renderBounties();
-        showToast("Bounty déposé et séquestre ouvert !");
+        showToast("✅ Bounty déposé et séquestre ouvert !");
       } else if (appState.modalType === 'help') {
         appState.peers.unshift({
           id: "peer-" + Date.now(),
           name: "Modeste YABLA",
           initials: "MY",
           location: "Cotonou, Bénin",
-          give: extra,
+          give: extra || desc,
           want: desc,
           status: "Publié à l'instant"
         });
         renderPeers();
-        showToast("Demande de troc technique publiée dans le flux !");
+        showToast("✅ Demande de troc technique publiée dans le flux !");
       } else if (appState.modalType === 'project') {
         appState.projects.unshift({
           id: "proj-" + Date.now(),
@@ -1439,11 +1670,11 @@ function setupEventListeners() {
           stars: 1,
           contributors: 1,
           desc: desc,
-          tags: [extra || "Open Source"],
+          tags: (extra || "Open Source").split(',').map(t => t.trim()).filter(Boolean),
           lookingFor: "Contributeurs"
         });
         renderProjects();
-        showToast("Projet open-source ajouté avec succès !");
+        showToast("✅ Projet open-source ajouté avec succès !");
       }
 
       createForm.reset();
@@ -1466,13 +1697,15 @@ function setupEventListeners() {
   if (mobileMenuBtn && navLinks) {
     mobileMenuBtn.addEventListener("click", (e) => {
       e.stopPropagation();
-      navLinks.classList.toggle("mobile-menu-active");
+      const isOpen = navLinks.classList.toggle("mobile-menu-active");
+      mobileMenuBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
     });
 
     // Fermer le menu lors du clic sur un lien
     navLinks.querySelectorAll("a").forEach(link => {
       link.addEventListener("click", () => {
         navLinks.classList.remove("mobile-menu-active");
+        mobileMenuBtn.setAttribute('aria-expanded', 'false');
       });
     });
 
@@ -1480,6 +1713,7 @@ function setupEventListeners() {
     document.addEventListener("click", (e) => {
       if (!navLinks.contains(e.target) && e.target !== mobileMenuBtn) {
         navLinks.classList.remove("mobile-menu-active");
+        mobileMenuBtn.setAttribute('aria-expanded', 'false');
       }
     });
   }
