@@ -798,28 +798,181 @@ function updateHeroMetrics() {
 // ==========================================================================
 // 6. PERSONA SWITCHER (MODE DÉMO)
 // ==========================================================================
+// 6. PERSONA SWITCHER (MODE DÉMO DYNAMIQUE AVEC ADAPTATION COMPLÈTE)
+// ==========================================================================
+const personaConfigs = {
+  visitor: {
+    kickerTag: "DÉCOUVERTE • TOUT PUBLIC",
+    welcomeBadge: "Découvrez librement l'écosystème open-source africain",
+    headline: `Explorez le potentiel du <br><span class="hero-headline-highlight">logiciel &amp; web africain</span>`,
+    subtitle: "Accédez sans inscription aux composants open-source, passerelles Mobile Money documentées et briques mutualisées conçues par les développeurs du continent.",
+    primaryBtn: {
+      text: "REJOINDRE LE RÉSEAU",
+      href: "#about",
+      action: () => {
+        showToast("💡 Choisissez un profil (Développeur, Startup ou Mainteneur) pour simuler vos accès membres !");
+      }
+    },
+    secondaryBtn: {
+      text: "EXPLORER LE CATALOGUE",
+      href: "#composants"
+    },
+    navCtaText: "REJOINDRE LE RÉSEAU",
+    navCtaAction: () => {
+      showToast("👋 Bienvenue ! Vous êtes actuellement en Vue Visiteur. Sélectionnez un rôle en haut pour simuler une publication.");
+    },
+    toastMsg: "👀 Vue Visiteur activée : exploration libre de la vitrine et des documentations.",
+    targetSectionId: "about"
+  },
+
+  developer: {
+    kickerTag: "ESPACE DÉVELOPPEUR • MEMBRE ACTIF",
+    welcomeBadge: "Modeste YABLA (Solde : 1,450 DevPoints • 210,000 FCFA)",
+    headline: `Gagnez des bounties et <br><span class="hero-headline-highlight">boostez vos projets africains</span>`,
+    subtitle: "Décrochez des missions rémunérées sous séquestre Mobile Money, troquez votre expertise avec des pairs de 24 pays et intégrez les modules certifiés.",
+    primaryBtn: {
+      text: "CHASSER UN BOUNTY",
+      href: "#bounties",
+      action: null
+    },
+    secondaryBtn: {
+      text: "PROPOSER UN TROC",
+      href: "#entraide"
+    },
+    navCtaText: "+ PUBLIER UN ÉCHANGE",
+    navCtaAction: () => {
+      openCreateModal('component');
+    },
+    toastMsg: "🚀 Vue Développeur Membre : accès complet aux bounties, trocs techniques et bacs à sable.",
+    targetSectionId: "bounties"
+  },
+
+  founder: {
+    kickerTag: "ESPACE STARTUP &amp; PORTEUR DE PROJET",
+    welcomeBadge: "Porteur de Projet • 1,200,000 FCFA disponibles sous séquestre",
+    headline: `Financez vos modules &amp; <br><span class="hero-headline-highlight">recrutez l'élite tech d'Afrique</span>`,
+    subtitle: "Déposez vos besoins en développement sous séquestre garanti, accélérez la livraison de vos briques critiques et recrutez des ingénieurs seniors vérifiés.",
+    primaryBtn: {
+      text: "DÉPOSER UN BOUNTY (ESCROW)",
+      href: "#bounties",
+      action: () => {
+        openCreateModal('bounty');
+      }
+    },
+    secondaryBtn: {
+      text: "EXPLORER LES TALENTS",
+      href: "#talents"
+    },
+    navCtaText: "+ DÉPOSER UN BOUNTY",
+    navCtaAction: () => {
+      openCreateModal('bounty');
+    },
+    toastMsg: "💼 Vue Startup : publiez un bounty sous séquestre et explorez les profils seniors.",
+    targetSectionId: "talents"
+  },
+
+  maintainer: {
+    kickerTag: "CONSOLE MAINTENEUR • TECH LEAD",
+    welcomeBadge: "Mainteneur : 4 PRs &amp; 12 issues en attente de revue",
+    headline: `Pilotez vos dépôts et <br><span class="hero-headline-highlight">fédérez des contributeurs qualifiés</span>`,
+    subtitle: "Organisez vos feuilles de route open-source, validez les revues de code, sécurisez vos composants et encouragez les meilleures contributions.",
+    primaryBtn: {
+      text: "AJOUTER UN PROJET OS",
+      href: "#projets",
+      action: () => {
+        openCreateModal('project');
+      }
+    },
+    secondaryBtn: {
+      text: "VOIR LES PROJETS ACTIFS",
+      href: "#projets"
+    },
+    navCtaText: "+ AJOUTER UN PROJET",
+    navCtaAction: () => {
+      openCreateModal('project');
+    },
+    toastMsg: "🛠️ Vue Mainteneur Open Source : gestion des dépôts, des tickets et des revues de code.",
+    targetSectionId: "projets"
+  }
+};
+
+window.handleNavCtaClick = function() {
+  const cfg = personaConfigs[appState.persona] || personaConfigs.developer;
+  if (cfg && cfg.navCtaAction) {
+    cfg.navCtaAction();
+  } else {
+    openCreateModal('component');
+  }
+};
+
+function applyPersona(personaKey, shouldScroll = false) {
+  const cfg = personaConfigs[personaKey];
+  if (!cfg) return;
+
+  appState.persona = personaKey;
+
+  // 1. Kicker tag & Welcome Badge
+  const kickerTagEl = document.getElementById("hero-kicker-tag");
+  if (kickerTagEl) kickerTagEl.innerHTML = cfg.kickerTag;
+
+  const badgeEl = document.getElementById("persona-welcome-badge");
+  if (badgeEl) badgeEl.innerHTML = cfg.welcomeBadge;
+
+  // 2. Headline & Subtitle
+  const titleEl = document.getElementById("hero-main-title");
+  if (titleEl) titleEl.innerHTML = cfg.headline;
+
+  const descEl = document.getElementById("hero-main-desc");
+  if (descEl) descEl.textContent = cfg.subtitle;
+
+  // 3. Boutons d'action Hero
+  const primaryBtn = document.getElementById("hero-btn-primary");
+  const primaryText = document.getElementById("hero-btn-primary-text");
+  if (primaryBtn) {
+    primaryBtn.setAttribute("href", cfg.primaryBtn.href);
+    if (primaryText) primaryText.textContent = cfg.primaryBtn.text;
+    primaryBtn.onclick = (e) => {
+      if (cfg.primaryBtn.action) {
+        e.preventDefault();
+        cfg.primaryBtn.action();
+      }
+    };
+  }
+
+  const secondaryBtn = document.getElementById("hero-btn-secondary");
+  if (secondaryBtn) {
+    secondaryBtn.setAttribute("href", cfg.secondaryBtn.href);
+    secondaryBtn.textContent = cfg.secondaryBtn.text;
+  }
+
+  // 4. Bouton CTA Navbar
+  const navCtaText = document.getElementById("nav-persona-cta-text");
+  if (navCtaText) navCtaText.textContent = cfg.navCtaText;
+
+  // 5. Toast d'information
+  showToast(cfg.toastMsg);
+
+  // 6. Mise en avant douce de la section cible
+  if (shouldScroll && cfg.targetSectionId) {
+    const targetSection = document.getElementById(cfg.targetSectionId);
+    if (targetSection) {
+      targetSection.classList.remove("persona-highlight-active");
+      void targetSection.offsetWidth; // Déclenche le reflow pour relancer l'animation
+      targetSection.classList.add("persona-highlight-active");
+      targetSection.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }
+}
+
 function initPersonaSwitcher() {
   const select = document.getElementById("persona-select");
-  const badge = document.getElementById("persona-welcome-badge");
-
   if (select) {
+    select.value = appState.persona;
     select.addEventListener("change", (e) => {
-      appState.persona = e.target.value;
-      if (appState.persona === 'visitor') {
-        if (badge) badge.textContent = "Découvrez l'écosystème open-source africain";
-        showToast("Vue Visiteur : découvrez librement les ressources et briques tech.");
-      } else if (appState.persona === 'developer') {
-        if (badge) badge.textContent = "Bienvenue Modeste YABLA (Solde : 1,450 DevPoints)";
-        showToast("Vue Développeur Membre : vos accès aux trocs et aux bounties sont actifs.");
-      } else if (appState.persona === 'founder') {
-        if (badge) badge.textContent = "Espace Porteur de Projet : 1.2M FCFA en séquestre";
-        showToast("Vue Startup : déposez un nouveau bounty ou recrutez un contributeur.");
-      } else if (appState.persona === 'maintainer') {
-        if (badge) badge.textContent = "Mainteneur : 4 tickets en attente de revue";
-        showToast("Vue Mainteneur : gérez les PRs et demandes de contributeurs.");
-      }
+      applyPersona(e.target.value, true);
     });
   }
+  applyPersona(appState.persona, false);
 }
 
 // ==========================================================================
