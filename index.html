@@ -54,8 +54,8 @@
 
         <!-- Mode Économie de Données (Data-Saver) -->
         <button class="data-saver-toggle-btn" id="data-saver-toggle" title="Activer/Désactiver l'économie de bande passante">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" class="svg-icon">
-            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
           </svg>
           <span>Économie Data :</span>
           <strong id="data-saver-status">OFF</strong>
@@ -97,7 +97,7 @@
           <!-- Liens de Navigation Centrés -->
           <nav class="nav-links" id="main-nav-links">
             <a href="#composants" class="nav-item">COMPOSANTS</a>
-            <a href="#bounties" class="nav-item">BOUNTIES</a>
+            <a href="#bounties" class="nav-item">MISSIONS</a>
             <a href="#entraide" class="nav-item">ENTRAIDE</a>
             <a href="#projets" class="nav-item">PROJETS</a>
             <a href="#talents" class="nav-item">TALENTS</a>
@@ -207,7 +207,7 @@
               </div>
               <div class="fc-price-row">
                 <span class="fc-big-val">1,200 $</span>
-                <span class="fc-label">bounty sous séquestre</span>
+                <span class="fc-label">mission sous séquestre</span>
               </div>
               <div class="fc-bar-progress">
                 <div class="fc-bar-fill"></div>
@@ -271,7 +271,7 @@
             <!-- Carte 7 : Data Metrics 520k+ -->
             <div class="fan-card fan-card-7">
               <div class="fc-mini-tabs">
-                <span class="active">Bounties</span>
+                <span class="active">Missions</span>
                 <span>SDKs</span>
               </div>
               <div class="fc-metric-large" id="hero-bounties-amount">28.4M</div>
@@ -469,7 +469,7 @@
           
           <!-- Bento Carte 3 (Fluorescent Lime) -->
           <div class="bento-card bento-card-lime">
-            <div class="bento-card-label text-dark">Micro-Bounties</div>
+            <div class="bento-card-label text-dark">Missions Rémunérées</div>
             <div class="bento-huge-number text-dark" id="bento-bounties-amount">520 000 FCFA</div>
             <p class="bento-desc text-dark">
               FCFA distribués chaque mois pour financer les contributions, corrections et modules open-source.
@@ -612,13 +612,13 @@
         <div class="section-lead-row">
           <div>
             <span class="section-pill-tag pill-tag-mint">Missions Rémunérées</span>
-            <h2 class="section-title">Bounties en Monnaie Locale</h2>
+            <h2 class="section-title">Missions Rémunérées en Monnaie Locale</h2>
             <p class="section-desc">
               Contribuez à des défis techniques lancés par des startups africaines. Fonds sécurisés en séquestre Mobile Money vérifié.
             </p>
           </div>
           <button class="btn btn-solar btn-pill" onclick="openCreateModal('bounty')">
-            + Lancer un Bounty
+            + Proposer une Mission
           </button>
         </div>
 
@@ -711,14 +711,14 @@
         <div class="faq-accordion-container">
           <details class="faq-item" open>
             <summary class="faq-question">
-              <span class="faq-q-text">Comment les bounties sont-ils sécurisés et payés en monnaie locale (FCFA, NGN, KES) ?</span>
+              <span class="faq-q-text">Comment les missions rémunérées sont-elles sécurisées et payées en monnaie locale (FCFA, NGN, KES) ?</span>
               <span class="faq-chevron">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="6 9 12 15 18 9"/></svg>
               </span>
             </summary>
             <div class="faq-answer">
               <p>
-                Lorsqu'une startup publie un bounty, les fonds sont prélevés via Mobile Money (Wave, MTN MoMo, Orange Money) et consignés sous un compte séquestre (escrow) vérifié. Le développeur travaille en confiance : dès que sa Pull Request est auditée et validée, les fonds lui sont automatiquement transférés sur son portefeuille Mobile Money, sans friction bancaire ni commissions excessives.
+                Lorsqu'une startup publie une mission rémunérée, les fonds sont prélevés via Mobile Money (Wave, MTN MoMo, Orange Money) et consignés sous un compte séquestre (escrow) vérifié. Le développeur travaille en confiance : dès que sa Pull Request est auditée et validée, les fonds lui sont automatiquement transférés sur son portefeuille Mobile Money, sans friction bancaire ni commissions excessives.
               </p>
             </div>
           </details>
@@ -812,7 +812,7 @@
           <h4>Plateforme</h4>
           <div class="footer-links-list">
             <a href="#composants">Composants & SDKs</a>
-            <a href="#bounties">Bounties en Devises</a>
+            <a href="#bounties">Missions en Devises Locales</a>
             <a href="#entraide">Troc Technique</a>
             <a href="#projets">Projets Open Source</a>
             <a href="#talents">Annuaire des Développeurs</a>
@@ -824,7 +824,7 @@
           <h4>Écosystème</h4>
           <div class="footer-links-list">
             <a href="javascript:void(0)" onclick="openCreateModal('component')">Publier un module</a>
-            <a href="javascript:void(0)" onclick="openCreateModal('bounty')">Déposer un bounty</a>
+            <a href="javascript:void(0)" onclick="openCreateModal('bounty')">Déposer une mission</a>
             <a href="https://github.com/arcaneai2007/devcom-africa" target="_blank" rel="noopener noreferrer">
               Code Source sur GitHub
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
@@ -841,7 +841,7 @@
               Preuve de travail réelle
             </span>
             <span>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
               Optimisé faible bande-passante
             </span>
             <span>
@@ -928,7 +928,7 @@ Cliquez sur « Exécuter dans la Console » pour déclencher l'appel et observer
         </button>
         <button class="modal-tab-item" data-type="bounty" data-tab="bounty">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><line x1="12" y1="6" x2="12" y2="8"/><line x1="12" y1="16" x2="12" y2="18"/></svg>
-          <span>Bounty Rémunéré</span>
+          <span>Mission Rémunérée</span>
         </button>
         <button class="modal-tab-item" data-type="help" data-tab="help">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
@@ -1010,7 +1010,7 @@ Cliquez sur « Exécuter dans la Console » pour déclencher l'appel et observer
       <div class="chat-quick-replies" id="chat-quick-replies">
         <button type="button" class="quick-chip" onclick="quickSendChat('👋 Salut ! Dispo pour un call tech ce soir ?')">👋 Dispo ce soir</button>
         <button type="button" class="quick-chip" onclick="quickSendChat('🔍 Peux-tu regarder mon webhook MoMo ?')">🔍 Revue webhook</button>
-        <button type="button" class="quick-chip" onclick="quickSendChat('⚡ Super, je teste ton module de suite !')">⚡ Je teste ton module</button>
+        <button type="button" class="quick-chip" onclick="quickSendChat('Super, je teste ton module de suite !')">Je teste ton module</button>
       </div>
 
       <!-- Champ de Saisie de Message -->
