@@ -6,7 +6,7 @@
  * - Convertisseur Multi-Devises (FCFA, NGN, KES, USD)
  * - Hero Live Code Sandbox
  * - Catalogue Composants & APIs avec Bac à Sable & Copie
- * - Bounties en Devises Locales & Séquestre
+ * - Missions en Devises Locales & Séquestre
  * - Espace Entraide & Troc Technique entre Pairs
  * - Projets Open Source & Preuve de Travail
  * - Annuaire Panafricain & Messagerie Directe
@@ -106,12 +106,12 @@ export function routeUSSD(session: USSDSession): USSDResponse {
   if (!text) {
     // Menu initial
     return USSDResponse.con(
-      "DevCom Africa\\n1. Mes Bounties\\n2. Mon Solde DevPoints\\n3. Code SOS Bug"
+      "DevCom Africa\\n1. Mes Missions\\n2. Mon Solde DevPoints\\n3. Code SOS Bug"
     );
   }
 
   if (text === '1') {
-    return USSDResponse.con("Bounties Récentes :\\n1. SDK MoMo (150k)\\n2. Sync PWA (200k)");
+    return USSDResponse.con("Missions Récentes :\\n1. SDK MoMo (150k)\\n2. Sync PWA (200k)");
   }
 
   if (text === '2') {
@@ -203,7 +203,7 @@ const client = new MoMoDisbursement({
   environment: 'production'
 });
 
-export async function payDeveloperBounty(phone: string, amountCfa: number) {
+export async function payDeveloperMission(phone: string, amountCfa: number) {
   return await client.transfer({
     amount: amountCfa,
     currency: 'XOF',
@@ -255,7 +255,7 @@ def create_checkout(order_id: str, amount_xof: int):
 const router = new USSDMenuRouter();
 
 router.start((session) => {
-  return session.con("Bienvenue sur DevCom Africa\\n1. Catalogue\\n2. Bounties\\n3. Aide");
+  return session.con("Bienvenue sur DevCom Africa\\n1. Catalogue\\n2. Missions\\n3. Aide");
 });
 
 router.on('1', (session) => {
@@ -552,7 +552,7 @@ export async function sendOtpCode(to: string, code: string) {
       name: "Modeste YABLA",
       initials: "MY",
       headline: "Fullstack Architect & MoMo Specialist",
-      location: "Cotonou, Bénin 🇧🇯",
+      location: "Cotonou, Bénin",
       points: "1,450 DP",
       skills: ["TypeScript", "Python", "Mobile Money", "Docker"],
       proofOfWork: "Auteur de 3 SDKs vérifiés"
@@ -562,7 +562,7 @@ export async function sendOtpCode(to: string, code: string) {
       name: "Amina Diallo",
       initials: "AD",
       headline: "Senior Mobile Engineer",
-      location: "Dakar, Sénégal 🇸🇳",
+      location: "Dakar, Sénégal",
       points: "1,280 DP",
       skills: ["Flutter", "Dart", "Wave SDK", "IndexedDB"],
       proofOfWork: "14 PRs publiques mergées"
@@ -572,7 +572,7 @@ export async function sendOtpCode(to: string, code: string) {
       name: "Emmanuel Kouassi",
       initials: "EK",
       headline: "Backend & Cloud Engineer",
-      location: "Abidjan, Côte d'Ivoire 🇨🇮",
+      location: "Abidjan, Côte d'Ivoire",
       points: "1,120 DP",
       skills: ["FastAPI", "PostgreSQL", "CI/CD", "AWS"],
       proofOfWork: "Contributeur Core AfriSync"
@@ -582,7 +582,7 @@ export async function sendOtpCode(to: string, code: string) {
       name: "Chukwudi Okafor",
       initials: "CO",
       headline: "Telecom & USSD Infrastructure Dev",
-      location: "Lagos, Nigeria 🇳🇬",
+      location: "Lagos, Nigeria",
       points: "1,620 DP",
       skills: ["Go", "Node.js", "USSD Protocols", "Redis"],
       proofOfWork: "Passerelle USSD 100k users"
@@ -592,7 +592,7 @@ export async function sendOtpCode(to: string, code: string) {
       name: "Grace Uwase",
       initials: "GU",
       headline: "Offline-First & CRDT Specialist",
-      location: "Kigali, Rwanda 🇷🇼",
+      location: "Kigali, Rwanda",
       points: "1,340 DP",
       skills: ["TypeScript", "CRDTs", "SQLite", "PWA"],
       proofOfWork: "Auteure de 2 modules IndexedDB"
@@ -602,7 +602,7 @@ export async function sendOtpCode(to: string, code: string) {
       name: "Jean-Luc Mbia",
       initials: "JM",
       headline: "Distributed Systems & Go Engineer",
-      location: "Douala, Cameroun 🇨🇲",
+      location: "Douala, Cameroun",
       points: "1,190 DP",
       skills: ["Go", "gRPC", "Kubernetes", "Kafka"],
       proofOfWork: "Maintainer momo-mock-server"
@@ -765,7 +765,7 @@ function initNetworkTicker() {
 
   const messages = [
     '24 pays connectés • 2,450+ devs actifs',
-    '6 bounties actifs • 1.4M FCFA en séquestre',
+    '6 missions actives • 1.4M FCFA en séquestre',
     '120+ composants open-source vérifiés',
     'Dernier commit il y a 3 min par Amina Diallo',
     '42 trocs techniques en cours ce mois',
@@ -808,9 +808,10 @@ const personaConfigs = {
     subtitle: "Accédez sans inscription aux composants open-source, passerelles Mobile Money documentées et briques mutualisées conçues par les développeurs du continent.",
     primaryBtn: {
       text: "REJOINDRE LE RÉSEAU",
-      href: "#about",
+      href: "#composants",
       action: () => {
-        showToast("💡 Choisissez un profil (Développeur, Startup ou Mainteneur) pour simuler vos accès membres !");
+        const compSection = document.getElementById("composants");
+        if (compSection) compSection.scrollIntoView({ behavior: "smooth" });
       }
     },
     secondaryBtn: {
@@ -819,19 +820,20 @@ const personaConfigs = {
     },
     navCtaText: "REJOINDRE LE RÉSEAU",
     navCtaAction: () => {
-      showToast("👋 Bienvenue ! Vous êtes actuellement en Vue Visiteur. Sélectionnez un rôle en haut pour simuler une publication.");
+      const select = document.getElementById("persona-select");
+      if (select) select.focus();
     },
-    toastMsg: "👀 Vue Visiteur activée : exploration libre de la vitrine et des documentations.",
-    targetSectionId: "about"
+    toastMsg: "",
+    targetSectionId: "composants"
   },
 
   developer: {
     kickerTag: "ESPACE DÉVELOPPEUR • MEMBRE ACTIF",
     welcomeBadge: "Modeste YABLA (Solde : 1,450 DevPoints • 210,000 FCFA)",
-    headline: `Gagnez des bounties et <br><span class="hero-headline-highlight">boostez vos projets africains</span>`,
+    headline: `Accomplissez des missions et <br><span class="hero-headline-highlight">boostez vos projets africains</span>`,
     subtitle: "Décrochez des missions rémunérées sous séquestre Mobile Money, troquez votre expertise avec des pairs de 24 pays et intégrez les modules certifiés.",
     primaryBtn: {
-      text: "CHASSER UN BOUNTY",
+      text: "POSTULER AUX MISSIONS",
       href: "#bounties",
       action: null
     },
@@ -839,11 +841,11 @@ const personaConfigs = {
       text: "PROPOSER UN TROC",
       href: "#entraide"
     },
-    navCtaText: "+ PUBLIER UN ÉCHANGE",
+    navCtaText: "PUBLIER UN ÉCHANGE",
     navCtaAction: () => {
       openCreateModal('component');
     },
-    toastMsg: "🚀 Vue Développeur Membre : accès complet aux bounties, trocs techniques et bacs à sable.",
+    toastMsg: "",
     targetSectionId: "bounties"
   },
 
@@ -853,7 +855,7 @@ const personaConfigs = {
     headline: `Financez vos modules &amp; <br><span class="hero-headline-highlight">recrutez l'élite tech d'Afrique</span>`,
     subtitle: "Déposez vos besoins en développement sous séquestre garanti, accélérez la livraison de vos briques critiques et recrutez des ingénieurs seniors vérifiés.",
     primaryBtn: {
-      text: "DÉPOSER UN BOUNTY (ESCROW)",
+      text: "DÉPOSER UNE MISSION (ESCROW)",
       href: "#bounties",
       action: () => {
         openCreateModal('bounty');
@@ -863,11 +865,11 @@ const personaConfigs = {
       text: "EXPLORER LES TALENTS",
       href: "#talents"
     },
-    navCtaText: "+ DÉPOSER UN BOUNTY",
+    navCtaText: "DÉPOSER UNE MISSION",
     navCtaAction: () => {
       openCreateModal('bounty');
     },
-    toastMsg: "💼 Vue Startup : publiez un bounty sous séquestre et explorez les profils seniors.",
+    toastMsg: "",
     targetSectionId: "talents"
   },
 
@@ -887,11 +889,11 @@ const personaConfigs = {
       text: "VOIR LES PROJETS ACTIFS",
       href: "#projets"
     },
-    navCtaText: "+ AJOUTER UN PROJET",
+    navCtaText: "AJOUTER UN PROJET",
     navCtaAction: () => {
       openCreateModal('project');
     },
-    toastMsg: "🛠️ Vue Mainteneur Open Source : gestion des dépôts, des tickets et des revues de code.",
+    toastMsg: "",
     targetSectionId: "projets"
   }
 };
@@ -905,7 +907,7 @@ window.handleNavCtaClick = function() {
   }
 };
 
-function applyPersona(personaKey, shouldScroll = false) {
+function applyPersona(personaKey, shouldScroll = false, triggerToast = false) {
   const cfg = personaConfigs[personaKey];
   if (!cfg) return;
 
@@ -949,15 +951,17 @@ function applyPersona(personaKey, shouldScroll = false) {
   const navCtaText = document.getElementById("nav-persona-cta-text");
   if (navCtaText) navCtaText.textContent = cfg.navCtaText;
 
-  // 5. Toast d'information
-  showToast(cfg.toastMsg);
+  // 5. Toast d'information (jamais au rechargement initial)
+  if (triggerToast && cfg.toastMsg) {
+    showToast(cfg.toastMsg);
+  }
 
   // 6. Mise en avant douce de la section cible
   if (shouldScroll && cfg.targetSectionId) {
     const targetSection = document.getElementById(cfg.targetSectionId);
     if (targetSection) {
       targetSection.classList.remove("persona-highlight-active");
-      void targetSection.offsetWidth; // Déclenche le reflow pour relancer l'animation
+      void targetSection.offsetWidth;
       targetSection.classList.add("persona-highlight-active");
       targetSection.scrollIntoView({ behavior: "smooth", block: "start" });
     }
@@ -969,10 +973,11 @@ function initPersonaSwitcher() {
   if (select) {
     select.value = appState.persona;
     select.addEventListener("change", (e) => {
-      applyPersona(e.target.value, true);
+      applyPersona(e.target.value, true, false);
     });
   }
-  applyPersona(appState.persona, false);
+  // Chargement initial : aucun toast automatique
+  applyPersona(appState.persona, false, false);
 }
 
 // ==========================================================================
@@ -1156,7 +1161,7 @@ function renderBounties() {
     if (b.difficulty === "Tous niveaux" || b.difficulty === "Débutant") diffClass = "diff-green";
     else if (b.difficulty === "Expert") diffClass = "diff-red";
 
-    const btnText = b._applied ? '✓ Candidature envoyée' : 'Postuler au Bounty';
+    const btnText = b._applied ? '✓ Candidature envoyée' : 'Postuler à la Mission';
     const btnDisabled = b._applied ? 'disabled style="opacity:0.7;cursor:default"' : '';
 
     return `
@@ -1198,7 +1203,7 @@ window.applyToBounty = function(id) {
 
   // Anti double-candidature
   if (bounty._applied) {
-    showToast('Vous avez déjà postulé à ce bounty.');
+    showToast('Vous avez déjà postulé à cette mission.');
     return;
   }
   bounty._applied = true;
@@ -1216,7 +1221,7 @@ window.applyToBounty = function(id) {
   }
 
   const applicantName = appState.persona === 'developer' ? 'Modeste YABLA' : 'votre profil';
-  showToast(`🛡️ Candidature enregistrée pour ${applicantName} ! Séquestre de ${formatAmount(bounty.amountCfa)} garanti.`);
+  showToast(`Candidature enregistrée pour ${applicantName} ! Séquestre de ${formatAmount(bounty.amountCfa)} garanti.`);
 };
 
 // ==========================================================================
@@ -1629,7 +1634,7 @@ window.sendChatMessage = function() {
       appState.unreadCount++;
       updateUnreadBadge();
     }
-    showToast(`💬 Nouveau message de ${appState.activeChatContact}`);
+    showToast(`Nouveau message de ${appState.activeChatContact}`);
   }, delay);
 };
 
@@ -1762,14 +1767,14 @@ function setupEventListeners() {
       if (!title) {
         titleInput.style.borderColor = 'var(--accent-rose)';
         titleInput.focus();
-        showToast('⚠️ Le titre est obligatoire.');
+        showToast('Le titre est obligatoire.');
         titleInput.addEventListener('input', () => { titleInput.style.borderColor = ''; }, { once: true });
         return;
       }
       if (!desc) {
         descInput.style.borderColor = 'var(--accent-rose)';
         descInput.focus();
-        showToast('⚠️ La description est obligatoire.');
+        showToast('La description est obligatoire.');
         descInput.addEventListener('input', () => { descInput.style.borderColor = ''; }, { once: true });
         return;
       }
@@ -1789,11 +1794,11 @@ function setupEventListeners() {
           simulation: `[DEVCOM] Module « ${title} » exécuté avec succès.`
         });
         renderComponents();
-        showToast("✅ Composant publié sur le catalogue avec succès !");
+        showToast("Composant publié sur le catalogue avec succès !");
       } else if (appState.modalType === 'bounty') {
         const amount = parseInt(extra) || 200000;
         if (isNaN(amount) || amount <= 0) {
-          showToast('⚠️ Montant invalide. Entrez une valeur numérique en FCFA.');
+          showToast('Montant invalide. Entrez une valeur numérique en FCFA.');
           return;
         }
         appState.bounties.unshift({
@@ -1807,7 +1812,7 @@ function setupEventListeners() {
           desc: desc
         });
         renderBounties();
-        showToast("✅ Bounty déposé et séquestre ouvert !");
+        showToast("Mission déposée et séquestre ouvert !");
       } else if (appState.modalType === 'help') {
         appState.peers.unshift({
           id: "peer-" + Date.now(),
@@ -1819,7 +1824,7 @@ function setupEventListeners() {
           status: "Publié à l'instant"
         });
         renderPeers();
-        showToast("✅ Demande de troc technique publiée dans le flux !");
+        showToast("Demande de troc technique publiée dans le flux !");
       } else if (appState.modalType === 'project') {
         appState.projects.unshift({
           id: "proj-" + Date.now(),
@@ -1832,7 +1837,7 @@ function setupEventListeners() {
           lookingFor: "Contributeurs"
         });
         renderProjects();
-        showToast("✅ Projet open-source ajouté avec succès !");
+        showToast("Projet open-source ajouté avec succès !");
       }
 
       createForm.reset();
@@ -1887,12 +1892,13 @@ function setupEventListeners() {
 // 17. UTILITAIRES : TOASTS & SANITIZATION
 // ==========================================================================
 function showToast(message) {
+  if (!message) return;
   const shelf = document.getElementById("toast-shelf");
   if (!shelf) return;
 
   const toast = document.createElement("div");
   toast.className = "toast-item";
-  toast.innerHTML = `<span class="toast-icon-svg"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span><span>${escapeHtml(message)}</span>`;
+  toast.innerHTML = `<span class="toast-icon-svg"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>${escapeHtml(message)}</span>`;
   shelf.appendChild(toast);
 
   setTimeout(() => {

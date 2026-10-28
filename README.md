@@ -15,7 +15,7 @@
    - Commandes d'installation prêtes à l'emploi (`npm i ...`, `pip install ...`).
    - Bac à sable (sandbox) d'exécution de code directement dans le navigateur.
 
-2. **💰 Bounties en Monnaie Locale & Séquestre Garanti :**
+2. **💰 Missions Rémunérées en Monnaie Locale & Séquestre Garanti :**
    - Missions et défis techniques proposés par des startups du continent.
    - Montants transparents avec convertisseur multi-devises en direct (**FCFA**, **NGN**, **KES**, **USD**).
    - Séquestre sécurisé via Mobile Money et crypto stablecoins.
